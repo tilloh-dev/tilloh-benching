@@ -1,0 +1,15 @@
+id: html-classics
+title: HTML classics
+description: The ten original single-file HTML tasks, from an SVG clock to a Markdown editor.
+tests:
+  - 01-svg-clock
+  - 02-fractal-tree
+  - 03-tower-defense
+  - 04-particle-simulation
+  - 05-game-of-life
+  - 06-physics-sandbox
+  - 07-deskbox-clone
+  - 08-paint-app
+  - 09-violin-3d
+  - 10-markdown-editor
+repetitions: 1

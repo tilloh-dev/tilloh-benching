@@ -1,0 +1,39 @@
+id: smoke-python-fizzbuzz
+title: FizzBuzz CLI
+description: Tiny program task; verified by running it in the sandbox.
+tags: [smoke, program, python]
+output:
+  files:
+    - path: fizzbuzz.py
+checks:
+  - program.run:
+      cases:
+        - name: n15
+          args: ['15']
+          expect:
+            exit_code: 0
+            stdout_equals: "1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz"
+        - name: n1
+          args: ['1']
+          expect:
+            stdout_equals: '1'
+        - name: bad-input
+          args: ['abc']
+          expect:
+            exit_code: 2
+judge:
+  mode: static
+  criteria:
+    - id: correct-output
+      title: Correct output
+      description: Prints 1..N with Fizz/Buzz/FizzBuzz substitutions, one per line, nothing else.
+      weight: 3
+      required: true
+    - id: input-handling
+      title: Input handling
+      description: Non-numeric or missing N prints a usage message to stderr and exits with status 2.
+      weight: 2
+    - id: code-quality
+      title: Code quality
+      description: Short, idiomatic, readable Python 3 with a main guard.
+      weight: 1

@@ -1,0 +1,3 @@
+#!/usr/bin/env node
+// Benchy CLI entry point. Engine and CLI are TypeScript run directly by Node 24 (type stripping).
+import '../src/cli/main.ts';

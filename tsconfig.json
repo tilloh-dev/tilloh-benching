@@ -1,0 +1,31 @@
+{
+	"extends": "./.svelte-kit/tsconfig.json",
+	"compilerOptions": {
+		// Engine, server and CLI run directly on Node 24 via type stripping:
+		// relative imports carry their .ts extension and only erasable syntax is allowed.
+		"allowImportingTsExtensions": true,
+		"erasableSyntaxOnly": true,
+		"allowJs": true,
+		"checkJs": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"sourceMap": true,
+		"strict": true,
+		"noUncheckedIndexedAccess": false,
+		"types": ["node"]
+	},
+	"include": [
+		".svelte-kit/ambient.d.ts",
+		".svelte-kit/non-ambient.d.ts",
+		".svelte-kit/types/**/$types.d.ts",
+		"vite.config.ts",
+		"playwright.config.ts",
+		"src/**/*.ts",
+		"src/**/*.svelte",
+		"scripts/**/*.ts",
+		"tests/**/*.ts",
+		"e2e/**/*.ts"
+	]
+}

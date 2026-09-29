@@ -1,23 +1,30 @@
-# Python
+# Dependencies and builds
+node_modules/
+build/
+.svelte-kit/
+
+# Host-specific config and secrets
+.env
+.env.*
+!.env.example
+benchy.local.yaml
+
+# Benchy caches (rebuildable)
+data/.cache/
+data/**/.judge-workspace/
+
+# Test output
+playwright-report/
+test-results/
+tests/fixtures/workspace/data/
+
+# Legacy Python tooling
 __pycache__/
 *.py[cod]
-*.egg-info/
-.eggs/
-build/
-dist/
 .venv/
-venv/
-.env
-
-# Tooling
-.mypy_cache/
-.pytest_cache/
-.ruff_cache/
-
-# Local model registry (copy from config/models.example.yaml)
-config/models.yaml
 
 # OS / editor
 .DS_Store
 .idea/
 .vscode/
+.playwright-mcp/

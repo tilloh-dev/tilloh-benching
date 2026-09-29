@@ -1,0 +1,114 @@
+id: 12-word-frequency-cli
+title: Word frequency CLI
+description: A Python program that counts words from stdin under a precise word definition and prints the top N; verified in the sandbox.
+tags: [program, python, cli, text-processing]
+output:
+  files:
+    - path: wordfreq.py
+checks:
+  - program.run:
+      timeout_s: 10
+      cases:
+        - name: default-n
+          stdin: "The quick brown fox jumps over the lazy dog. The dog sleeps; the fox runs!\nA fox, a dog, and THE end. Quick, quick: the fox is QUICK, and the dog is not.\n"
+          expect:
+            exit_code: 0
+            stdout_equals: |
+              the 7
+              dog 4
+              fox 4
+              quick 4
+              a 2
+              and 2
+              is 2
+              brown 1
+              end 1
+              jumps 1
+        - name: ties-alphabetical
+          args: ['5']
+          stdin: "pear apple fig\nFig APPLE pear\nkiwi date kiwi date kiwi\nbanana cherry banana cherry\n"
+          expect:
+            exit_code: 0
+            stdout_equals: |
+              kiwi 3
+              apple 2
+              banana 2
+              cherry 2
+              date 2
+        - name: separators-and-fewer-than-n
+          args: ['20']
+          stdin: "Don't stop: it's a well-known café in São Paulo,\troom 101b, e-mail me_now!\r\nDON'T  stop.\n"
+          expect:
+            exit_code: 0
+            stdout_equals: |
+              don 2
+              s 2
+              stop 2
+              t 2
+              a 1
+              b 1
+              caf 1
+              e 1
+              in 1
+              it 1
+              known 1
+              mail 1
+              me 1
+              now 1
+              o 1
+              paulo 1
+              room 1
+              well 1
+        - name: empty-input
+          stdin: ''
+          expect:
+            exit_code: 0
+            stdout_equals: ''
+        - name: invalid-n-zero
+          args: ['0']
+          stdin: "hello world\n"
+          expect:
+            exit_code: 2
+            stdout_equals: ''
+        - name: invalid-n-text
+          args: ['abc']
+          stdin: "hello world\n"
+          expect:
+            exit_code: 2
+            stdout_equals: ''
+judge:
+  mode: static
+  guidance: >-
+    The automated cases are facts; read the code for the rules they do not cover: digits-only N
+    (reject "+5", "1.5", "-3"), more than one argument, input with no words, and the exact word
+    definition (a solution using \w, str.isalpha() or str.split() is wrong). Judge performance by
+    whether stdin is consumed in a single streaming pass with a dictionary or Counter.
+  criteria:
+    - id: correct-output
+      title: Correct counts and order
+      description: >-
+        Words are extracted exactly as specified, counted case-insensitively and printed as
+        "word count" lines sorted by count descending, then alphabetically, limited to N; all
+        output cases pass.
+      weight: 3
+      required: true
+    - id: edge-cases
+      title: Arguments and edge cases
+      description: >-
+        Default N of 10, digits-only N of at least 1, usage message on stderr with exit 2 and empty
+        stdout for invalid or extra arguments, silent exit 0 for empty or word-free input, and
+        UTF-8 input with non-ASCII characters handled as separators.
+      weight: 2
+    - id: performance
+      title: Linear, streaming-friendly
+      description: >-
+        Reads stdin in a single streaming pass (line by line or in chunks) with memory proportional
+        to the number of distinct words, O(n) counting and no quadratic string handling; sorting
+        only the distinct words is fine.
+      weight: 2
+    - id: code-quality
+      title: Code quality
+      description: >-
+        Short, idiomatic, readable Python 3 using only the standard library, with a main guard,
+        clear structure and no dead code.
+      weight: 1

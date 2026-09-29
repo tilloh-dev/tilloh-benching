@@ -1,0 +1,31 @@
+id: smoke-html-counter
+title: Click counter
+description: Tiny HTML task for a fast end-to-end check of a blueprint.
+tags: [smoke, html]
+output:
+  files:
+    - path: index.html
+checks:
+  - html.parse
+  - html.render:
+      screenshots: [300]
+      interactions:
+        - click: button
+        - click: button
+        - wait: 200
+judge:
+  mode: static
+  criteria:
+    - id: counter-works
+      title: Counter works
+      description: A visible button increments a visible number on every click; the number starts at 0.
+      weight: 3
+      required: true
+    - id: self-contained
+      title: Self-contained, valid page
+      description: One valid HTML5 file, inline CSS/JS only, no external requests, no console errors.
+      weight: 2
+    - id: presentation
+      title: Presentation
+      description: Centered, readable, pleasant styling; the button has visible hover/active feedback.
+      weight: 1

@@ -1,0 +1,106 @@
+id: 07-deskbox-clone
+title: desk.box landing page clone
+description: Recreate the German desk.box SaaS marketing homepage from a detailed description, with verbatim copy, dropdown navigation and a responsive hamburger menu.
+tags: [html, css, landing-page, german]
+output:
+  files:
+    - path: index.html
+checks:
+  - html.parse
+  - html.render:
+      screenshots: [800]
+      interactions:
+        - click: text=Funktionen
+        - wait: 400
+        - screenshot: nav-dropdown
+        - press: Escape
+        - move: [640, 600]
+        - wait: 300
+        - scroll: 750
+        - wait: 400
+        - screenshot: scroll-1
+        - scroll: 750
+        - wait: 400
+        - screenshot: scroll-2
+        - scroll: 750
+        - wait: 400
+        - screenshot: scroll-3
+        - scroll: 750
+        - wait: 400
+        - screenshot: scroll-4
+        - scroll: 750
+        - wait: 400
+        - screenshot: scroll-5
+        - scroll: 750
+        - wait: 400
+        - screenshot: scroll-6
+        - scroll: 100000
+        - wait: 400
+        - screenshot: bottom
+judge:
+  mode: static
+  guidance: >-
+    Search the source for every quoted German string (exact wording, umlauts, the en dash in the
+    hero headline, "support(at)deskbox-office.de", the phone number and the copyright line);
+    missing, translated or paraphrased strings lower the score of the section they belong to. The
+    screenshots were taken at 1280 px width only, so verify the hamburger breakpoint and its toggle
+    script in the code.
+  criteria:
+    - id: header-nav
+      title: Sticky header and dropdowns
+      description: >-
+        A sticky header with the "desk.box" wordmark, "Funktionen", "Preise" and "Service" with
+        carets, a "Login" link and a prominent "Jetzt testen" button; the dropdowns open on hover
+        or click via inline JS and contain plausible submenu entries.
+      weight: 3
+    - id: hero
+      title: Hero section
+      description: >-
+        The exact headline "desk.box – Die smarte Bürosoftware für die Landwirtschaft", the three
+        trust badges, body copy, both buttons with their exact labels, a labelled person
+        placeholder and a product-screenshot placeholder with a "Video abspielen" play overlay.
+      weight: 3
+    - id: features-offer
+      title: Feature bullets and offer cards
+      description: >-
+        A row of at least eight feature bullets, each with its own inline-SVG icon and German text
+        as listed, and a "Das bietet dir desk.box" section with the five cards Schreibtisch,
+        Banking, Aktenschrank, Faktura and Adressbuch, each with icon placeholder, German
+        description and "Mehr erfahren" link.
+      weight: 2
+    - id: proof-news-cta
+      title: Testimonials, blog, CTA band
+      description: >-
+        At least four named customer quotes (e.g. "Nico Ahlmann, Hof Ahlmann Groß Tessin"), a blog
+        grid with at least three cards (image placeholder, headline, teaser, "Weiterlesen") and a
+        "60 Tage kostenlos testen" band with a "Jetzt registrieren" button.
+      weight: 2
+    - id: footer
+      title: Complete footer
+      description: >-
+        Logo, two certification badge placeholders, the exact phone, email and support hours, the
+        five social links (LinkedIn, Instagram, YouTube, Facebook, WhatsApp), footer navigation
+        and the exact line "© 2026 stadt.werk konzeption.text.gestaltung GmbH".
+      weight: 2
+    - id: responsive-nav
+      title: Responsive with hamburger
+      description: >-
+        Media queries reflow every section for narrow viewports without horizontal overflow, and
+        below a sensible breakpoint the nav collapses into a hamburger button whose script opens
+        and closes the menu, including the dropdowns.
+      weight: 2
+    - id: visual-design
+      title: Professional SaaS design
+      description: >-
+        Sections appear in the specified order with a clear visual hierarchy, consistent spacing,
+        a clean professional palette, system fonts only and tidy, labelled placeholders; the page
+        reads like a real modern SaaS landing page.
+      weight: 2
+    - id: self-contained
+      title: Self-contained, valid, error-free
+      description: >-
+        One valid HTML5 file with inline CSS and JS only and no external images, fonts or scripts
+        (every image, logo and video replaced by an inline SVG or CSS placeholder), and no
+        JavaScript errors in CHECKS.md.
+      weight: 2
+      required: true

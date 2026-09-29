@@ -1,0 +1,27 @@
+# Benchy defaults for every host that uses this repository.
+# Host-specific values (llama-server path, models dir, host name) go into
+# benchy.local.yaml — see benchy.local.yaml.example. API keys go into .env.
+
+server:
+  port: 8787
+  bind: 127.0.0.1 # the API can start processes — keep it local
+
+concurrency:
+  generation: 4 # remote / Claude Code requests in flight; llama-cpp is always one model at a time
+  checks: 2 # headless-browser and sandbox checks in parallel
+  judge: 2 # claude -p judgements in parallel
+
+judge:
+  model: claude-opus-5-5
+  effort: xhigh
+  timeout_s: 1800
+  # mode_override: static   # force every test to the cheaper static judge
+
+llama:
+  port: 8099 # Benchy's own llama-server; your router on 8081 is never touched
+  startup_timeout_s: 120
+  load_timeout_s: 900
+
+sandbox:
+  memory_mb: 1024
+  timeout_s: 30

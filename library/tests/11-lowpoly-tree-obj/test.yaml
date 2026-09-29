@@ -1,0 +1,56 @@
+id: 11-lowpoly-tree-obj
+title: Low-poly tree as OBJ
+description: Hand-write a Wavefront OBJ of a recognizable low-poly tree with a trunk, a layered canopy and clean geometry.
+tags: [model3d, obj, geometry]
+output:
+  files:
+    - path: tree.obj
+checks:
+  - model3d.render
+judge:
+  mode: static
+  guidance: >-
+    CHECKS.md lists triangle count and bounding box (bbox min y should be 0, height 2–5 units);
+    the renderer triangulates quads, so count the `f` lines in tree.obj for the 50–400 face
+    budget. Spot-check faces for out-of-range indices, the trunk caps and the joins between canopy
+    layers; the renderer draws both sides of every face, so open or inverted faces do not show in
+    the images and must be found in the file.
+  criteria:
+    - id: recognizable
+      title: Reads as a tree
+      description: >-
+        In the four rendered views the model is unmistakably a tree with a distinct trunk and
+        canopy, not an abstract blob, and it looks good from every side.
+      weight: 3
+      required: true
+    - id: valid-geometry
+      title: Valid, closed geometry
+      description: >-
+        The file loads without errors; all face indices are in range, each part is closed, winding
+        is consistent and outward, and there are no degenerate or duplicate faces or unused
+        vertices.
+      weight: 3
+    - id: polygon-budget
+      title: Low-poly budget
+      description: >-
+        Between about 50 and 400 faces (counted as `f` lines), spent where they shape the
+        silhouette, with a deliberate faceted low-poly look.
+      weight: 2
+    - id: proportions-orientation
+      title: Orientation, scale, proportions
+      description: >-
+        Y-up, lowest vertex at y = 0, trunk base centered near the origin, total height 2–5 units,
+        a canopy clearly wider than the trunk, part of the trunk visible and nothing floating.
+      weight: 2
+    - id: file-hygiene
+      title: Clean OBJ file
+      description: >-
+        Only v, f, o/g and comment lines, parts grouped as trunk and canopy, consistent number
+        formatting and no references to missing material files.
+      weight: 1
+    - id: craft
+      title: Stylized craft
+      description: >-
+        An appealing stylized design: layered or faceted canopy, tapering trunk, pleasing
+        proportions and intentional variation.
+      weight: 1

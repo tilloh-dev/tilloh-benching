@@ -1,0 +1,84 @@
+id: 03-tower-defense
+title: Neon roguelike tower defense
+description: A 2D tower defense game with endless escalating waves, bosses, upgradable turrets and a skill tree that persists between runs.
+tags: [html, canvas, game, interactive]
+output:
+  files:
+    - path: index.html
+checks:
+  - html.parse
+  - html.render:
+      screenshots: [1000, 4000]
+      interactions:
+        - click: [640, 400]
+        - wait: 500
+        - press: Enter
+        - press: Space
+        - wait: 1000
+        - screenshot: after-start
+        - click: [480, 320]
+        - click: [800, 480]
+        - press: '1'
+        - click: [560, 440]
+        - wait: 5000
+        - screenshot: after-play
+judge:
+  mode: interactive
+  guidance: >-
+    Play for real: start a run, build every turret type, upgrade one turret many times, survive
+    until a boss appears, then lose on purpose to reach the skill tree, buy a node and reload the
+    page to confirm it persisted. Where playing far enough is impractical, verify wave scaling,
+    enemy variants and unbounded upgrades in the code and say so in the rationale.
+  criteria:
+    - id: core-loop
+      title: Playable game loop
+      description: >-
+        Enemies follow a route across the level, turrets can be placed on buildable grid cells and
+        shoot and kill enemies, the player has currency and lives, and a run can be lost.
+      weight: 3
+      required: true
+    - id: waves-bosses
+      title: Endless waves and bosses
+      description: >-
+        Waves never run out and get measurably stronger (HP, speed, count or armor scale with the
+        wave number), and every wave contains a boss that is clearly distinct from normal enemies.
+      weight: 3
+    - id: enemy-variety
+      title: At least 5 enemy variants
+      description: >-
+        Five or more enemy types with different stats or behavior (e.g. fast, armored, splitting,
+        healing, flying) that are visually distinguishable on screen.
+      weight: 2
+    - id: turrets-upgrades
+      title: 3+ turrets, endless upgrades
+      description: >-
+        At least three turret types with distinct roles; each can be upgraded without a level cap,
+        with scaling cost and a visible effect on stats or appearance.
+      weight: 3
+    - id: meta-progression
+      title: Skill tree and replayability
+      description: >-
+        A skill tree bought with currency earned in runs, persisted between runs (e.g.
+        localStorage) and affecting later runs; roguelike elements such as random modifiers or
+        choices make runs differ.
+      weight: 2
+    - id: special-feature
+      title: Special feature
+      description: >-
+        A distinctive extra mechanic chosen by the model that is clearly presented in the UI,
+        actually works in play and adds to the game.
+      weight: 1
+    - id: neon-style-level
+      title: Neon low-poly style and level
+      description: >-
+        Neon colors with glow on a dark background, geometric low-poly shapes for turrets and
+        enemies, a well-designed level whose path and buildable cells are easy to read, and a
+        clear HUD.
+      weight: 2
+    - id: self-contained
+      title: Self-contained, stable, error-free
+      description: >-
+        One self-contained HTML file with no external resources that loads and plays without
+        JavaScript errors and stays smooth over several waves.
+      weight: 2
+      required: true

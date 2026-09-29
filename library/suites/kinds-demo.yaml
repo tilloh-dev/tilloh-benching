@@ -1,0 +1,9 @@
+id: kinds-demo
+title: Artifact kinds demo
+description: One test per artifact kind (HTML page, 3D model, program, prose) to exercise every check type.
+tests:
+  - 01-svg-clock
+  - 11-lowpoly-tree-obj
+  - 12-word-frequency-cli
+  - 13-essay-local-llms
+repetitions: 1

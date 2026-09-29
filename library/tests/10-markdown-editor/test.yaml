@@ -1,0 +1,76 @@
+id: 10-markdown-editor
+title: Markdown editor with live preview
+description: A split-pane Markdown editor with a hand-written parser, live preview, XSS-safe output, counters and Copy HTML.
+tags: [html, editor, parser, interactive]
+output:
+  files:
+    - path: index.html
+checks:
+  - html.parse
+  - html.render:
+      screenshots: [500]
+      interactions:
+        - click: textarea
+        - press: Control+End
+        - type: "\n\n## Typed heading\n\nSome **bold**, *italic* and `code`. <b>raw html</b>\n\n- one\n- two\n"
+        - wait: 500
+        - screenshot: after-typing
+judge:
+  mode: interactive
+  guidance: >-
+    Type hostile and tricky input: `<script>alert(1)</script>`, `<img src=x onerror=alert(1)>`,
+    `[x](javascript:alert(1))`, a fenced block containing `# not a heading` and `**not bold**`,
+    and mixed bold/italic inside list items. Resize the window below about 700 px wide to check the
+    stacked layout, and click Copy HTML while reading its clipboard code.
+  criteria:
+    - id: live-preview
+      title: Split pane with live preview
+      description: >-
+        A raw Markdown textarea on the left and the rendered preview on the right; the preview
+        updates on every edit without a button press.
+      weight: 3
+      required: true
+    - id: markdown-coverage
+      title: Required Markdown features
+      description: >-
+        Headings h1–h6, bold, italic, inline code, fenced code blocks, unordered and ordered lists,
+        blockquotes, links, images and horizontal rules render correctly, and code blocks are not
+        parsed for inline markup.
+      weight: 3
+    - id: xss-safety
+      title: Raw HTML escaped
+      description: >-
+        Raw HTML in the input is escaped before conversion so no script or event handler can run;
+        link and image URLs cannot inject attributes, and javascript: URLs are neutralized.
+      weight: 2
+    - id: sample-document
+      title: Sample document
+      description: >-
+        The editor is prefilled with a sample that demonstrates every supported feature and
+        renders cleanly on load.
+      weight: 1
+    - id: counts-copy
+      title: Counters and Copy HTML
+      description: >-
+        Live word and character counts that are accurate, and a "Copy HTML" button that copies the
+        generated HTML source to the clipboard with feedback and graceful failure handling.
+      weight: 2
+    - id: responsive-layout
+      title: Responsive stacking
+      description: >-
+        The panes fill the window and scroll independently, and they stack vertically on narrow
+        viewports without horizontal overflow.
+      weight: 2
+    - id: typography-theme
+      title: Readable theme
+      description: >-
+        A clean, readable theme with a monospaced editor font and a proportional preview font, and
+        well-styled headings, code blocks and blockquotes in the preview.
+      weight: 1
+    - id: self-contained
+      title: Own parser, self-contained, error-free
+      description: >-
+        A single valid HTML5 file with inline CSS and JS only, a Markdown converter written in
+        vanilla JS (no CDN or library), and no JavaScript errors on load or while typing.
+      weight: 2
+      required: true

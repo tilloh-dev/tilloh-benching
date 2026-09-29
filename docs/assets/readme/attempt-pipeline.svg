@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 330" role="img" aria-labelledby="title description">
+  <title id="title">How one attempt flows through Benchy</title>
+  <desc id="description">A blueprint and a test go to the generator, the answer is extracted and checked, Claude Code judges it, and everything is stored as files. Stored attempts can be judged again without regenerating.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <style>
+      .canvas { fill: #f8fafc; }
+      .node { fill: #ffffff; stroke: #475569; stroke-width: 2; }
+      .node-accent { fill: #fffbeb; stroke: #b45309; stroke-width: 2; }
+      .node-data { fill: #f0fdf4; stroke: #15803d; stroke-width: 2; }
+      .label { fill: #0f172a; font: 600 17px system-ui, sans-serif; text-anchor: middle; }
+      .detail { fill: #334155; font: 13px system-ui, sans-serif; text-anchor: middle; }
+      .flow { fill: none; stroke: #334155; stroke-width: 2.5; marker-end: url(#arrow); }
+      .loop { fill: none; stroke: #15803d; stroke-width: 2.5; stroke-dasharray: 7 6; marker-end: url(#arrow); }
+      .loop-label { fill: #15803d; font: 600 13px system-ui, sans-serif; text-anchor: middle; }
+    </style>
+  </defs>
+
+  <rect class="canvas" width="1000" height="330" rx="16"/>
+
+  <path class="flow" d="M 186 130 H 214"/>
+  <path class="flow" d="M 380 130 H 408"/>
+  <path class="flow" d="M 574 130 H 602"/>
+  <path class="flow" d="M 768 130 H 796"/>
+  <path class="loop" d="M 880 190 V 262 H 685 V 196"/>
+  <text class="loop-label" x="782" y="288">re-judge with a new rubric or judge</text>
+
+  <rect class="node" x="26" y="70" width="160" height="120" rx="12"/>
+  <text class="label" x="106" y="118">Blueprint × test</text>
+  <text class="detail" x="106" y="144">model + settings,</text>
+  <text class="detail" x="106" y="162">prompt + criteria</text>
+
+  <rect class="node" x="220" y="70" width="160" height="120" rx="12"/>
+  <text class="label" x="300" y="118">Generate</text>
+  <text class="detail" x="300" y="144">llama-server, API</text>
+  <text class="detail" x="300" y="162">or claude -p</text>
+
+  <rect class="node" x="414" y="70" width="160" height="120" rx="12"/>
+  <text class="label" x="494" y="118">Extract + check</text>
+  <text class="detail" x="494" y="144">files, Chromium,</text>
+  <text class="detail" x="494" y="162">bwrap sandbox</text>
+
+  <rect class="node-accent" x="608" y="70" width="160" height="120" rx="12"/>
+  <text class="label" x="688" y="118">Judge</text>
+  <text class="detail" x="688" y="144">claude -p, blind,</text>
+  <text class="detail" x="688" y="162">0–10 per criterion</text>
+
+  <rect class="node-data" x="802" y="70" width="170" height="120" rx="12"/>
+  <text class="label" x="887" y="118">data/runs/</text>
+  <text class="detail" x="887" y="144">plain files, shown</text>
+  <text class="detail" x="887" y="162">in BenchyOS</text>
+</svg>

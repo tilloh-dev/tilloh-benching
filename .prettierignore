@@ -1,0 +1,11 @@
+build/
+.svelte-kit/
+node_modules/
+pnpm-lock.yaml
+pnpm-workspace.yaml
+data/
+runs/
+playwright-report/
+test-results/
+static/vendor/
+*.md
