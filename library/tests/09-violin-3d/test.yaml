@@ -1,0 +1,84 @@
+id: 09-violin-3d
+title: Playable 3D violin
+description: A lit 3D violin built with raw WebGL or CSS 3D that can be orbited and played with synthesized Web Audio notes.
+tags: [html, webgl, 3d, audio, interactive]
+output:
+  files:
+    - path: index.html
+checks:
+  - html.parse
+  - html.render:
+      screenshots: [800, 3000]
+      interactions:
+        - drag: [[640, 400], [860, 430]]
+        - wait: 500
+        - screenshot: orbit-right
+        - drag: [[640, 400], [420, 330]]
+        - wait: 500
+        - screenshot: orbit-left
+        - move: [620, 380]
+        - move: [660, 420]
+        - click: [640, 400]
+        - wait: 300
+        - screenshot: string-played
+judge:
+  mode: interactive
+  guidance: >-
+    Orbit the model and inspect the scroll, bridge and bouts from several angles; then play each
+    string by click or hover (and any documented keys) and check that the string under the cursor
+    reacts. Headless browsers may produce no audible sound, so verify frequencies (G3 ≈ 196 Hz,
+    D4 ≈ 293.66 Hz, A4 = 440 Hz, E5 ≈ 659.26 Hz), envelope and AudioContext resume in the code.
+  criteria:
+    - id: violin-model
+      title: Recognizable violin geometry
+      description: >-
+        A 3D violin with a body showing upper and lower bouts and a waist, neck, fingerboard,
+        scroll, bridge and four strings, in plausible proportions and recognizable from several
+        angles.
+      weight: 3
+      required: true
+    - id: lit-3d
+      title: Real 3D with lighting
+      description: >-
+        Genuine 3D geometry rendered with raw WebGL or CSS 3D transforms, shaded by lighting so the
+        form reads clearly, with correct depth ordering and no external library.
+      weight: 2
+    - id: orbit-camera
+      title: Mouse orbit camera
+      description: >-
+        Dragging rotates the camera smoothly around the violin with sensible limits; scroll-to-zoom
+        is a plus.
+      weight: 2
+    - id: playable-audio
+      title: Playable, correctly tuned strings
+      description: >-
+        Clicking or hovering a string (optionally keys) plays a Web Audio note for that string,
+        tuned to G3, D4, A4 and E5, with a string-like timbre and envelope rather than a bare sine
+        beep; the hit test picks the string actually under the cursor.
+      weight: 3
+      required: true
+    - id: string-feedback
+      title: Visual string feedback
+      description: >-
+        The played string visibly vibrates or highlights in sync with its note and settles back
+        afterwards.
+      weight: 2
+    - id: play-hint
+      title: How-to-play hint
+      description: >-
+        A small, readable on-screen hint explains how to orbit and how to play, matching the actual
+        controls.
+      weight: 1
+    - id: visual-design
+      title: Original, appealing design
+      description: >-
+        An original and visually appealing presentation: wood-like coloring, fitting background,
+        composition and UI polish that go beyond a bare demo.
+      weight: 2
+    - id: self-contained
+      title: Self-contained, valid, error-free
+      description: >-
+        A single valid HTML5 file with inline CSS and JS only, no CDN, library, texture or audio
+        file, and no JavaScript errors on load or while playing.
+      weight: 2
+      required: true

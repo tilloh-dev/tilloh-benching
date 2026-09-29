@@ -1,0 +1,6 @@
+id: claude-sonnet-agentic
+extends: claude-sonnet-chat
+label: Claude Sonnet 5.5 · agentic · high
+description: Claude Code writes the files itself with Read/Write/Edit and sandboxed Bash; it can test its own work before finishing.
+claude:
+  mode: agentic

@@ -1,0 +1,63 @@
+id: 01-svg-clock
+title: SVG analog clock
+description: A live analog clock drawn in SVG with tick marks, three hands and a 24-hour digital readout.
+tags: [html, svg, clock, animation]
+output:
+  files:
+    - path: index.html
+checks:
+  - html.parse
+  - html.render:
+      screenshots: [500, 3000]
+judge:
+  mode: static
+  guidance: >-
+    The two screenshots are 2.5 s apart: the digital readout must advance by 2–3 seconds and the
+    second hand must move accordingly. You cannot know the wall-clock time of the screenshots, so
+    check that the code reads the local time from Date and that hand angles are consistent with the
+    readout (the hour hand advances with the minutes). Count the tick marks in the code.
+  criteria:
+    - id: correct-time
+      title: Shows the correct time
+      description: >-
+        Hands and readout are derived from the current local time; hour, minute and second angles
+        are mathematically correct and agree with the digital readout in both screenshots.
+      weight: 3
+      required: true
+    - id: hands-ticking
+      title: Three hands, one-second updates
+      description: >-
+        Distinct hour, minute and second hands (length/width/color differ); the second hand updates
+        every second without drift, skipped seconds or a visible jump backwards at 59→0.
+      weight: 2
+    - id: tick-marks
+      title: Hour and minute ticks
+      description: >-
+        12 longer hour ticks and shorter ticks for every other minute (60 positions in total),
+        evenly spaced and correctly aligned with the hands' rotation origin.
+      weight: 2
+    - id: layout-size
+      title: Centered, at least 320×320
+      description: >-
+        Exactly one SVG clock, centered horizontally and vertically, rendered at 320×320 px or
+        larger and not clipped at the 1280×800 viewport.
+      weight: 1
+    - id: digital-readout
+      title: Digital HH:MM:SS readout
+      description: >-
+        The current time appears below the clock in 24-hour HH:MM:SS format with zero padding,
+        updating in sync with the second hand.
+      weight: 2
+    - id: theme-design
+      title: Clean light-on-dark design
+      description: >-
+        Light clock elements on a dark background, good contrast and a tidy, deliberate look
+        (consistent stroke widths, a center cap, legible readout); no clutter.
+      weight: 1
+    - id: self-contained
+      title: Self-contained, valid, error-free
+      description: >-
+        A single valid HTML5 file with inline CSS and JS only, no external resources, and no
+        JavaScript errors in CHECKS.md.
+      weight: 2
+      required: true

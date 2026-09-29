@@ -1,0 +1,22 @@
+id: smoke-haiku
+title: Three haiku
+description: Tiny prose task; judged on form and content only.
+tags: [smoke, text]
+output:
+  mode: text
+judge:
+  mode: static
+  criteria:
+    - id: form
+      title: Haiku form
+      description: Exactly three haiku, each three lines with a 5-7-5 syllable pattern (English syllable counting).
+      weight: 2
+      required: true
+    - id: theme
+      title: On theme
+      description: Every haiku is about benchmarking software, and each takes a different angle.
+      weight: 2
+    - id: craft
+      title: Craft
+      description: Concrete imagery, no filler words, a seasonal or nature reference as in classic haiku.
+      weight: 1

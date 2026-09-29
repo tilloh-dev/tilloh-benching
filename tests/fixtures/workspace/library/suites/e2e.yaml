@@ -1,0 +1,4 @@
+id: e2e
+title: E2E
+tests: [page]
+blueprints: [e2e-good, e2e-mixed]

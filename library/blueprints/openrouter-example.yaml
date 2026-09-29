@@ -1,0 +1,15 @@
+id: openrouter-example
+label: OpenRouter (example)
+description: Template for any OpenRouter model. Set OPENROUTER_API_KEY in .env and replace the model slug.
+kind: openai-compatible
+tags: [remote, example]
+endpoint:
+  base_url: https://openrouter.ai/api/v1
+  model: qwen/qwen3.6-35b-a3b
+  api_key_env: OPENROUTER_API_KEY
+request:
+  temperature: 0.6
+  max_tokens: 32000
+  # OpenRouter's unified reasoning switch; remove for models without reasoning.
+  reasoning:
+    effort: high

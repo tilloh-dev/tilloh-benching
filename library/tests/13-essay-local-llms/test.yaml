@@ -1,0 +1,56 @@
+id: 13-essay-local-llms
+title: 'Essay: local LLMs for small teams'
+description: A 400–700 word Markdown essay weighing local against hosted language models for small teams, ending in a clear recommendation.
+tags: [text, essay, markdown]
+output:
+  mode: text
+checks:
+  - text.stats:
+      min_words: 400
+      max_words: 700
+judge:
+  mode: static
+  guidance: >-
+    Use the word and heading counts from CHECKS.md for the format criterion (the count includes
+    headings). Check that each of the five dimensions gets both sides, and treat confident numbers
+    that are implausible or presented as hard facts without context as a weakness, not as
+    concreteness.
+  criteria:
+    - id: clear-recommendation
+      title: Clear, justified recommendation
+      description: >-
+        Ends with an explicit, actionable recommendation for a typical small team, names the
+        conditions under which it changes, and follows from the arguments made.
+      weight: 3
+      required: true
+    - id: balanced-tradeoffs
+      title: Balanced trade-offs
+      description: >-
+        Cost, privacy, latency, output quality and maintenance are all discussed, each with where
+        local models and where hosted APIs come out ahead; neither side is strawmanned.
+      weight: 3
+    - id: argument-quality
+      title: Argument quality
+      description: >-
+        Reasoning is specific and causal rather than a list of generic pros and cons: it names
+        decision factors such as data sensitivity, request volume, utilization or skills, and
+        weighs them.
+      weight: 2
+    - id: concreteness
+      title: Concrete, plausible example
+      description: >-
+        At least one concrete example (a team, workload or hardware setup with rough numbers) that
+        is technically plausible and actually supports the argument.
+      weight: 2
+    - id: structure-format
+      title: Structure and format
+      description: >-
+        One level-1 title and 3–5 level-2 sections, 400–700 words, plain Markdown prose with few
+        lists, and no preamble, meta-commentary or code-fenced answer.
+      weight: 2
+    - id: writing-quality
+      title: Writing quality
+      description: >-
+        Clear, concise and well-organized English for technical leads, with smooth transitions and
+        no filler, clichés or repetition.
+      weight: 2

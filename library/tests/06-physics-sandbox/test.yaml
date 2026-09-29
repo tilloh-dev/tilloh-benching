@@ -1,0 +1,71 @@
+id: 06-physics-sandbox
+title: 2D bouncing-ball physics sandbox
+description: A canvas physics sandbox with gravity, restitution, ball-ball collisions, click-to-spawn and drag-to-fling.
+tags: [html, canvas, physics, interactive]
+output:
+  files:
+    - path: index.html
+checks:
+  - html.parse
+  - html.render:
+      screenshots: [500, 2500]
+      interactions:
+        - click: [640, 300]
+        - click: [420, 260]
+        - click: [860, 260]
+        - drag: [[700, 350], [1000, 180]]
+        - drag: [[500, 350], [250, 200]]
+        - wait: 2500
+        - screenshot: after-spawn
+judge:
+  mode: interactive
+  guidance: >-
+    Spawn 40 or more balls (rapid clicks and hard flings into the walls and corners), then watch
+    for jitter, energy gain, overlapping balls and balls escaping the walls; change every slider
+    while balls are moving and toggle collisions off and on. Read the collision code for positional
+    correction and an impulse along the contact normal.
+  criteria:
+    - id: physics-core
+      title: Gravity, bounce, collisions
+      description: >-
+        Balls of varying radius fall under gravity, bounce off walls and floor with energy loss,
+        and collide with each other with a plausible circle-circle response (mass-aware impulse,
+        overlap resolved).
+      weight: 3
+      required: true
+    - id: spawn-fling
+      title: Click to spawn, drag to fling
+      description: >-
+        A click spawns a ball at the cursor; click-drag launches it with a velocity derived from the
+        drag vector, ideally with a visible aim line while dragging.
+      weight: 3
+    - id: controls
+      title: Live controls and buttons
+      description: >-
+        Gravity, restitution and friction can be changed live with immediate effect; a Reset button
+        clears the scene and a toggle switches ball-ball collisions on and off.
+      weight: 2
+    - id: colors-count
+      title: Distinct colors and ball count
+      description: >-
+        Balls have distinct colors and a live count of active balls updates on spawn and reset.
+      weight: 1
+    - id: stability
+      title: Stable with dozens of balls
+      description: >-
+        With dozens of balls there is no runaway energy, no tunneling through walls, no endless
+        jitter in resting stacks and no NaN or disappearing balls; time steps are clamped or
+        sub-stepped.
+      weight: 3
+    - id: theme
+      title: Clean dark theme
+      description: >-
+        A dark, uncluttered scene with a tidy control panel whose labels and values are readable.
+      weight: 1
+    - id: self-contained
+      title: Self-contained, valid, error-free
+      description: >-
+        A single valid HTML5 file with inline CSS and JS only, no external resources, and no
+        JavaScript errors, neither on load nor during play.
+      weight: 2
+      required: true

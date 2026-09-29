@@ -1,0 +1,79 @@
+id: 05-game-of-life
+title: Conway's Game of Life
+description: Game of Life on a canvas grid with playback controls, speed slider, cell editing, presets and live statistics.
+tags: [html, canvas, simulation]
+output:
+  files:
+    - path: index.html
+checks:
+  - html.parse
+  - html.render:
+      screenshots: [500]
+      interactions:
+        - click: text=Randomize
+        - wait: 300
+        - screenshot: randomized
+        - click: text=Step
+        - wait: 300
+        - screenshot: stepped
+        - click: text=Start
+        - wait: 2500
+        - screenshot: running
+judge:
+  mode: static
+  guidance: >-
+    Compare the randomized and stepped screenshots: the generation counter should rise by exactly
+    one and the pattern should change plausibly. Read the update function for a separate next-state
+    buffer (in-place updates are a classic bug) and for the neighbor count at the grid edges. Check
+    preset patterns cell by cell against the known shapes.
+  criteria:
+    - id: conway-rules
+      title: Correct B3/S23 rules
+      description: >-
+        Births on exactly 3 neighbors, survival on 2 or 3, computed from the previous generation in
+        a separate buffer, with consistent edge handling (wrap or dead border).
+      weight: 3
+      required: true
+    - id: grid-rendering
+      title: 60×40+ grid with borders
+      description: >-
+        A canvas grid of at least 60×40 cells with clearly visible cell borders and square,
+        evenly sized cells.
+      weight: 2
+    - id: controls
+      title: Playback controls and speed
+      description: >-
+        Start/Pause, Step, Clear and Randomize all work as named, and a speed slider changes the
+        tick rate live without restarting the simulation.
+      weight: 3
+    - id: cell-editing
+      title: Click and drag editing
+      description: >-
+        Clicking or dragging on the grid while paused toggles cells at the correct position; a drag
+        paints a continuous line instead of flickering the same cell on and off.
+      weight: 2
+    - id: presets
+      title: Preset patterns
+      description: >-
+        A dropdown with at least two presets (e.g. Glider, Pulsar) that load correct, recognizable
+        patterns onto the grid.
+      weight: 2
+    - id: live-stats
+      title: Generation and population
+      description: >-
+        A generation counter and a population count that are shown live, update every tick and
+        reset or recount correctly after Clear, Randomize and preset loading.
+      weight: 1
+    - id: theme
+      title: Clean dark theme
+      description: >-
+        Dark background with clearly contrasting live cells, an orderly control bar and a
+        cohesive, readable layout.
+      weight: 1
+    - id: self-contained
+      title: Self-contained, valid, error-free
+      description: >-
+        A single valid HTML5 file with inline CSS and JS only, no external resources, and no
+        JavaScript errors in CHECKS.md.
+      weight: 2
+      required: true

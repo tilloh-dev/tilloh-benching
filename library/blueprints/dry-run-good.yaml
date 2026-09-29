@@ -1,0 +1,5 @@
+id: dry-run-good
+extends: dry-run
+label: Dry run (always good)
+dry_run:
+  profile: good

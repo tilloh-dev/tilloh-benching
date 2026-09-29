@@ -1,0 +1,78 @@
+id: 02-fractal-tree
+title: Animated L-system fractal tree
+description: A canvas fractal tree generated from an L-system that grows over time, with live controls for its parameters.
+tags: [html, canvas, animation, generative]
+output:
+  files:
+    - path: index.html
+checks:
+  - html.parse
+  - html.render:
+      screenshots: [300, 1500, 5000]
+      interactions:
+        - click: text=Regenerate
+        - wait: 400
+        - screenshot: regenerate-growing
+        - wait: 4000
+        - screenshot: regenerate-done
+judge:
+  mode: static
+  guidance: >-
+    The early screenshots should show a partly grown tree and the later ones a complete one; a tree
+    that is already complete at 300 ms does not animate its growth. Check in the code that an
+    actual L-system (axiom, rewrite rules, string expansion, turtle interpretation with a
+    push/pop stack) produces the tree, and how the maximum depth is bounded so the page cannot
+    freeze.
+  criteria:
+    - id: lsystem-turtle
+      title: L-system with turtle drawing
+      description: >-
+        The tree is produced by expanding an axiom with rewrite rules and interpreting the string
+        turtle-style (forward, turn, push/pop) on a canvas; a plain recursive branch function
+        without an L-system scores low.
+      weight: 3
+      required: true
+    - id: animated-growth
+      title: Animated growth
+      description: >-
+        Branches extend and the tree unfolds over time via requestAnimationFrame instead of
+        appearing instantly; the growth looks smooth and ordered (trunk first, twigs last).
+      weight: 3
+    - id: live-controls
+      title: Live parameter controls
+      description: >-
+        Sliders or inputs for recursion depth, branch angle, length ratio and randomness/jitter,
+        with visible values; changing any of them updates the tree without a reload.
+      weight: 3
+    - id: regenerate
+      title: Regenerate with fresh seed
+      description: >-
+        A "Regenerate" button redraws with the current settings and a new random seed, so the
+        jittered tree visibly differs between runs (compare the regenerate screenshots).
+      weight: 1
+    - id: depth-coloring
+      title: Depth-based coloring
+      description: >-
+        Branch color follows depth as a gradient from trunk to twigs, ideally with tapering
+        thickness; leaves or blossoms at the tips are a plus.
+      weight: 2
+    - id: performance
+      title: Stable at high depth
+      description: >-
+        High depths do not freeze the page: string or segment growth is capped or bounded, drawing
+        is spread across frames or batched, and restarting cancels the previous animation instead
+        of stacking loops.
+      weight: 2
+    - id: visual-design
+      title: Original, beautiful design
+      description: >-
+        A pleasant background and cohesive palette, a well-composed tree and a tidy control panel;
+        the result looks original and deliberately designed, not like a default demo.
+      weight: 2
+    - id: self-contained
+      title: Self-contained, valid, error-free
+      description: >-
+        A single valid HTML5 file with inline CSS and JS only, no external resources, and no
+        JavaScript errors in CHECKS.md.
+      weight: 2
+      required: true

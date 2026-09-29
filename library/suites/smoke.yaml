@@ -1,0 +1,5 @@
+id: smoke
+title: Smoke
+description: Three tiny tasks (HTML, program, prose) to check that a blueprint works end to end.
+tests: [smoke-html-counter, smoke-python-fizzbuzz, smoke-haiku]
+repetitions: 1

@@ -1,0 +1,18 @@
+# Copy to benchy.local.yaml (gitignored) and adjust for this machine.
+
+host:
+  name: hermine            # shows up in run ids and on the results site
+
+llama:
+  # hermine — WSL with the Windows CUDA build. Benchy starts it through PowerShell,
+  # connects via 127.0.0.1 or the WSL gateway and stops only its own PID.
+  binary: /mnt/c/Users/<you>/tooling/llama.cpp/vendor/llama.cpp/llama-b10786/llama-server.exe
+  models_dir: /mnt/c/Users/<you>/AppData/Local/llama.cpp/models
+
+  # Gertrude — native Linux Vulkan build:
+  # binary: ~/tooling/llama.cpp/vendor/llama.cpp/llama-b10786/llama-server
+  # models_dir: ~/.local/share/llama.cpp/models
+
+  # Optional:
+  # connect_host: 172.30.48.1   # force the address Benchy uses to reach llama-server
+  # extra_args: ['--no-webui']

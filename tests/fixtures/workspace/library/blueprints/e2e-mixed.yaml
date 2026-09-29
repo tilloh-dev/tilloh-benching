@@ -1,0 +1,5 @@
+id: e2e-mixed
+label: E2E mixed
+extends: e2e-good
+dry_run:
+  profile: broken

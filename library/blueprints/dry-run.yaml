@@ -1,0 +1,8 @@
+id: dry-run
+label: Dry run (mixed)
+description: Canned responses, deliberately including broken ones. No network, no model.
+kind: dry-run
+tags: [test]
+dry_run:
+  profile: mixed
+  delay_ms: 200

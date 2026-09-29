@@ -1,0 +1,72 @@
+id: 04-particle-simulation
+title: Interactive particle simulation
+description: A full-window canvas with hundreds of physics-driven particles that react to the mouse, live controls and an FPS counter.
+tags: [html, canvas, animation, simulation]
+output:
+  files:
+    - path: index.html
+checks:
+  - html.parse
+  - html.render:
+      screenshots: [500, 2500]
+      interactions:
+        - move: [640, 400]
+        - move: [320, 260]
+        - move: [360, 300]
+        - wait: 1200
+        - screenshot: cursor-left
+        - move: [960, 520]
+        - move: [920, 480]
+        - wait: 1200
+        - screenshot: cursor-right
+judge:
+  mode: static
+  guidance: >-
+    Compare the cursor-left and cursor-right screenshots with the untouched ones: particles should
+    visibly gather around or flee from the cursor position. Count the particles the code actually
+    creates and check how the count control adds or removes them.
+  criteria:
+    - id: particle-physics
+      title: 300+ animated particles
+      description: >-
+        A full-window canvas animated with requestAnimationFrame shows at least 300 particles
+        moving with velocity plus gravity or drift that wrap or bounce at the edges.
+      weight: 3
+      required: true
+    - id: mouse-interaction
+      title: Cursor attraction or repulsion
+      description: >-
+        Moving the mouse attracts or repels nearby particles with a distance falloff; the effect is
+        visible in the interaction screenshots and stops or fades when the cursor leaves.
+      weight: 3
+    - id: live-controls
+      title: Live control panel
+      description: >-
+        A small on-screen panel adjusts at least two parameters (e.g. count, gravity, attraction
+        strength) with immediate effect and visible values.
+      weight: 2
+    - id: fps-counter
+      title: Live FPS counter
+      description: >-
+        An FPS readout in a corner, computed from real frame timing and updating while the
+        simulation runs.
+      weight: 1
+    - id: stability
+      title: Stable, frame-rate-safe simulation
+      description: >-
+        No particles escape, freeze or turn NaN; motion is time-step aware or clamped, the canvas
+        follows window resizes, and 300+ particles run smoothly.
+      weight: 2
+    - id: visual-theme
+      title: Clean dark theme
+      description: >-
+        A dark background with subtly colored particles and an unobtrusive panel; the scene looks
+        calm and polished rather than noisy.
+      weight: 2
+    - id: self-contained
+      title: Self-contained, valid, error-free
+      description: >-
+        A single valid HTML5 file with inline CSS and JS only, no external resources, and no
+        JavaScript errors in CHECKS.md.
+      weight: 2
+      required: true

@@ -1,164 +1,169 @@
-# benching
+# BenchyOS
 
-Benchmark tests for AI and other things. This repo currently hosts **llm-check**, a local-first LLM test bench: drop prompts as `.txt` files, list the models you want to compare in a YAML config, and the bench produces one self-contained `.html` per (prompt × model) plus a static dashboard with overview, 2-way compare, and broken-HTML detector.
+BenchyOS benchmarks local and remote language models against your own prompts. Every result is stored as plain files and checked automatically. An independent Claude Code judge then scores it per criterion. BenchyOS, a desktop-style web UI, shows outputs, llama.cpp settings, run metadata and verdicts, and exports a read-only copy for sharing.
 
-Built for the workflow "I have a prompt that asks an LLM to produce a self-contained HTML page. I want to see how different models do, side by side."
+![One attempt: blueprint × test → generate → extract and check → judge → files, with re-judging as a loop](docs/assets/readme/attempt-pipeline.svg)
 
-## Highlights
+*Generating and judging are decoupled: a new rubric or judge model re-scores stored results without calling the model again.*
 
-- Local-first: llama.cpp (and any other OpenAI-compatible local server) works out of the box, no API keys needed.
-- Cloud-optional: drop a key in `.env` and uncomment the model in `config/models.yaml`.
-- One `.txt` per prompt. No metadata, no front-matter, no DSL.
-- Two-layer validator: strict HTML parser (`html5lib`) + headless Chromium (`playwright`) that captures runtime errors and a thumbnail.
-- Static dashboard: pure `index.html` you open from disk. Overview matrix, 2-way side-by-side compare, error explorer.
-- Dry-run mode: smoke-test the whole pipeline with built-in canned responses (no network, no LLM).
+## Concepts
 
-## Quickstart (local, llama.cpp)
+| Term | What it is | Where it lives |
+|---|---|---|
+| **Blueprint** | The thing under test: a model plus every setting that matters (llama-server flags, sampling, effort, system prompt). Versioned by a hash of its settings. | `library/blueprints/<id>.yaml` |
+| **Bench test** | A prompt, the files you expect back, automated checks and the judge criteria. | `library/tests/<id>/test.yaml` + `prompt.md` |
+| **Suite** | A named set of tests with default repetitions. | `library/suites/<id>.yaml` |
+| **Run** | Blueprints × tests × repetitions, with snapshots of everything used. | `data/runs/<run-id>/` |
+| **Attempt** | One blueprint × test × repetition: response, artifacts, evidence, checks, verdicts, your own rating. | `data/runs/<run-id>/<blueprint>/<test>/<rep>/` |
 
-On Debian/Ubuntu (PEP 668) you cannot `pip install` into the system Python. Use a venv:
+**Blueprint kinds**
+
+- `llama-cpp` — BenchyOS starts llama-server on **this** host in router mode with a generated preset, one model at a time.
+- `openai-compatible` — any `/chat/completions` API with a key from `.env`: OpenRouter, Ollama Cloud, OpenAI, vLLM, LM Studio.
+- `claude-code` — `claude -p` as the subject, in `chat` mode (one answer, no tools) or `agentic` mode (writes files in a sandbox).
+- `dry-run` — canned responses, including deliberately broken ones. No network, no model.
+
+## Requirements
+
+Debian-based Linux (Pop!_OS, Ubuntu, Debian, or WSL on Windows) with:
+
+- **Node 24+** and **pnpm**
+- **Claude Code**, logged in (`claude` on `PATH`) — the judge uses your subscription
+- **bubblewrap** (`sudo apt install bubblewrap`) — sandbox for generated programs
+- Optional: **llama.cpp** for local models, **openscad** for `.scad` 3D models
+
+## Get started
+
+1. Install dependencies and the headless browser the checks use:
+
+   ```bash
+   pnpm install
+   pnpm exec playwright install chromium
+   pnpm build
+   ```
+
+2. Configure this host. Copy the example and set the llama-server binary and models directory:
+
+   ```bash
+   cp benchy.local.yaml.example benchy.local.yaml
+   cp .env.example .env        # only for API blueprints
+   ```
+
+3. Check the host:
+
+   ```bash
+   ./bin/benchy doctor --probe
+   ```
+
+   `--probe` makes one tiny `claude -p` call to prove the login works.
+
+4. Run the smoke suite without any model or cost:
+
+   ```bash
+   ./bin/benchy run -s smoke -b dry-run --judge dry-run
+   ```
+
+5. Open BenchyOS:
+
+   ```bash
+   ./bin/benchy serve        # http://127.0.0.1:8787
+   ```
+
+> [!IMPORTANT]
+> Keep `server.bind` at `127.0.0.1`. The API starts processes (llama-server, `claude -p`, sandboxed programs) and has no authentication.
+
+## Run local models
+
+BenchyOS only ever controls llama-server on the machine it runs on. On **hermine** it runs inside WSL and drives the Windows CUDA build. On **Gertrude** it drives the native Vulkan build.
+
+1. Import your router preset once. Every `[section]` becomes a blueprint:
+
+   ```bash
+   ./bin/benchy import-preset ~/tooling/llama.cpp/presets/models.ini --strip-models-dir
+   ```
+
+2. Make variants in the Blueprints app with **Derive**. A derived blueprint uses `extends` and only lists what differs, for example `reasoning-effort: high` or `cache-type-k: q4_0`.
+
+3. Start a run from **New run** or the CLI:
+
+   ```bash
+   ./bin/benchy run -s html-classics -b Qwen3.6-27B -b gemma-4-31B
+   ```
+
+**How BenchyOS handles llama-server:**
+
+- **Own instance on port 8099.** It writes a preset with one section per blueprint and runs `llama-server --models-preset … --models-max 1`. The router loads each model when its turn comes. Your own router on 8081 is never touched.
+- **Refuses a busy GPU.** If any other llama-server runs, the preflight reports it and the run does not start.
+- **Stops only its own process, by PID.** Under WSL that means `taskkill /PID`, never by image name.
+- **Records the real settings.** Per blueprint it stores the preset section, the exact launch argv from the router, `/props`, the build, the GPU and the timings (prompt and generation t/s, draft acceptance).
+
+Relative model paths resolve against `llama.models_dir`, so one blueprint works on both hosts.
+
+## Judging
+
+The judge is `claude -p` with `claude-opus-5-5` at effort `xhigh` by default. Change the default in `benchy.config.yaml`, or per run with `--judge-model` and `--judge-effort`.
+
+- **Isolated from your setup.** `--safe-mode` (static) or `--restricted` (interactive) with `--strict-mcp-config`: your CLAUDE.md, hooks, skills and MCP servers do not reach the judge.
+- **Blind.** It works in a neutral temp directory: task, criteria, submission, screenshots and check logs. Nothing names the model.
+- **Structured.** `--json-schema` forces a score, rationale and evidence per criterion. BenchyOS computes the 0–100 score from the weights. A `required` criterion below 5/10 fails the attempt's gate.
+- **Two depths per test.** `static` reads code, screenshots and logs. `interactive` also drives the page with Playwright MCP and may run programs with sandboxed Bash. Interactive is more thorough and much slower.
+
+Re-judge anything without regenerating:
 
 ```bash
-# 1. Create and activate a virtualenv (one-time)
-python3 -m venv .venv
-source .venv/bin/activate
-
-# 2. Install Python deps
-pip install -e .
-
-# 3. Install the headless browser used by the validator
-playwright install chromium
-
-# 4. Create your local model registry from the example
-cp config/models.example.yaml config/models.yaml   # then edit to taste
-
-# 5. Start a llama.cpp OpenAI-compatible server in another terminal, e.g.:
-#    llama-server -m /path/to/model.gguf --host 127.0.0.1 --port 8081
-#    (default api_base in config/models.yaml is http://localhost:8081/v1)
-
-# 6. Run the bench
-llm-check run
-
-# 7. Open the printed dashboard path in your browser
+./bin/benchy judge <run-id>                       # current rubric, default judge
+./bin/benchy judge <run-id> --judge-model haiku   # cheap sanity pass
+./bin/benchy criteria 09-violin-3d --write        # let Claude draft a rubric
 ```
 
-In future terminals, just `source .venv/bin/activate` before running `llm-check`. Or call the binary directly without activating: `./.venv/bin/llm-check run`.
-
-No `.env` is needed for local models.
-
-## Quickstart (dry-run, no LLM)
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -e .
-playwright install chromium
-llm-check run --dry-run
-```
-
-The dry-run provider produces a deterministic mix of valid and intentionally-broken HTML so every dashboard view has something to show.
-
-## Adding a prompt
-
-Drop a plain `.txt` file in `prompts/`. The filename (without `.txt`) becomes the prompt id. The file body is sent as the user message. A small built-in system prompt tells the model to respond with one self-contained HTML5 document and nothing else.
-
-## Adding a model
-
-Edit `config/models.yaml` (create it once with `cp config/models.example.yaml config/models.yaml`; the real file is gitignored):
-
-```yaml
-models:
-  - id: llamacpp-coder
-    provider: openai/llamacpp           # any name after `openai/`; llama.cpp ignores it
-    label: "llama.cpp coder (local)"
-    kind: workstation                   # optional free-form badge, e.g. the host it runs on
-    api_base: http://localhost:8081/v1  # llama-server --port 8081
-    api_key: not-needed                 # required by litellm; server ignores it
-    model_name: "qwen2.5-coder-7b-instruct-q5_k_m.gguf"   # exact name from /v1/models
-    concurrency: 1
-    enabled: true
-```
-
-`model_name` is the string the server returns at `GET {api_base}/models` (the `id` field for each entry in `data`). The preflight queries that endpoint and shows you the served name. You can leave `model_name` blank to auto-adopt whatever the server is currently serving.
-
-`kind` is an optional free-form label (any string, capped at 20 characters) — typically the device or host the model runs on, e.g. `hermine` or `localhost`. It is purely cosmetic: it does not affect local/cloud classification (that stays auto-detected from `provider`/`api_base`), it is only shown as a badge next to the model in the per-run dashboard and the aggregate overview. Omit it to show no badge.
-
-### Multiple llama.cpp models
-
-A single `llama-server` serves exactly one loaded model at a time. Two patterns:
-
-- Multiple servers: run `llama-server` on different ports and add one YAML entry per port (each with its own `api_base` and `model_name`). They run in parallel.
-- One server, swap between runs: keep multiple entries against the same `api_base` but only enable the one matching the currently loaded `.gguf`. Entries whose `model_name` is not currently served are skipped with a clear message.
-
-All cells targeting the same `api_base` are automatically serialized (effective concurrency = 1 per endpoint), regardless of the global `concurrency` setting.
-
-For cloud models, uncomment one of the examples in the file and put the matching key in `.env` (see `.env.example`). Use any model string `litellm` accepts (`openai/gpt-4o`, `anthropic/claude-...`, `gemini/...`, `openrouter/...`, etc.).
-
-### Concurrency
-
-`defaults.concurrency` caps total in-flight requests for the whole run. Each model can override with its own `concurrency` (most local single-GPU setups want `1`). The runner takes `min(global, per-model)` per call.
+Rate attempts yourself in the attempt viewer's **Human** tab. The leaderboard can rank by judge, human or a blend. The Judge app shows where you and the judge disagree.
 
 ## Commands
 
+| Command | Does |
+|---|---|
+| `benchy serve` | BenchyOS and API on localhost |
+| `benchy run -s <suite> -b <blueprint>…` | Run, with preflight; hands off to a running server |
+| `benchy judge <run\|attempt>…` | (Re-)judge stored attempts |
+| `benchy resume <run> [--retry-failed]` | Continue an interrupted run; optionally regenerate failed attempts |
+| `benchy recheck <run\|attempt>…` | Re-run the automated checks (fresh screenshots and logs) |
+| `benchy list [blueprints\|tests\|suites\|runs\|checks]` | Show the library and library errors |
+| `benchy criteria <test> [--write]` | Draft judge criteria with Claude |
+| `benchy import-preset <models.ini> [--strip-models-dir]` | Blueprints from a llama-server router preset; relative model paths make them portable |
+| `benchy import-legacy runs/ --preset <ini>` | Import llm-check results |
+| `benchy export <dir>` | Read-only static site for sharing |
+| `benchy doctor [--probe]` | Check Node, Chromium, bwrap, claude, llama-server, GPU, keys |
+
+## Share results
+
 ```bash
-llm-check list                       # show prompts and models, with reachability
-llm-check run                        # run the full matrix
-llm-check run --dry-run              # use canned responses, no network
-llm-check run -p 01-landing-page     # filter prompts (repeatable)
-llm-check run -m llamacpp            # filter models (repeatable)
-llm-check validate                   # re-render runs/index.html (aggregate)
-llm-check validate runs/<run>        # re-render a single per-model dashboard
+./bin/benchy export ../benchy-site
+python3 -m http.server --directory ../benchy-site 8000
 ```
 
-## Output layout
+The export is the same BenchyOS in read-only mode, plus JSON snapshots and every linked file. Host it on any static web server. It does not open from `file://`, because browsers block ES modules there.
 
-Each model gets its own run directory. The top-level `runs/index.html` aggregates the latest run per model into a single overview/compare/error view.
+## Checks
 
+| Check | Runs on | What it does |
+|---|---|---|
+| `output.files` | every attempt | Declared files present, truncation, empty files |
+| `html.parse` | HTML | parse5: doctype, structure, parse errors, duplicate ids |
+| `html.render` | HTML | Chromium, network blocked: page/console errors, blocked requests, timed screenshots, scripted interactions |
+| `svg.render` | SVG | Rendered screenshot, XML errors |
+| `model3d.render` | OBJ, STL, glTF, PLY, OpenSCAD | three.js, four views, geometry stats |
+| `program.run` | Python, Bash, JS/TS, C/C++, Rust, Go … | bubblewrap without network, cases with args, stdin and exact expectations |
+| `json.parse`, `text.stats` | JSON, prose | Validity; words, headings, length limits |
+
+The status per attempt is one of `ok`, `warnings`, `broken` or `failed` (nothing extracted or generation failed).
+
+## Develop
+
+```bash
+pnpm dev        # API on :8787 + Vite on :5173 with hot reload
+pnpm check      # svelte-check, 0 errors and 0 warnings
+pnpm test       # Vitest, including the dry-run pipeline with Chromium
+pnpm lint       # Prettier + ESLint
 ```
-runs/
-├── index.html                                    # aggregate dashboard (open this)
-├── results.json                                  # aggregate payload (for debugging)
-├── assets/                                       # shared css + js
-├── 2026-06-30T22-12-00Z__llamacpp-ornith/        # one run dir PER model
-│   ├── index.html                                # single-model dashboard
-│   ├── results.json
-│   ├── outputs/                                  # prompt × this model
-│   └── thumbnails/
-└── 2026-06-30T22-12-00Z__llamacpp-qwen/
-    └── ...
-```
 
-The aggregate dashboard reads the per-model `results.json` files on disk and shows them all side-by-side. Re-running a single model leaves other models' runs intact; the aggregate is re-rendered each time and always reflects the latest run per `model_id`.
-
-## How the broken-HTML detector works
-
-Two passes per output:
-
-1. Parser pass (`html5lib`, lossless): missing `<!DOCTYPE>`, missing `html/head/body`, parse errors with line/col, duplicate IDs.
-2. Headless pass (`playwright` + Chromium): loads the file via `file://`, captures `console.error`, `pageerror`, and failed subresource requests. Also writes a 1280×800 thumbnail.
-
-Status per cell:
-- `ok` - no issues
-- `warnings` - parser issues only (page still renders)
-- `broken` - runtime JS or page error
-- `failed` - the LLM request itself failed (network, timeout, no key)
-
-## Dashboard
-
-Open `runs/<timestamp>/index.html` in any browser - it works straight off disk.
-
-- Overview: matrix of prompts × models with status badges, latency, tokens, cost, and a hover-ready thumbnail. Click any cell to open the rendered output in a modal.
-- Compare: pick a prompt, then two models. Both outputs render in sandboxed iframes side by side. Validator details collapse below each side.
-- Errors: every flagged output grouped by error kind, with one click to open the offending file.
-
-Keyboard: `1` / `2` / `3` switch tabs, `/` focuses the active tab's filter, `Esc` closes the modal.
-
-## Folder reference
-
-```
-config/models.example.yaml  # template model registry (tracked)
-config/models.yaml          # your model registry (gitignored; copy from example)
-prompts/*.txt           # the prompt suite
-src/llm_check/          # bench source
-runs/                   # outputs (gitignored)
-.env.example            # cloud keys template
-```
+Contributor and agent conventions are in [AGENTS.md](AGENTS.md); the UI rules are in [docs/DESIGN.md](docs/DESIGN.md) and live in BenchyOS under **Start → Design system**. The top-bar theme switch cycles system → dark → light.

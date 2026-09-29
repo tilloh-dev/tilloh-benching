@@ -1,0 +1,271 @@
+/* BenchyOS base styles. Tokens live in src/lib/design/tokens.css; rules in docs/DESIGN.md. */
+@import './lib/design/tokens.css';
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	border-radius: 0;
+}
+
+html,
+body {
+	margin: 0;
+	height: 100%;
+	background: var(--bg);
+	color: var(--fg);
+	font-family: var(--font);
+	font-size: var(--fs-m);
+	line-height: var(--lh);
+	-webkit-font-smoothing: antialiased;
+	overflow: hidden;
+}
+
+button,
+input,
+select,
+textarea {
+	font: inherit;
+	color: inherit;
+}
+
+a {
+	color: var(--accent-text);
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+::selection {
+	background: var(--accent);
+	color: var(--accent-fg);
+}
+
+* {
+	scrollbar-width: thin;
+	scrollbar-color: var(--line-strong) transparent;
+}
+
+:focus-visible {
+	outline: 1px solid var(--focus);
+	outline-offset: 1px;
+}
+
+kbd {
+	display: inline-block;
+	padding: 0 var(--sp-2);
+	border: var(--bw) solid var(--line-strong);
+	font-size: var(--fs-xs);
+	color: var(--fg-2);
+	background: var(--surface-2);
+}
+
+code {
+	font-size: 0.95em;
+	padding: 0 var(--sp-1);
+	background: var(--sunken);
+	border: var(--bw) solid var(--line-soft);
+}
+
+/* --------------------------------------------------------- form controls */
+
+.input,
+.select,
+.textarea {
+	width: 100%;
+	min-height: var(--control-h);
+	padding: var(--sp-1) var(--sp-3);
+	background: var(--sunken);
+	border: var(--bw) solid var(--line);
+	color: var(--fg);
+	font-size: var(--fs-m);
+	transition: border-color var(--dur-1);
+}
+.input:hover,
+.select:hover,
+.textarea:hover {
+	border-color: var(--line-strong);
+}
+.input:focus,
+.select:focus,
+.textarea:focus {
+	outline: none;
+	border-color: var(--focus);
+}
+.input::placeholder,
+.textarea::placeholder {
+	color: var(--fg-4);
+}
+.textarea {
+	line-height: 1.5;
+	resize: vertical;
+	min-height: 72px;
+	padding: var(--sp-2) var(--sp-3);
+}
+.select {
+	appearance: none;
+	padding-right: var(--sp-6);
+	background-image:
+		linear-gradient(45deg, transparent 50%, var(--fg-3) 50%),
+		linear-gradient(135deg, var(--fg-3) 50%, transparent 50%);
+	background-position:
+		calc(100% - 10px) 55%,
+		calc(100% - 6px) 55%;
+	background-size: 4px 4px;
+	background-repeat: no-repeat;
+}
+
+.label {
+	display: block;
+	font-size: var(--fs-xs);
+	font-weight: var(--fw-strong);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--fg-3);
+	margin-bottom: var(--sp-1);
+}
+.hint {
+	font-size: var(--fs-s);
+	color: var(--fg-3);
+}
+.muted {
+	color: var(--fg-3);
+}
+
+/* --------------------------------------------------------- tables */
+
+.table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: var(--fs-m);
+}
+.table th {
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	height: var(--row-h);
+	padding: 0 var(--sp-4);
+	text-align: left;
+	font-size: var(--fs-s);
+	font-weight: var(--fw-strong);
+	color: var(--fg-3);
+	background: var(--surface-2);
+	border-bottom: var(--bw) solid var(--line);
+	white-space: nowrap;
+}
+.table td {
+	height: var(--row-h);
+	padding: 0 var(--sp-4);
+	border-bottom: var(--bw) solid var(--line-soft);
+	vertical-align: middle;
+}
+.table tbody tr.clickable {
+	cursor: pointer;
+}
+.table tbody tr:hover {
+	background: var(--hover);
+}
+.table tbody tr.selected {
+	background: var(--accent-soft);
+	box-shadow: inset 2px 0 0 var(--accent);
+}
+.num {
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------- layout helpers */
+
+.row {
+	display: flex;
+	align-items: center;
+	gap: var(--sp-3);
+}
+.col {
+	display: flex;
+	flex-direction: column;
+	gap: var(--sp-3);
+}
+.grow {
+	flex: 1;
+	min-width: 0;
+}
+.wrap {
+	flex-wrap: wrap;
+}
+.spacer {
+	flex: 1;
+}
+.scroll {
+	overflow: auto;
+	min-height: 0;
+}
+.pad {
+	padding: var(--sp-4) var(--sp-5);
+}
+.card {
+	background: var(--surface);
+	border: var(--bw) solid var(--line);
+	padding: var(--sp-4) var(--sp-5);
+}
+.section-title {
+	font-size: var(--fs-xs);
+	font-weight: var(--fw-strong);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--fg-3);
+	margin: 0 0 var(--sp-3);
+}
+.ellipsis {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.divider {
+	height: var(--bw);
+	background: var(--line-soft);
+	margin: var(--sp-4) 0;
+}
+
+/* --------------------------------------------------------- motion (see docs/DESIGN.md) */
+
+/* Retro: a window unfolds in visible steps. */
+@keyframes step-unfold {
+	from {
+		clip-path: inset(0 100% 100% 0);
+	}
+	to {
+		clip-path: inset(0 0 0 0);
+	}
+}
+@keyframes step-fold {
+	from {
+		clip-path: inset(0 0 0 0);
+	}
+	to {
+		clip-path: inset(0 0 100% 0);
+	}
+}
+/* Retro: text caret. */
+@keyframes caret {
+	50% {
+		opacity: 0;
+	}
+}
+.caret::after {
+	content: '▌';
+	margin-left: 1px;
+	color: var(--accent);
+	animation: caret 1s steps(1) infinite;
+}
+/* Functional: fade in place, no movement. */
+@keyframes appear {
+	from {
+		opacity: 0;
+	}
+}
+/* Live state: the only continuous animation, for things that are running. */
+@keyframes blink {
+	50% {
+		opacity: 0.35;
+	}
+}

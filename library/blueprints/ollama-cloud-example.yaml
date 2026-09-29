@@ -1,0 +1,13 @@
+id: ollama-cloud-example
+label: Ollama Cloud (example)
+description: Template for Ollama's hosted models via its OpenAI-compatible API. Set OLLAMA_API_KEY in .env and pick a cloud model name.
+kind: openai-compatible
+tags: [remote, example]
+endpoint:
+  base_url: https://ollama.com/v1
+  model: gpt-oss:120b
+  api_key_env: OLLAMA_API_KEY
+request:
+  temperature: 0.7
+  max_tokens: 32000
+  reasoning_effort: high

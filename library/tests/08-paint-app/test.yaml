@@ -1,0 +1,77 @@
+id: 08-paint-app
+title: Canvas paint app
+description: A drawing application with brush, eraser, size and color controls, undo/redo, clear and PNG export.
+tags: [html, canvas, interactive, tool]
+output:
+  files:
+    - path: index.html
+checks:
+  - html.parse
+  - html.render:
+      screenshots: [500]
+      interactions:
+        - drag: [[420, 320], [820, 460]]
+        - drag: [[460, 520], [860, 360]]
+        - drag: [[560, 300], [600, 560]]
+        - wait: 300
+        - screenshot: three-strokes
+        - click: text=Undo
+        - wait: 300
+        - screenshot: after-undo
+        - click: text=Redo
+        - wait: 300
+        - screenshot: after-redo
+judge:
+  mode: interactive
+  guidance: >-
+    Draw fast curves and short dabs, switch colors, sizes and the eraser between strokes, then
+    undo and redo several steps, draw after an undo (the redo stack must be discarded) and try
+    Clear followed by Undo. Save a PNG and check in the code that the export is a real .png data
+    URL download that includes the background.
+  criteria:
+    - id: drawing
+      title: Smooth freehand drawing
+      description: >-
+        A canvas of at least 800×600 on a clearly bordered stage; strokes follow the pointer exactly
+        (no offset), stay continuous and smooth on fast movement and support touch or pointer
+        events.
+      weight: 3
+      required: true
+    - id: tools
+      title: Brush, eraser, size and colors
+      description: >-
+        Brush and eraser tools, a brush-size slider, a color picker and a preset palette that all
+        affect the next stroke; the active tool is visibly marked and the eraser restores the
+        background.
+      weight: 3
+    - id: undo-redo
+      title: Correct undo and redo
+      description: >-
+        Undo and Redo step through the history one stroke at a time in both directions; a new
+        stroke after undo clears the redo stack and the buttons reflect when nothing is left.
+      weight: 3
+    - id: clear-save
+      title: Clear and Save as PNG
+      description: >-
+        Clear empties the canvas to the current background, and "Save as PNG" downloads a .png
+        produced from a canvas data URL.
+      weight: 2
+    - id: state-display
+      title: Shows size and color
+      description: >-
+        The current brush size and the selected color are shown in the UI and update immediately
+        when changed.
+      weight: 1
+    - id: ui-theme
+      title: Clean light tool chrome
+      description: >-
+        A clean, uncluttered light theme for the toolbar with grouped controls, clear labels or
+        icons and hover/active feedback.
+      weight: 2
+    - id: self-contained
+      title: Self-contained, valid, error-free
+      description: >-
+        A single valid HTML5 file with inline CSS and JS only, no external resources, and no
+        JavaScript errors, neither on load nor while drawing.
+      weight: 2
+      required: true

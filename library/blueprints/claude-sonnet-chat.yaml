@@ -1,0 +1,9 @@
+id: claude-sonnet-chat
+label: Claude Sonnet 5.5 · chat · high
+description: Claude Code as the subject, one answer without tools — comparable to a single chat completion.
+kind: claude-code
+tags: [remote, claude]
+claude:
+  model: claude-sonnet-5-5
+  effort: high
+  mode: chat
