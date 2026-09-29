@@ -129,3 +129,26 @@ describe('WSL → Windows process control', () => {
 		expect(ownedFilter(procs, undefined)).toHaveLength(4);
 	});
 });
+
+describe('portable preset import', () => {
+	it('strips Linux and Windows models-dir prefixes from path keys only', () => {
+		// act
+		const linux = sectionToServer(
+			{ model: '/home/USER/.local/share/llama.cpp/models/Q/q.gguf', 'ctx-size': '4096' },
+			'/home/tim',
+			true
+		);
+		const win = sectionToServer(
+			{
+				model: 'C:/Users/Anwender/AppData/Local/llama.cpp/models/Q/q.gguf',
+				mmproj: 'C:/Users/Anwender/AppData/Local/llama.cpp/models/Q/mm.gguf'
+			},
+			undefined,
+			true
+		);
+
+		// assume
+		expect(linux).toEqual({ model: 'Q/q.gguf', 'ctx-size': 4096 });
+		expect(win).toEqual({ model: 'Q/q.gguf', mmproj: 'Q/mm.gguf' });
+	});
+});

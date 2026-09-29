@@ -187,6 +187,7 @@ export async function judgeAttempt(input: JudgeInput): Promise<Judgement> {
 				jsonSchema: verdictSchema(input.test.judge.criteria),
 				isolation: interactive ? 'restricted' : 'safe',
 				mcpConfig: served ? playwrightMcpConfig(served.url, join(jw.dir, '.browser')) : undefined,
+				allowedTools: served ? ['mcp__browser__*'] : undefined,
 				settings: tools.includes('Bash') ? SANDBOXED_BASH : undefined,
 				maxBudgetUsd: input.settings.judge.max_budget_usd,
 				timeoutMs: input.settings.judge.timeout_s * 1000,

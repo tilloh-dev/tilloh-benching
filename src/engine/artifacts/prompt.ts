@@ -10,7 +10,8 @@ export type ChatMessage = { role: 'system' | 'user' | 'assistant'; content: stri
 export function outputInstructions(test: BenchTest, agentic = false): string {
 	if (test.output.instructions) return test.output.instructions;
 	const { mode, files } = test.output;
-	if (agentic || mode === 'workspace') {
+	// A prose answer stays a prose answer, even for an agent that could write files.
+	if ((agentic && mode !== 'text') || mode === 'workspace') {
 		const list = files.length
 			? files.map((f) => `- \`${f.path}\`${f.description ? ` — ${f.description}` : ''}`).join('\n')
 			: '- whatever files the task needs';

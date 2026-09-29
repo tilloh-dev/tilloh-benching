@@ -1,0 +1,17 @@
+id: page
+title: Tiny page
+output:
+  files:
+    - path: index.html
+checks:
+  - html.parse
+  - html.render:
+      screenshots: [200]
+judge:
+  criteria:
+    - id: works
+      title: Works
+      weight: 2
+      required: true
+    - id: looks
+      title: Looks good

@@ -3,7 +3,7 @@ import type { Workspace } from '../core/workspace.ts';
 import { saveBlueprint } from '../core/library.ts';
 import { ID_PATTERN, type Scalar } from '../core/schema.ts';
 import { exists } from '../util/fs.ts';
-import { iniValue, parseIni } from '../llama/preset.ts';
+import { PATH_KEYS, iniValue, parseIni } from '../llama/preset.ts';
 
 export function sanitizeId(name: string): string {
 	const id = name
@@ -14,15 +14,24 @@ export function sanitizeId(name: string): string {
 	return ID_PATTERN.test(id) ? id : `bp-${id || 'unnamed'}`;
 }
 
-/** One router-preset [section] → llama-cpp blueprint fields. */
+/** Everything up to and including the models directory, on Linux and Windows layouts. */
+const MODELS_DIR_PREFIX = /^(?:[A-Za-z]:)?[\\/].*?[\\/]llama\.cpp[\\/]models[\\/]/;
+
+/**
+ * One router-preset [section] → llama-cpp blueprint fields. With `relative`,
+ * model paths lose their host-specific prefix and resolve against
+ * llama.models_dir — the same blueprint then works on every host.
+ */
 export function sectionToServer(
 	keys: Record<string, string>,
-	home?: string
+	home?: string,
+	relative = false
 ): Record<string, Scalar> {
 	const server: Record<string, Scalar> = {};
 	for (const [k, raw] of Object.entries(keys)) {
 		if (k === 'alias') continue;
-		const v = home ? raw.replace(/\/home\/USER\b/g, home) : raw;
+		let v = home ? raw.replace(/\/home\/USER\b/g, home) : raw;
+		if (relative && PATH_KEYS.has(k)) v = v.replace(MODELS_DIR_PREFIX, '');
 		server[k] = iniValue(v);
 	}
 	return server;
@@ -37,6 +46,7 @@ export async function importPreset(
 		tags?: string[];
 		overwrite?: boolean;
 		home?: string;
+		relative?: boolean;
 		source: string;
 	}
 ): Promise<{ created: string[]; skipped: string[] }> {
@@ -56,7 +66,7 @@ export async function importPreset(
 			label: name,
 			kind: 'llama-cpp',
 			tags: ['local', 'llama.cpp', ...(o.tags ?? [])],
-			server: sectionToServer(keys, o.home),
+			server: sectionToServer(keys, o.home, o.relative),
 			origin: { source: o.source, note: `router preset section [${name}]` }
 		});
 		created.push(id);

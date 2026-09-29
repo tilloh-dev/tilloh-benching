@@ -62,7 +62,11 @@ export const Origin = z.strictObject({
 	note: z.string().optional()
 });
 
-/** A blueprint as written on disk; `extends` may supply any field. */
+/**
+ * A blueprint as written on disk. `extends` may supply any field, so nested
+ * blocks may be partial here (a variant can set just `claude.mode`); the
+ * resolved Blueprint below validates them completely.
+ */
 export const BlueprintFile = z.strictObject({
 	id: Id,
 	label: z.string().optional(),
@@ -75,9 +79,9 @@ export const BlueprintFile = z.strictObject({
 	request: JsonObject.optional(),
 	/** llama-cpp only: llama-server flags without the leading "--", as in a router preset. */
 	server: z.record(z.string(), Scalar).optional(),
-	endpoint: Endpoint.optional(),
-	pricing: Pricing.optional(),
-	claude: ClaudeSubject.optional(),
+	endpoint: Endpoint.partial().optional(),
+	pricing: Pricing.partial().optional(),
+	claude: ClaudeSubject.partial().optional(),
 	dry_run: DryRunSubject.optional(),
 	timeout_s: z.number().positive().optional(),
 	concurrency: z.number().int().positive().optional(),
@@ -89,7 +93,10 @@ export type BlueprintFile = z.infer<typeof BlueprintFile>;
 export const Blueprint = BlueprintFile.extend({
 	kind: BlueprintKind,
 	tags: z.array(z.string()),
-	request: JsonObject
+	request: JsonObject,
+	endpoint: Endpoint.optional(),
+	pricing: Pricing.optional(),
+	claude: ClaudeSubject.optional()
 }).superRefine((bp, ctx) => {
 	const need = (cond: boolean, message: string) => {
 		if (!cond) ctx.addIssue({ code: 'custom', message });

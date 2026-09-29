@@ -149,3 +149,28 @@ judge:
 		expect(h2.rubric_hash).not.toBe(h1.rubric_hash);
 	});
 });
+
+describe('partial nested blocks', () => {
+	it('lets a variant override one nested field and validates the resolved result', async () => {
+		// arrange
+		const ws = await tempWorkspace({
+			'library/blueprints/cc.yaml':
+				'id: cc\nkind: claude-code\nclaude: { model: claude-sonnet-5-5, effort: high, mode: chat }\n',
+			'library/blueprints/cc-agentic.yaml':
+				'id: cc-agentic\nextends: cc\nclaude: { mode: agentic }\n',
+			'library/blueprints/broken.yaml': 'id: broken\nkind: claude-code\nclaude: { mode: chat }\n'
+		});
+
+		// act
+		const lib = await loadLibrary(ws);
+
+		// assume
+		expect(lib.blueprints.get('cc-agentic')?.claude).toEqual({
+			model: 'claude-sonnet-5-5',
+			effort: 'high',
+			mode: 'agentic'
+		});
+		expect(lib.blueprints.has('broken')).toBe(false);
+		expect(lib.issues.map((i) => i.file)).toEqual(['blueprints/broken.yaml']);
+	});
+});

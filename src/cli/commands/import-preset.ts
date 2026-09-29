@@ -10,6 +10,7 @@ const HELP = `benchy import-preset <models.ini> — one llama-cpp blueprint per 
       --section <name>    import only these sections (repeatable)
       --prefix <text>     prefix for blueprint ids
       --tag <tag>         extra tag for every imported blueprint (repeatable)
+      --strip-models-dir  store model paths relative to llama.models_dir (portable across hosts)
       --overwrite         replace existing blueprints with the same id`;
 
 export default async function importPresetCmd(args: string[]): Promise<number> {
@@ -19,7 +20,8 @@ export default async function importPresetCmd(args: string[]): Promise<number> {
 			section: { type: 'string', multiple: true },
 			prefix: { type: 'string' },
 			tag: { type: 'string', multiple: true },
-			overwrite: { type: 'boolean' }
+			overwrite: { type: 'boolean' },
+			'strip-models-dir': { type: 'boolean' }
 		},
 		HELP
 	);
@@ -35,6 +37,7 @@ export default async function importPresetCmd(args: string[]): Promise<number> {
 		prefix: p.values.prefix as string | undefined,
 		tags: (p.values.tag as string[] | undefined) ?? [],
 		overwrite: !!p.values.overwrite,
+		relative: !!p.values['strip-models-dir'],
 		home: homedir(),
 		source: file
 	});

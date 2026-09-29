@@ -1,0 +1,6 @@
+id: e2e-good
+label: E2E good
+kind: dry-run
+dry_run:
+  profile: good
+  delay_ms: 20

@@ -79,7 +79,7 @@ Benchy only ever controls llama-server on the machine it runs on. On **hermine**
 1. Import your router preset once. Every `[section]` becomes a blueprint:
 
    ```bash
-   ./bin/benchy import-preset ~/tooling/llama.cpp/presets/models.ini
+   ./bin/benchy import-preset ~/tooling/llama.cpp/presets/models.ini --strip-models-dir
    ```
 
 2. Make variants in the Blueprints app with **Derive**. A derived blueprint uses `extends` and only lists what differs, for example `reasoning-effort: high` or `cache-type-k: q4_0`.
@@ -125,9 +125,11 @@ Rate attempts yourself in the attempt viewer's **Human** tab. The leaderboard ca
 | `benchy serve` | BenchyOS and API on localhost |
 | `benchy run -s <suite> -b <blueprint>…` | Run, with preflight; hands off to a running server |
 | `benchy judge <run\|attempt>…` | (Re-)judge stored attempts |
+| `benchy resume <run> [--retry-failed]` | Continue an interrupted run; optionally regenerate failed attempts |
+| `benchy recheck <run\|attempt>…` | Re-run the automated checks (fresh screenshots and logs) |
 | `benchy list [blueprints\|tests\|suites\|runs\|checks]` | Show the library and library errors |
 | `benchy criteria <test> [--write]` | Draft judge criteria with Claude |
-| `benchy import-preset <models.ini>` | Blueprints from a llama-server router preset |
+| `benchy import-preset <models.ini> [--strip-models-dir]` | Blueprints from a llama-server router preset; relative model paths make them portable |
 | `benchy import-legacy runs/ --preset <ini>` | Import llm-check results |
 | `benchy export <dir>` | Read-only static site for sharing |
 | `benchy doctor [--probe]` | Check Node, Chromium, bwrap, claude, llama-server, GPU, keys |

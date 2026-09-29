@@ -9,6 +9,8 @@ export type ClaudeRunOptions = {
 	effort?: Effort;
 	/** Built-in tools to expose; [] disables all tools. */
 	tools: string[];
+	/** Tools that run without a permission prompt (print mode has nobody to ask), e.g. mcp__browser__*. */
+	allowedTools?: string[];
 	appendSystemPrompt?: string;
 	jsonSchema?: unknown;
 	mcpConfig?: unknown;
@@ -66,6 +68,7 @@ export function claudeArgs(o: ClaudeRunOptions): string[] {
 	args.push('--model', o.model);
 	if (o.effort) args.push('--effort', o.effort);
 	args.push('--tools', o.tools.join(','));
+	if (o.allowedTools?.length) args.push('--allowedTools', o.allowedTools.join(','));
 	if (o.appendSystemPrompt) args.push('--append-system-prompt', o.appendSystemPrompt);
 	if (o.jsonSchema) args.push('--json-schema', JSON.stringify(o.jsonSchema));
 	if (o.mcpConfig) args.push('--mcp-config', JSON.stringify(o.mcpConfig));

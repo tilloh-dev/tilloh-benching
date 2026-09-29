@@ -9,6 +9,7 @@ ${c.bold('Usage')}
 ${c.bold('Commands')}
   serve                         start BenchyOS (web UI + API) on localhost
   run                           run blueprints against tests
+  resume <run-id>               continue an interrupted run (--retry-failed)
   judge <run|attempt>…          (re-)judge existing results without regenerating
   recheck <run|attempt>…        re-run automated checks (fresh screenshots and logs)
   list [blueprints|tests|suites|runs|checks]
@@ -34,6 +35,7 @@ async function main(): Promise<number> {
 	const modules: Record<string, () => Promise<{ default: (args: string[]) => Promise<number> }>> = {
 		serve: () => import('./commands/serve.ts'),
 		run: () => import('./commands/run.ts'),
+		resume: () => import('./commands/resume.ts'),
 		judge: () => import('./commands/judge.ts'),
 		recheck: () => import('./commands/recheck.ts'),
 		list: () => import('./commands/list.ts'),

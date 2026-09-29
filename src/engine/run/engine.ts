@@ -345,10 +345,11 @@ export class Engine extends EventEmitter<{ event: [EngineEvent] }> {
 	}
 
 	/** Resets failed attempts so the next start regenerates them. */
+	/** Resets attempts whose generation failed or produced nothing usable, so the next start regenerates them. */
 	async retryFailed(runId: string): Promise<number> {
 		let n = 0;
 		for (const a of this.index.attemptsOfRun(runId)) {
-			if (a.error?.stage !== 'generating') continue;
+			if (a.error?.stage !== 'generating' && a.status !== 'failed') continue;
 			await this.#patch(a.id, (x) => {
 				x.stage = 'pending';
 				x.status = null;
@@ -584,13 +585,22 @@ export class Engine extends EventEmitter<{ event: [EngineEvent] }> {
 		const dir = attemptDir(this.ws, run.id, a.blueprint_id, a.test_id, a.rep);
 		await rm(join(dir, 'artifacts'), { recursive: true, force: true });
 		await rm(join(dir, 'evidence'), { recursive: true, force: true });
+		// A regenerated attempt is a new sample: verdicts and ratings of the old one no longer apply.
+		for (const stale of ['judgements', 'checks.json', 'human.json', 'reasoning.md']) {
+			await rm(join(dir, stale), { recursive: true, force: true });
+		}
 		await ensureDir(join(dir, 'artifacts'));
 		await this.#patch(a.id, (x) => {
 			x.stage = 'generating';
 			x.started_at = nowIso();
 			x.artifacts = [];
 			x.evidence = [];
+			x.status = null;
 			delete x.error;
+			delete x.checks;
+			delete x.judgement;
+			delete x.judge_error;
+			delete x.human;
 		});
 		this.log(run.id, 'info', `generate ${a.blueprint_id} × ${a.test_id} #${a.rep}`);
 		const agentic =
@@ -617,12 +627,14 @@ export class Engine extends EventEmitter<{ event: [EngineEvent] }> {
 			if (result.reasoning) await writeAttemptText(this.ws, a.id, 'reasoning.md', result.reasoning);
 			await writeJson(join(dir, 'raw.json'), result.raw ?? null);
 
-			let artifacts: ArtifactRef[];
+			let artifacts: ArtifactRef[] = result.wroteFiles
+				? await this.#collectWorkspace(dir, test)
+				: [];
 			let extraction: Attempt['extraction'];
-			if (result.wroteFiles) {
-				artifacts = await this.#collectWorkspace(dir, test);
+			if (artifacts.length) {
 				extraction = { method: 'workspace', notes: [] };
 			} else {
+				// Also the fallback for agents that answered in text instead of writing files.
 				const ex = extractArtifacts(test, result.content);
 				artifacts = [];
 				for (const f of ex.files) {
