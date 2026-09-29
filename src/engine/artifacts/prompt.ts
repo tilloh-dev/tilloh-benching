@@ -4,7 +4,7 @@ import { languageForPath } from '../core/kinds.ts';
 export type ChatMessage = { role: 'system' | 'user' | 'assistant'; content: string };
 
 /**
- * The output contract Benchy adds so extraction is reliable across models.
+ * The output contract BenchyOS adds so extraction is reliable across models.
  * Tests can replace it with `output.instructions`.
  */
 export function outputInstructions(test: BenchTest, agentic = false): string {

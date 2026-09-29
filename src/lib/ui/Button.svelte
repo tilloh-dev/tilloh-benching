@@ -13,6 +13,7 @@
 		onclick,
 		children
 	}: {
+		/** primary: the one main action of a view (accent). ghost: toolbar actions. */
 		variant?: 'default' | 'primary' | 'ghost' | 'danger';
 		size?: 'sm' | 'md';
 		icon?: string;
@@ -30,13 +31,14 @@
 	class:icon-only={!children}
 	{type}
 	{title}
+	aria-label={!children ? title : undefined}
 	disabled={disabled || loading}
 	{onclick}
 >
 	{#if loading}
-		<span class="spin"></span>
+		<span class="busy" aria-hidden="true">◐</span>
 	{:else if icon}
-		<Icon name={icon} size={size === 'sm' ? 14 : 16} accent={variant !== 'primary'} />
+		<Icon name={icon} size={12} />
 	{/if}
 	{#if children}<span>{@render children()}</span>{/if}
 </button>
@@ -46,97 +48,74 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		gap: 7px;
-		height: 32px;
-		padding: 0 13px;
-		border-radius: 8px;
-		border: 1px solid var(--line);
-		background: linear-gradient(180deg, #1b2858, #152048);
-		color: var(--text);
-		font-weight: 500;
-		font-size: 13px;
-		cursor: pointer;
+		gap: var(--sp-3);
+		height: var(--control-h);
+		padding: 0 var(--sp-4);
+		border: var(--bw) solid var(--line-strong);
+		background: var(--surface-2);
+		color: var(--fg);
+		font-size: var(--fs-m);
+		font-weight: var(--fw-strong);
 		white-space: nowrap;
-		box-shadow:
-			0 1px 0 rgba(255, 255, 255, 0.06) inset,
-			0 1px 2px rgba(0, 0, 0, 0.3);
+		cursor: pointer;
 		transition:
-			transform 0.08s,
-			box-shadow 0.15s,
-			border-color 0.15s,
-			background 0.15s;
+			background var(--dur-1),
+			border-color var(--dur-1);
 	}
 	.btn:hover:not(:disabled) {
-		border-color: var(--line-strong);
-		box-shadow:
-			0 1px 0 rgba(255, 255, 255, 0.08) inset,
-			0 0 0 3px rgba(255, 210, 63, 0.06);
+		background: var(--hover);
+		border-color: var(--fg-3);
 	}
 	.btn:active:not(:disabled) {
-		transform: translateY(1px);
+		background: var(--sunken);
 	}
 	.btn:disabled {
-		opacity: 0.45;
+		color: var(--fg-4);
 		cursor: not-allowed;
 	}
 	.sm {
-		height: 26px;
-		padding: 0 9px;
-		font-size: 12px;
-		border-radius: 7px;
+		height: var(--control-h-s);
+		padding: 0 var(--sp-3);
+		font-size: var(--fs-s);
 	}
 	.icon-only {
+		width: var(--control-h);
 		padding: 0;
-		width: 32px;
 	}
 	.icon-only.sm {
-		width: 26px;
+		width: var(--control-h-s);
 	}
 	.primary {
-		background: linear-gradient(180deg, var(--yellow-2), var(--yellow));
-		border-color: var(--yellow-deep);
-		color: var(--yellow-ink);
-		font-weight: 600;
-		box-shadow:
-			0 1px 0 rgba(255, 255, 255, 0.5) inset,
-			0 0 18px rgba(255, 210, 63, 0.25);
+		background: var(--accent);
+		border-color: var(--accent);
+		color: var(--accent-fg);
 	}
 	.primary:hover:not(:disabled) {
-		border-color: var(--yellow-2);
-		box-shadow:
-			0 1px 0 rgba(255, 255, 255, 0.6) inset,
-			0 0 26px rgba(255, 210, 63, 0.45);
+		background: var(--accent);
+		border-color: var(--fg);
+	}
+	.primary:disabled {
+		background: var(--surface-2);
+		border-color: var(--line);
 	}
 	.ghost {
 		background: transparent;
 		border-color: transparent;
-		box-shadow: none;
-		color: var(--text-2);
+		color: var(--fg-2);
+		font-weight: var(--fw);
 	}
 	.ghost:hover:not(:disabled) {
-		background: var(--bg-4);
+		color: var(--fg);
 		border-color: var(--line);
-		color: var(--text);
 	}
 	.danger {
-		color: #ffb3bd;
+		color: var(--bad);
 	}
 	.danger:hover:not(:disabled) {
-		background: #4a1420;
-		border-color: #a3334a;
-		color: #fff;
+		border-color: var(--bad);
 	}
-	.spin {
-		width: 14px;
-		height: 14px;
-		border-radius: 50%;
-		border: 2px solid currentColor;
-		border-right-color: transparent;
-		animation: spin 0.7s linear infinite;
-	}
-	@keyframes spin {
-		to {
-			transform: rotate(360deg);
-		}
+	.busy {
+		display: inline-block;
+		animation: blink var(--dur-3) steps(2) infinite;
 	}
 </style>

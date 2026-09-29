@@ -193,7 +193,7 @@
 			{#if benchy.live && !a.error}
 				<Menu items={judgeItems} align="right">
 					{#snippet trigger()}
-						<Icon name="gavel" size={15} /> Judge {#if busy === 'judge' || a.stage === 'judging'}<span
+						<Icon name="gavel" size={12} /> Judge {#if busy === 'judge' || a.stage === 'judging'}<span
 								class="dotspin"
 							></span>{/if}
 					{/snippet}
@@ -227,7 +227,7 @@
 			<div class="preview-tab">
 				{#if a.error}
 					<div class="fail card">
-						<h3><Icon name="error" size={18} /> Generation failed</h3>
+						<h3><Icon name="error" size={12} /> Generation failed</h3>
 						<p class="mono">{a.error.message}</p>
 						{#if response}<details open>
 								<summary>Partial response</summary><Code
@@ -284,7 +284,7 @@
 				</div>
 				{#if a.extraction?.notes.length}
 					<div class="notes">
-						{#each a.extraction.notes as n (n)}<span><Icon name="info" size={13} /> {n}</span
+						{#each a.extraction.notes as n (n)}<span><Icon name="info" size={12} /> {n}</span
 							>{/each}
 					</div>
 				{/if}
@@ -304,7 +304,7 @@
 				{#if reasoning}
 					<details class="reasoning">
 						<summary
-							><Icon name="sparkle" size={14} /> Reasoning trace · {(
+							><Icon name="sparkle" size={12} /> Reasoning trace · {(
 								reasoning.length / 1000
 							).toFixed(1)}k chars {#if metrics.reasoning_tokens}· {metrics.reasoning_tokens} tokens{/if}</summary
 						>
@@ -359,7 +359,7 @@
 							<a
 								href={benchy.api.fileUrl(`${id}/${l.path}`)}
 								target="_blank"
-								rel="noopener noreferrer"><Icon name="terminal" size={14} /> {l.label}</a
+								rel="noopener noreferrer"><Icon name="terminal" size={12} /> {l.label}</a
 							>
 						{/each}
 					{/if}
@@ -396,7 +396,7 @@
 					{/if}
 					{#if judgement.error}
 						<div class="card fail">
-							<h3><Icon name="error" size={18} /> Judge failed</h3>
+							<h3><Icon name="error" size={12} /> Judge failed</h3>
 							<p class="mono">{judgement.error}</p>
 						</div>
 					{/if}
@@ -422,10 +422,10 @@
 								{#if v.flags.prompt_injection_suspected || v.flags.output_incomplete}
 									<div class="flags">
 										{#if v.flags.prompt_injection_suspected}<span class="flag bad"
-												><Icon name="alert" size={13} /> prompt injection suspected</span
+												><Icon name="alert" size={12} /> prompt injection suspected</span
 											>{/if}
 										{#if v.flags.output_incomplete}<span class="flag warn"
-												><Icon name="alert" size={13} /> output incomplete</span
+												><Icon name="alert" size={12} /> output incomplete</span
 											>{/if}
 									</div>
 								{/if}
@@ -584,7 +584,7 @@
 							Blueprint snapshot <span class="mono">{detail.blueprint.hash}</span>
 						</h4>
 						{#if detail.blueprint.blueprint.origin?.reconstructed}<p class="warn small">
-								<Icon name="alert" size={13} />
+								<Icon name="alert" size={12} />
 								{detail.blueprint.blueprint.origin.note}
 							</p>{/if}
 						<JsonTree value={detail.blueprint.blueprint} open />
@@ -612,7 +612,7 @@
 					<JsonTree value={detail.run.host} open />
 				</div>
 				{#if detail.files.raw}<a href={detail.files.raw} target="_blank" rel="noopener noreferrer"
-						><Icon name="external" size={14} /> raw.json</a
+						><Icon name="external" size={12} /> raw.json</a
 					>{/if}
 			</div>
 		{/if}
@@ -622,78 +622,76 @@
 <style>
 	.head {
 		display: flex;
-		gap: 16px;
+		gap: var(--sp-6);
 		align-items: center;
-		padding: 12px 16px;
-		border-bottom: 1px solid var(--line-soft);
-		background: linear-gradient(180deg, rgba(255, 210, 63, 0.04), transparent);
+		padding: var(--sp-5) var(--sp-6);
+		border-bottom: var(--bw) solid var(--line-soft);
 	}
 	.title-block {
 		min-width: 0;
 	}
 	h2 {
 		margin: 0;
-		font-size: 16px;
+		font-size: var(--fs-l);
 		max-width: 360px;
 	}
 	h2.t {
-		color: var(--text-2);
-		font-weight: 500;
+		color: var(--fg-2);
+		font-weight: var(--fw);
 	}
 	.x {
-		color: var(--yellow);
+		color: var(--fg-3);
 	}
 	.rep {
-		color: var(--text-3);
+		color: var(--fg-3);
 		font-variant-numeric: tabular-nums;
 	}
 	.meta {
-		font-size: 12px;
-		color: var(--text-3);
-		gap: 5px;
-		margin-top: 3px;
+		font-size: var(--fs-s);
+		color: var(--fg-3);
+		gap: var(--sp-3);
+		margin-top: var(--sp-2);
 	}
 	.link {
 		background: none;
 		border: 0;
 		padding: 0;
-		color: var(--yellow-2);
 		cursor: pointer;
-		font-size: 12px;
+		font-size: var(--fs-s);
+		color: var(--fg-2);
+		text-decoration: underline;
 	}
 	.legacy {
-		padding: 0 6px;
-		border-radius: 5px;
-		border: 1px solid var(--line);
-		font-size: 11px;
+		padding: 0 var(--sp-3);
+		border: var(--bw) solid var(--line);
+		font-size: var(--fs-xs);
 	}
 	.badges {
 		display: flex;
 		flex-direction: column;
-		gap: 4px;
+		gap: var(--sp-2);
 		align-items: flex-end;
 	}
 	.big-score {
 		display: flex;
 		flex-direction: column;
 		align-items: flex-end;
-		gap: 3px;
+		gap: var(--sp-2);
 	}
 	.small {
-		font-size: 12px;
+		font-size: var(--fs-s);
 	}
 	.head-actions {
 		display: flex;
 		align-items: center;
-		gap: 4px;
+		gap: var(--sp-2);
 	}
 	.dotspin {
 		width: 10px;
 		height: 10px;
-		border-radius: 50%;
-		border: 2px solid var(--yellow);
 		border-right-color: transparent;
-		animation: spin 0.7s linear infinite;
+		animation: spin var(--dur-3) linear infinite;
+		border: 2px solid var(--fg);
 	}
 	@keyframes spin {
 		to {
@@ -711,88 +709,86 @@
 		min-height: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 8px;
-		padding: 12px;
+		gap: var(--sp-4);
+		padding: var(--sp-5);
 	}
 	.art-tabs {
 		display: flex;
-		gap: 4px;
+		gap: var(--sp-2);
 		flex-wrap: wrap;
 	}
 	.art-tabs button {
 		display: inline-flex;
 		align-items: center;
-		gap: 6px;
+		gap: var(--sp-3);
 		height: 28px;
-		padding: 0 10px;
-		border-radius: 7px;
-		border: 1px solid var(--line-soft);
-		background: var(--bg-3);
-		color: var(--text-2);
+		padding: 0 var(--sp-5);
+		border: var(--bw) solid var(--line-soft);
+		background: var(--surface-2);
+		color: var(--fg-2);
 		cursor: pointer;
-		font-family: var(--mono);
-		font-size: 12px;
+		font-family: var(--font);
+		font-size: var(--fs-s);
 	}
 	.art-tabs button.on {
-		border-color: var(--yellow-a35);
-		color: var(--yellow-2);
-		box-shadow: var(--glow-soft);
+		color: var(--fg);
+		border-color: var(--line-strong);
+		box-shadow: inset 0 -2px 0 var(--accent);
 	}
 	.art-tabs small {
 		font-family: var(--font);
-		color: var(--text-4);
+		color: var(--fg-4);
 	}
 	.fail h3 {
-		margin: 0 0 6px;
+		margin: 0 0 var(--sp-3);
 		display: flex;
-		gap: 8px;
+		gap: var(--sp-4);
 		align-items: center;
 		color: var(--bad);
-		font-size: 14px;
+		font-size: var(--fs-l);
 		--icon-accent: var(--bad);
 	}
 	.fail p {
 		white-space: pre-wrap;
-		font-size: 12.5px;
+		font-size: var(--fs-m);
 	}
 	.notes {
 		display: flex;
 		flex-direction: column;
-		gap: 3px;
-		font-size: 12px;
-		color: var(--text-3);
+		gap: var(--sp-2);
+		font-size: var(--fs-s);
+		color: var(--fg-3);
 	}
 	.md-card {
-		padding: 4px 22px 18px;
+		padding: var(--sp-2) var(--sp-7) var(--sp-6);
 	}
 	.reasoning summary {
 		cursor: pointer;
-		color: var(--text-2);
+		color: var(--fg-2);
 		display: flex;
 		align-items: center;
-		gap: 6px;
-		padding: 6px 0;
+		gap: var(--sp-3);
+		padding: var(--sp-3) 0;
 	}
 	.check .issues {
 		list-style: none;
-		margin: 8px 0 0;
+		margin: var(--sp-4) 0 0;
 		padding: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 3px;
+		gap: var(--sp-2);
 	}
 	.issues li {
 		display: flex;
-		gap: 8px;
+		gap: var(--sp-4);
 		align-items: baseline;
-		font-size: 12.5px;
-		padding: 4px 8px;
-		border-radius: 6px;
-		background: var(--bg-1);
+		font-size: var(--fs-m);
+		padding: var(--sp-2) var(--sp-4);
+		background: var(--sunken);
 	}
 	.issues .sev {
-		font-size: 10px;
-		font-weight: 700;
+		font-size: var(--fs-xs);
+		font-weight: var(--fw-strong);
 		text-transform: uppercase;
 		min-width: 52px;
 	}
@@ -806,41 +802,40 @@
 		color: var(--info);
 	}
 	.issues .kind {
-		color: var(--text-3);
-		font-size: 11.5px;
+		color: var(--fg-3);
+		font-size: var(--fs-s);
 	}
 	.issues .msg {
 		flex: 1;
 		word-break: break-word;
-		color: var(--text-2);
+		color: var(--fg-2);
 	}
 	.issues .loc {
-		color: var(--text-4);
-		font-size: 11px;
+		color: var(--fg-4);
+		font-size: var(--fs-xs);
 	}
 	.verdict-head {
 		display: flex;
-		gap: 18px;
+		gap: var(--sp-6);
 		align-items: flex-start;
 	}
 	.summary {
-		margin: 0 0 6px;
-		color: var(--text);
+		margin: 0 0 var(--sp-3);
+		color: var(--fg);
 		line-height: 1.55;
 	}
 	.flags {
 		display: flex;
-		gap: 6px;
-		margin-top: 6px;
+		gap: var(--sp-3);
+		margin-top: var(--sp-3);
 	}
 	.flag {
 		display: inline-flex;
 		align-items: center;
-		gap: 4px;
-		font-size: 11.5px;
-		padding: 2px 8px;
-		border-radius: 999px;
-		border: 1px solid;
+		gap: var(--sp-2);
+		font-size: var(--fs-s);
+		padding: var(--sp-1) var(--sp-4);
+		border: var(--bw) solid;
 	}
 	.flag.bad {
 		color: var(--bad);
@@ -853,91 +848,89 @@
 	.sw {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		gap: 10px;
+		gap: var(--sp-5);
 	}
 	.sw ul {
 		margin: 0;
-		padding-left: 18px;
-		font-size: 13px;
-		color: var(--text-2);
+		padding-left: var(--sp-6);
+		font-size: var(--fs-m);
+		color: var(--fg-2);
 	}
 	.crit.gate {
-		border-color: rgba(255, 93, 115, 0.45);
+		border-color: var(--bad);
 	}
 	.w {
-		font-size: 11px;
-		color: var(--text-3);
+		font-size: var(--fs-xs);
+		color: var(--fg-3);
 		font-variant-numeric: tabular-nums;
 	}
 	.req {
-		font-size: 10px;
-		font-weight: 700;
+		font-size: var(--fs-xs);
+		font-weight: var(--fw-strong);
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
-		padding: 1px 6px;
-		border-radius: 4px;
-		color: var(--yellow-2);
-		border: 1px solid var(--yellow-a35);
+		padding: var(--sp-1) var(--sp-3);
+		color: var(--fg-2);
+		border: var(--bw) solid var(--line-strong);
 	}
 	.desc {
-		margin: 4px 0 0;
-		font-size: 12px;
-		color: var(--text-3);
+		margin: var(--sp-2) 0 0;
+		font-size: var(--fs-s);
+		color: var(--fg-3);
 	}
 	.rationale {
-		margin: 8px 0 0;
-		color: var(--text-2);
-		font-size: 13px;
+		margin: var(--sp-4) 0 0;
+		color: var(--fg-2);
+		font-size: var(--fs-m);
 	}
 	.evidence {
-		margin: 6px 0 0;
-		padding-left: 18px;
-		font-size: 12px;
-		color: var(--text-3);
-		font-family: var(--mono);
+		margin: var(--sp-3) 0 0;
+		padding-left: var(--sp-6);
+		font-size: var(--fs-s);
+		color: var(--fg-3);
+		font-family: var(--font);
 	}
 	.hcrit input[type='range'] {
 		width: 100%;
-		accent-color: var(--yellow);
-		margin-top: 8px;
+		accent-color: var(--accent);
+		margin-top: var(--sp-4);
 	}
 	.hval {
 		min-width: 30px;
 		text-align: right;
-		color: var(--yellow-2);
+		color: var(--fg);
 	}
 	.metrics {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-		gap: 8px;
+		gap: var(--sp-4);
 	}
 	.metrics div {
 		display: flex;
 		flex-direction: column;
-		padding: 9px 12px;
-		border-radius: var(--radius);
-		background: var(--bg-3);
-		border: 1px solid var(--line-soft);
+		padding: var(--sp-4) var(--sp-5);
+		background: var(--surface-2);
+		border: var(--bw) solid var(--line-soft);
 	}
 	.metrics span {
-		font-size: 11px;
-		color: var(--text-3);
+		font-size: var(--fs-xs);
+		color: var(--fg-3);
 	}
 	.metrics b {
-		font-size: 15px;
+		font-size: var(--fs-l);
 		font-variant-numeric: tabular-nums;
 	}
 	.kv {
 		display: grid;
 		grid-template-columns: max-content 1fr;
-		gap: 4px 16px;
-		font-size: 12.5px;
+		gap: var(--sp-2) var(--sp-6);
+		font-size: var(--fs-m);
 	}
 	.kv span {
-		color: var(--text-3);
+		color: var(--fg-3);
 	}
 	.kv b {
-		font-weight: 500;
+		font-weight: var(--fw);
 		word-break: break-all;
 	}
 	.warn {
@@ -949,6 +942,6 @@
 	}
 	details summary {
 		cursor: pointer;
-		margin-top: 8px;
+		margin-top: var(--sp-4);
 	}
 </style>

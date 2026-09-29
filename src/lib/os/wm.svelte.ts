@@ -7,8 +7,6 @@ export type AppDef = {
 	id: string;
 	title: string;
 	icon: string;
-	/** Tile hue for the desktop icon (degrees). */
-	hue: number;
 	component: Component<{ win: Win; props: Record<string, unknown> }>;
 	size: { w: number; h: number };
 	min?: { w: number; h: number };
@@ -60,8 +58,8 @@ function saveLayout(s: Saved) {
 }
 
 export function desktopBounds() {
-	const top = 38;
-	const bottom = 52;
+	const top = 30; // --topbar-h
+	const bottom = 36; // --taskbar-h
 	return { x: 0, y: top, w: window.innerWidth, h: window.innerHeight - top - bottom };
 }
 
@@ -101,14 +99,16 @@ class WindowManager {
 		}
 		const b = desktopBounds();
 		const saved = this.#layout[def.id];
-		const w = Math.min(saved?.w ?? def.size.w, b.w - 24);
+		// Keep the desktop icon column free on wide screens.
+		const left = b.w > 1100 ? 208 : 12;
+		const w = Math.min(saved?.w ?? def.size.w, b.w - left - 12);
 		const h = Math.min(saved?.h ?? def.size.h, b.h - 24);
 		const open = this.windows.filter((x) => x.state !== 'minimized').length;
 		const cascade = (open % 6) * 28;
 		const x =
 			saved && !this.windows.some((o) => o.app === def.id)
 				? saved.x
-				: Math.max(12, Math.min(b.w - w - 12, (b.w - w) / 2 - 90 + cascade));
+				: Math.max(left, Math.min(b.w - w - 12, left + (b.w - left - w) / 2 - 40 + cascade));
 		const y =
 			saved && !this.windows.some((o) => o.app === def.id)
 				? saved.y

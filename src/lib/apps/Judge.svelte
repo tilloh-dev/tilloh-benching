@@ -200,62 +200,61 @@
 	.head {
 		display: flex;
 		align-items: center;
-		gap: 22px;
-		padding: 14px 16px;
-		border-bottom: 1px solid var(--line-soft);
+		gap: var(--sp-7);
+		padding: var(--sp-6) var(--sp-6);
+		border-bottom: var(--bw) solid var(--line-soft);
 	}
 	.stat {
 		display: flex;
 		flex-direction: column;
 	}
 	.stat b {
-		font-size: 22px;
+		font-size: var(--fs-xl);
 		font-variant-numeric: tabular-nums;
 	}
 	.stat b.live {
-		color: var(--yellow);
-		text-shadow: 0 0 12px var(--yellow-a35);
+		color: var(--fg);
+		animation: blink 1s steps(2) infinite;
 	}
 	.stat span {
-		font-size: 11px;
-		color: var(--text-3);
+		font-size: var(--fs-xs);
+		color: var(--fg-3);
 	}
 	.small {
-		font-size: 12px;
+		font-size: var(--fs-s);
 	}
 	.body {
 		flex: 1;
-		padding: 12px;
+		padding: var(--sp-5);
 		display: flex;
 		flex-direction: column;
-		gap: 10px;
+		gap: var(--sp-5);
 	}
 	.opts {
 		display: flex;
 		flex-direction: column;
-		gap: 6px;
+		gap: var(--sp-3);
 	}
 	.chips {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 4px;
-		margin-top: 8px;
+		gap: var(--sp-2);
+		margin-top: var(--sp-4);
 	}
 	.chip {
-		font-size: 11.5px;
-		padding: 3px 8px;
-		border-radius: 999px;
-		border: 1px solid var(--line-soft);
-		background: var(--bg-1);
-		color: var(--text-2);
+		font-size: var(--fs-s);
+		padding: var(--sp-2) var(--sp-4);
+		border: var(--bw) solid var(--line-soft);
+		background: var(--sunken);
+		color: var(--fg-2);
 		cursor: pointer;
 	}
 	.chip:hover {
-		border-color: var(--yellow-a35);
-		color: var(--text);
+		color: var(--fg);
+		border-color: var(--line-strong);
 	}
 	.pad-x {
-		padding: 0 4px;
+		padding: 0 var(--sp-2);
 	}
 	.pos {
 		color: var(--warn);
@@ -264,10 +263,10 @@
 		color: var(--info);
 	}
 	.log {
-		font-size: 12px;
+		font-size: var(--fs-s);
 		display: flex;
 		flex-direction: column;
-		gap: 2px;
+		gap: var(--sp-1);
 	}
 	.log .warn {
 		color: var(--warn);

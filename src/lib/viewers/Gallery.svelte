@@ -32,7 +32,7 @@
 				{images[open].label} <span class="muted">· {open + 1}/{images.length} · ← → Esc</span>
 			</figcaption>
 		</figure>
-		<button class="x" aria-label="Close"><Icon name="close" size={18} /></button>
+		<button class="x" aria-label="Close"><Icon name="close" size={12} /></button>
 	</div>
 {/if}
 
@@ -40,39 +40,36 @@
 	.gallery {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-		gap: 10px;
+		gap: var(--sp-5);
 	}
 	.thumb {
 		display: flex;
 		flex-direction: column;
 		padding: 0;
-		border: 1px solid var(--line-soft);
-		border-radius: var(--radius);
-		background: var(--bg-1);
+		border: var(--bw) solid var(--line-soft);
+		background: var(--sunken);
 		overflow: hidden;
 		cursor: zoom-in;
-		animation: fade-up 0.3s both;
+		animation: appear var(--dur-3) both;
 		transition:
-			border-color 0.15s,
-			transform 0.2s var(--ease-out),
-			box-shadow 0.2s;
+			border-color var(--dur-2),
+			transform var(--dur-3) var(--ease),
+			box-shadow var(--dur-3);
 	}
 	.thumb:hover {
-		border-color: var(--yellow-a35);
-		transform: translateY(-2px);
-		box-shadow: var(--glow-soft);
+		border-color: var(--fg-3);
 	}
 	.thumb img {
 		width: 100%;
 		aspect-ratio: 16 / 10;
 		object-fit: cover;
 		object-position: top;
-		background: #fff;
+		background: #fff; /* screenshots */
 	}
 	.cap {
-		padding: 6px 9px;
-		font-size: 11.5px;
-		color: var(--text-3);
+		padding: var(--sp-3) var(--sp-4);
+		font-size: var(--fs-s);
+		color: var(--fg-3);
 		text-align: left;
 	}
 	.lightbox {
@@ -81,9 +78,9 @@
 		z-index: 20000;
 		display: grid;
 		place-items: center;
-		background: rgba(3, 6, 14, 0.82);
+		background: color-mix(in srgb, var(--bg) 88%, transparent);
 		backdrop-filter: blur(6px);
-		animation: fade-up 0.15s both;
+		animation: appear var(--dur-2) both;
 	}
 	figure {
 		margin: 0;
@@ -91,20 +88,19 @@
 		max-height: 88vh;
 		display: flex;
 		flex-direction: column;
-		gap: 8px;
+		gap: var(--sp-4);
 	}
 	figure img {
 		max-width: 92vw;
 		max-height: 82vh;
 		object-fit: contain;
-		border-radius: 10px;
 		box-shadow: var(--shadow-pop);
-		background: #fff;
+		background: #fff; /* screenshots */
 	}
 	figcaption {
 		text-align: center;
-		color: var(--text-2);
-		font-size: 13px;
+		color: var(--fg-2);
+		font-size: var(--fs-m);
 	}
 	.x {
 		position: absolute;
@@ -112,10 +108,9 @@
 		right: 18px;
 		width: 36px;
 		height: 36px;
-		border-radius: 50%;
-		border: 1px solid var(--line);
-		background: var(--bg-3);
-		color: var(--text);
+		border: var(--bw) solid var(--line);
+		background: var(--surface-2);
+		color: var(--fg);
 		display: grid;
 		place-items: center;
 		cursor: pointer;

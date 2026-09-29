@@ -33,29 +33,29 @@
 
 <style>
 	.md {
-		color: var(--text-2);
+		color: var(--fg-2);
 		line-height: 1.65;
-		font-size: 14px;
+		font-size: var(--fs-m);
 		max-width: 820px;
 	}
 	.md :global(h1),
 	.md :global(h2),
 	.md :global(h3),
 	.md :global(h4) {
-		color: var(--text);
+		color: var(--fg);
 		line-height: 1.25;
 		margin: 1.3em 0 0.5em;
 	}
 	.md :global(h1) {
-		font-size: 24px;
+		font-size: var(--fs-xl);
 	}
 	.md :global(h2) {
-		font-size: 19px;
-		padding-bottom: 6px;
-		border-bottom: 1px solid var(--line-soft);
+		font-size: var(--fs-l);
+		padding-bottom: var(--sp-3);
+		border-bottom: var(--bw) solid var(--line-soft);
 	}
 	.md :global(h3) {
-		font-size: 16px;
+		font-size: var(--fs-m);
 	}
 	.md :global(p),
 	.md :global(ul),
@@ -63,37 +63,33 @@
 		margin: 0.7em 0;
 	}
 	.md :global(strong) {
-		color: var(--text);
+		color: var(--fg);
 	}
 	.md :global(code) {
-		font-family: var(--mono);
-		font-size: 12.5px;
-		background: var(--bg-1);
-		border: 1px solid var(--line-soft);
-		border-radius: 5px;
-		padding: 1px 5px;
-		color: var(--yellow-2);
+		font-family: var(--font);
+		font-size: 0.95em;
+		background: var(--sunken);
+		border: var(--bw) solid var(--line-soft);
+		padding: var(--sp-1) var(--sp-3);
+		color: var(--fg);
 	}
 	.md :global(pre) {
-		background: var(--bg-0);
-		border: 1px solid var(--line-soft);
-		border-radius: var(--radius);
-		padding: 12px 14px;
+		background: var(--sunken);
+		border: var(--bw) solid var(--line-soft);
+		padding: var(--sp-5) var(--sp-6);
 		overflow: auto;
 	}
 	.md :global(pre code) {
 		background: none;
 		border: 0;
 		padding: 0;
-		color: #d9e0ff;
+		color: var(--fg);
 	}
 	.md :global(blockquote) {
 		margin: 0.8em 0;
-		padding: 4px 14px;
-		border-left: 3px solid var(--yellow);
-		color: var(--text-3);
-		background: var(--yellow-a10);
-		border-radius: 0 8px 8px 0;
+		padding: var(--sp-2) var(--sp-6);
+		border-left: 2px solid var(--line-strong);
+		color: var(--fg-3);
 	}
 	.md :global(table) {
 		border-collapse: collapse;
@@ -101,8 +97,8 @@
 	}
 	.md :global(th),
 	.md :global(td) {
-		border: 1px solid var(--line);
-		padding: 5px 9px;
+		border: var(--bw) solid var(--line);
+		padding: var(--sp-3) var(--sp-4);
 	}
 	.md :global(hr) {
 		border: 0;
@@ -113,18 +109,18 @@
 		max-width: 100%;
 	}
 	.md :global(.hljs-keyword) {
-		color: #ffd23f;
+		color: var(--syn-keyword);
 	}
 	.md :global(.hljs-string) {
-		color: #7ee6c3;
+		color: var(--syn-string);
 	}
 	.md :global(.hljs-comment) {
-		color: #5d6ba3;
+		color: var(--syn-comment);
 	}
 	.md :global(.hljs-number) {
-		color: #ff9f7a;
+		color: var(--syn-number);
 	}
 	.md :global(.hljs-title) {
-		color: #8fb8ff;
+		color: var(--syn-name);
 	}
 </style>

@@ -1,8 +1,8 @@
 {
-	"name": "benchy",
+	"name": "benchyos",
 	"private": true,
 	"version": "0.1.0",
-	"description": "Benchmark local and remote LLMs against your own prompts, judged by Claude Code.",
+	"description": "BenchyOS \u2014 benchmark local and remote LLMs against your own prompts, judged by Claude Code.",
 	"type": "module",
 	"license": "MIT",
 	"engines": {

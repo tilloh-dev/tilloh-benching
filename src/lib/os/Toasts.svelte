@@ -7,13 +7,13 @@
 <div class="toasts">
 	{#each toasts.items as t (t.id)}
 		<div class="toast {t.kind}">
-			<Icon name={icons[t.kind]} size={18} />
+			<Icon name={icons[t.kind]} size={12} />
 			<div class="grow">
 				<div class="title">{t.title}</div>
 				{#if t.body}<div class="body">{t.body}</div>{/if}
 			</div>
 			<button aria-label="Dismiss" onclick={() => toasts.dismiss(t.id)}
-				><Icon name="close" size={14} /></button
+				><Icon name="close" size={12} /></button
 			>
 		</div>
 	{/each}
@@ -22,33 +22,31 @@
 <style>
 	.toasts {
 		position: fixed;
-		right: 16px;
-		bottom: calc(var(--taskbar-h) + 14px);
+		right: var(--sp-4);
+		bottom: calc(var(--taskbar-h) + var(--sp-4));
 		z-index: 40000;
 		display: flex;
 		flex-direction: column;
-		gap: 8px;
-		width: 360px;
+		gap: var(--sp-3);
+		width: 340px;
 		pointer-events: none;
 	}
 	.toast {
 		pointer-events: auto;
 		display: flex;
 		align-items: flex-start;
-		gap: 10px;
-		padding: 11px 12px;
-		border-radius: var(--radius);
-		background: var(--bg-3);
-		border: 1px solid var(--line);
+		gap: var(--sp-3);
+		padding: var(--sp-3) var(--sp-4);
+		background: var(--surface);
+		border: var(--bw) solid var(--line-strong);
+		border-left: 2px solid var(--c);
 		box-shadow: var(--shadow-pop);
-		animation: toast-in 0.3s var(--ease-spring) both;
+		animation: step-unfold var(--dur-2) steps(var(--steps)) both;
 		--c: var(--info);
-		border-left: 3px solid var(--c);
 	}
-	.toast :global(svg) {
+	.toast > :global(svg) {
 		color: var(--c);
-		--icon-accent: var(--c);
-		margin-top: 1px;
+		margin-top: var(--sp-1);
 	}
 	.ok {
 		--c: var(--ok);
@@ -60,26 +58,21 @@
 		--c: var(--bad);
 	}
 	.title {
-		font-weight: 600;
-		font-size: 13px;
+		font-weight: var(--fw-strong);
 	}
 	.body {
-		font-size: 12.5px;
-		color: var(--text-2);
-		margin-top: 2px;
+		font-size: var(--fs-s);
+		color: var(--fg-2);
 		word-break: break-word;
 	}
 	button {
-		background: none;
 		border: 0;
-		color: var(--text-3);
+		background: none;
+		color: var(--fg-3);
 		cursor: pointer;
-		padding: 2px;
+		padding: 0;
 	}
-	@keyframes toast-in {
-		from {
-			opacity: 0;
-			transform: translateX(30px) scale(0.96);
-		}
+	button:hover {
+		color: var(--fg);
 	}
 </style>

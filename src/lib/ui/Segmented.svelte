@@ -19,32 +19,28 @@
 <style>
 	.seg {
 		display: inline-flex;
-		padding: 2px;
-		gap: 2px;
-		border-radius: 8px;
-		background: var(--bg-1);
-		border: 1px solid var(--line);
+		border: var(--bw) solid var(--line-strong);
 	}
 	button {
-		height: 26px;
-		padding: 0 10px;
+		height: calc(var(--control-h) - 2px);
+		padding: 0 var(--sp-4);
 		border: 0;
-		border-radius: 6px;
-		background: transparent;
-		color: var(--text-3);
-		font-size: 12px;
-		font-weight: 500;
+		border-right: var(--bw) solid var(--line);
+		background: var(--sunken);
+		color: var(--fg-3);
+		font-size: var(--fs-s);
 		cursor: pointer;
-		transition:
-			background 0.15s,
-			color 0.15s;
+		transition: color var(--dur-1);
+	}
+	button:last-child {
+		border-right: 0;
 	}
 	button:hover {
-		color: var(--text);
+		color: var(--fg);
 	}
 	button.on {
-		background: var(--bg-4);
-		color: var(--yellow-2);
-		box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+		background: var(--surface-2);
+		color: var(--fg);
+		font-weight: var(--fw-strong);
 	}
 </style>

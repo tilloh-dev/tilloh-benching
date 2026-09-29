@@ -28,66 +28,53 @@
 
 <style>
 	.tabs {
-		display: flex;
-		gap: 2px;
-		padding: 0 12px;
-		border-bottom: 1px solid var(--line-soft);
-		background: var(--bg-2);
 		flex: none;
+		display: flex;
+		padding: 0 var(--sp-4);
+		border-bottom: var(--bw) solid var(--line);
+		background: var(--surface);
 		overflow-x: auto;
 		overflow-y: hidden;
 		scrollbar-width: none;
 	}
 	.tab {
-		position: relative;
 		display: inline-flex;
 		align-items: center;
-		gap: 6px;
-		height: 38px;
-		padding: 0 12px;
+		gap: var(--sp-2);
+		height: var(--row-h);
+		padding: 0 var(--sp-4);
 		border: 0;
+		border-bottom: 2px solid transparent;
+		margin-bottom: -1px;
 		background: transparent;
-		color: var(--text-3);
-		font-weight: 500;
+		color: var(--fg-3);
 		cursor: pointer;
 		white-space: nowrap;
-		transition: color 0.15s;
+		transition: color var(--dur-2);
 	}
 	.small .tab {
-		height: 32px;
-		font-size: 12.5px;
+		height: var(--control-h);
+		font-size: var(--fs-s);
 	}
 	.tab:hover:not(:disabled) {
-		color: var(--text);
+		color: var(--fg);
 	}
 	.tab:disabled {
-		opacity: 0.4;
+		color: var(--fg-4);
 		cursor: default;
 	}
 	.tab.active {
-		color: var(--text);
-	}
-	.tab::after {
-		content: '';
-		position: absolute;
-		left: 10px;
-		right: 10px;
-		bottom: -1px;
-		height: 2px;
-		border-radius: 2px;
-		background: var(--yellow);
-		box-shadow: 0 0 10px var(--yellow);
-		transform: scaleX(0);
-		transition: transform 0.2s var(--ease-out);
-	}
-	.tab.active::after {
-		transform: scaleX(1);
+		color: var(--fg);
+		border-bottom-color: var(--accent);
 	}
 	.count {
-		font-size: 11px;
-		padding: 0 6px;
-		border-radius: 999px;
-		background: var(--bg-4);
-		color: var(--text-2);
+		font-size: var(--fs-xs);
+		color: var(--fg-3);
+	}
+	.count::before {
+		content: '[';
+	}
+	.count::after {
+		content: ']';
 	}
 </style>

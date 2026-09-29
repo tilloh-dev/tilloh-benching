@@ -63,7 +63,7 @@ export class EngineLockedError extends Error {
 	readonly pid: number;
 	constructor(pid: number) {
 		super(
-			`another Benchy engine (pid ${pid}) owns this workspace — use it (benchy serve) or stop it first`
+			`another BenchyOS engine (pid ${pid}) owns this workspace — use it (benchy serve) or stop it first`
 		);
 		this.pid = pid;
 	}

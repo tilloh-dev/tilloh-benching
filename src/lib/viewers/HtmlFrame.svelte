@@ -22,13 +22,13 @@
 			>
 		{/each}
 		<button class="tb" title="Reload" onclick={() => nonce++}
-			><Icon name="refresh" size={14} /></button
+			><Icon name="refresh" size={12} /></button
 		>
 		<button class="tb" title="Fullscreen" onclick={() => frame?.requestFullscreen()}
-			><Icon name="maximize" size={13} /></button
+			><Icon name="maximize" size={12} /></button
 		>
 		<a class="tb" href={src} target="_blank" rel="noopener noreferrer" title="Open in new tab"
-			><Icon name="external" size={14} /></a
+			><Icon name="external" size={12} /></a
 		>
 	</div>
 	<div class="stage">
@@ -52,28 +52,26 @@
 		flex-direction: column;
 		height: 100%;
 		min-height: 0;
-		border: 1px solid var(--line-soft);
-		border-radius: var(--radius);
+		border: var(--bw) solid var(--line-soft);
 		overflow: hidden;
-		background: var(--bg-0);
+		background: var(--sunken);
 	}
 	.bar {
 		flex: none;
 		display: flex;
 		align-items: center;
-		gap: 4px;
+		gap: var(--sp-2);
 		height: 34px;
-		padding: 0 6px 0 10px;
-		background: var(--bg-3);
-		border-bottom: 1px solid var(--line-soft);
+		padding: 0 var(--sp-3) 0 var(--sp-5);
+		background: var(--surface-2);
+		border-bottom: var(--bw) solid var(--line-soft);
 	}
 	.url {
-		font-size: 11.5px;
-		color: var(--text-3);
-		padding: 3px 10px;
-		border-radius: 999px;
-		background: var(--bg-1);
-		border: 1px solid var(--line-soft);
+		font-size: var(--fs-s);
+		color: var(--fg-3);
+		padding: var(--sp-2) var(--sp-5);
+		background: var(--sunken);
+		border: var(--bw) solid var(--line-soft);
 		max-width: 50%;
 	}
 	.tb {
@@ -81,37 +79,36 @@
 		place-items: center;
 		height: 24px;
 		min-width: 26px;
-		padding: 0 7px;
-		border-radius: 6px;
-		border: 1px solid transparent;
+		padding: 0 var(--sp-4);
+		border: var(--bw) solid transparent;
 		background: transparent;
-		color: var(--text-3);
-		font-size: 11px;
+		color: var(--fg-3);
+		font-size: var(--fs-xs);
 		cursor: pointer;
 		text-decoration: none;
 	}
 	.tb:hover {
-		background: var(--bg-4);
-		color: var(--text);
+		background: var(--hover);
+		color: var(--fg);
 		text-decoration: none;
 	}
 	.tb.on {
-		color: var(--yellow-2);
 		border-color: var(--line);
-		background: var(--bg-2);
+		background: var(--surface);
+		color: var(--fg);
 	}
 	.stage {
 		flex: 1;
 		min-height: 0;
 		display: flex;
 		justify-content: center;
-		background: repeating-conic-gradient(#0b1230 0% 25%, #0e1638 0% 50%) 50% / 22px 22px;
+		background: var(--sunken);
 	}
 	iframe {
 		height: 100%;
 		border: 0;
-		background: #fff;
-		transition: width 0.25s var(--ease-out);
+		background: #fff; /* artifacts expect the browser default canvas */
+		transition: width var(--dur-3) var(--ease);
 		max-width: 100%;
 	}
 </style>

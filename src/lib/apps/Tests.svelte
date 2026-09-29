@@ -282,7 +282,7 @@
 			<ListItem active={selected === t.id} onclick={() => select(t.id)}>
 				<div class="row">
 					<b class="ellipsis grow">{t.file.title}</b>{#if !t.resolved}<span class="bad"
-							><Icon name="alert" size={14} /></span
+							><Icon name="alert" size={12} /></span
 						>{/if}
 				</div>
 				<div class="row meta">
@@ -355,7 +355,7 @@
 			{#if issues.length}
 				<div class="issues">
 					{#each issues as i (i.message)}<div>
-							<Icon name="alert" size={14} />
+							<Icon name="alert" size={12} />
 							{i.message}
 						</div>{/each}
 				</div>
@@ -472,7 +472,7 @@
 									onclick={() => {
 										files = files.filter((_, j) => j !== i);
 										dirty = true;
-									}}><Icon name="close" size={13} /></button
+									}}><Icon name="close" size={12} /></button
 								>
 							{/each}
 						</div>
@@ -489,7 +489,8 @@
 								dirty = true;
 							}}>Add file</Button
 						>
-						<label class="label" for="t-instr">Custom output instructions (replaces Benchy's)</label
+						<label class="label" for="t-instr"
+							>Custom output instructions (replaces BenchyOS's)</label
 						>
 						<textarea
 							id="t-instr"
@@ -501,7 +502,7 @@
 									...draft!.output,
 									instructions: (e.target as HTMLTextAreaElement).value || undefined
 								})}
-							placeholder="Leave empty: Benchy asks for exactly one fenced block per file."
+							placeholder="Leave empty: BenchyOS asks for exactly one fenced block per file."
 						></textarea>
 					{:else if tab === 'checks'}
 						<Toggle
@@ -529,7 +530,7 @@
 											onclick={() => {
 												checks = checks.filter((_, j) => j !== i);
 												dirty = true;
-											}}><Icon name="close" size={13} /></button
+											}}><Icon name="close" size={12} /></button
 										>
 									</div>
 									<textarea
@@ -594,7 +595,7 @@
 						{#if suggestion}
 							<div class="card suggestion">
 								<div class="row">
-									<b><Icon name="sparkle" size={15} /> Suggested rubric</b><span class="muted small"
+									<b><Icon name="sparkle" size={12} /> Suggested rubric</b><span class="muted small"
 										>{suggestion.criteria.length} criteria · {suggestion.judge_mode}</span
 									><span class="spacer"></span><Button
 										size="sm"
@@ -688,15 +689,15 @@
 		top: 0;
 		z-index: 2;
 		display: flex;
-		gap: 6px;
-		padding: 10px;
-		background: var(--bg-2);
-		border-bottom: 1px solid var(--line-soft);
+		gap: var(--sp-3);
+		padding: var(--sp-5);
+		background: var(--surface);
+		border-bottom: var(--bw) solid var(--line-soft);
 	}
 	.meta {
-		font-size: 11.5px;
-		color: var(--text-3);
-		gap: 6px;
+		font-size: var(--fs-s);
+		color: var(--fg-3);
+		gap: var(--sp-3);
 	}
 	.bad {
 		color: var(--bad);
@@ -704,44 +705,42 @@
 	}
 	.head {
 		display: flex;
-		gap: 14px;
+		gap: var(--sp-6);
 		align-items: center;
-		padding: 12px 16px;
-		border-bottom: 1px solid var(--line-soft);
+		padding: var(--sp-5) var(--sp-6);
+		border-bottom: var(--bw) solid var(--line-soft);
 	}
 	h2 {
 		margin: 0;
-		font-size: 16px;
+		font-size: var(--fs-l);
 	}
 	.dirty {
-		font-size: 11px;
-		color: var(--yellow-2);
-		border: 1px solid var(--yellow-a35);
-		padding: 0 6px;
-		border-radius: 5px;
+		font-size: var(--fs-xs);
+		padding: 0 var(--sp-3);
+		color: var(--fg-2);
+		border: var(--bw) solid var(--line-strong);
 	}
 	.top {
 		display: flex;
 		flex-direction: column;
-		gap: 2px;
+		gap: var(--sp-1);
 	}
 	.tb {
 		max-width: 150px;
-		color: var(--text-3);
+		color: var(--fg-3);
 	}
 	.small {
-		font-size: 12px;
+		font-size: var(--fs-s);
 	}
 	.issues {
-		padding: 8px 16px;
-		background: rgba(255, 93, 115, 0.08);
-		border-bottom: 1px solid rgba(255, 93, 115, 0.3);
-		color: #ffb3bd;
-		font-size: 12.5px;
+		padding: var(--sp-4) var(--sp-6);
+		border-bottom: var(--bw) solid var(--bad);
+		color: var(--bad);
+		font-size: var(--fs-m);
 	}
 	.form {
 		flex: 1;
-		padding: 14px 16px 24px;
+		padding: var(--sp-6) var(--sp-6) var(--sp-7);
 	}
 	fieldset {
 		border: 0;
@@ -749,43 +748,42 @@
 		margin: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 6px;
+		gap: var(--sp-3);
 		max-width: 940px;
 	}
 	fieldset .label {
-		margin-top: 8px;
+		margin-top: var(--sp-4);
 	}
 	.grid2 {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		gap: 0 12px;
+		gap: 0 var(--sp-5);
 	}
 	.prompt-head {
-		margin-top: 12px;
+		margin-top: var(--sp-5);
 	}
 	.textarea.prompt {
-		font-size: 13px;
+		font-size: var(--fs-m);
 		min-height: 280px;
 	}
 	.files {
 		display: grid;
 		grid-template-columns: 1.2fr 0.8fr 2fr auto 30px;
-		gap: 5px;
+		gap: var(--sp-3);
 		align-items: center;
 	}
 	.files .input {
-		padding: 5px 8px;
-		font-size: 12.5px;
+		padding: var(--sp-3) var(--sp-4);
+		font-size: var(--fs-m);
 	}
 	.rm {
 		display: grid;
 		place-items: center;
 		height: 28px;
 		width: 28px;
-		border: 1px solid var(--line-soft);
-		border-radius: 6px;
+		border: var(--bw) solid var(--line-soft);
 		background: transparent;
-		color: var(--text-3);
+		color: var(--fg-3);
 		cursor: pointer;
 	}
 	.rm:hover {
@@ -795,78 +793,76 @@
 	.check-row {
 		display: flex;
 		flex-direction: column;
-		gap: 6px;
+		gap: var(--sp-3);
 	}
 	.err {
 		color: var(--bad);
-		font-size: 12.5px;
+		font-size: var(--fs-m);
 	}
 	.crit-head {
-		margin-top: 16px;
+		margin-top: var(--sp-6);
 	}
 	.suggestion {
-		border-color: var(--yellow-a35);
-		box-shadow: var(--glow-soft);
-		animation: fade-up 0.25s both;
+		animation: appear var(--dur-3) both;
+		border-color: var(--line-strong);
 	}
 	.suggestion ul {
-		margin: 6px 0 0;
-		padding-left: 18px;
+		margin: var(--sp-3) 0 0;
+		padding-left: var(--sp-6);
 		display: flex;
 		flex-direction: column;
-		gap: 4px;
-		font-size: 13px;
+		gap: var(--sp-2);
+		font-size: var(--fs-m);
 	}
 	.crit {
 		display: flex;
 		flex-direction: column;
-		gap: 6px;
-		animation: fade-up 0.25s both;
+		gap: var(--sp-3);
+		animation: appear var(--dur-3) both;
 	}
 	.crit-grid {
 		display: grid;
 		grid-template-columns: 180px 1fr auto auto auto;
-		gap: 8px;
+		gap: var(--sp-4);
 		align-items: center;
 	}
 	.crit-grid .input {
-		padding: 5px 8px;
+		padding: var(--sp-3) var(--sp-4);
 	}
 	.weight {
 		display: inline-flex;
-		border: 1px solid var(--line);
-		border-radius: 7px;
+		border: var(--bw) solid var(--line);
 		overflow: hidden;
 	}
 	.weight button {
 		height: 28px;
-		padding: 0 9px;
+		padding: 0 var(--sp-4);
 		border: 0;
 		background: transparent;
-		color: var(--text-3);
+		color: var(--fg-3);
 		cursor: pointer;
-		font-size: 12px;
+		font-size: var(--fs-s);
 	}
 	.weight button.on {
-		background: var(--yellow-a20);
-		color: var(--yellow-2);
+		background: var(--surface-2);
+		color: var(--fg);
+		font-weight: var(--fw-strong);
 	}
 	.order {
 		display: flex;
-		gap: 2px;
+		gap: var(--sp-1);
 	}
 	.order button {
 		width: 24px;
 		height: 24px;
-		border: 1px solid var(--line-soft);
-		border-radius: 5px;
+		border: var(--bw) solid var(--line-soft);
 		background: transparent;
-		color: var(--text-3);
+		color: var(--fg-3);
 		cursor: pointer;
-		font-size: 10px;
+		font-size: var(--fs-xs);
 	}
 	.order button:hover {
-		color: var(--text);
+		color: var(--fg);
 		border-color: var(--line-strong);
 	}
 	.order .del:hover {
@@ -876,23 +872,21 @@
 	.textarea.desc {
 		min-height: 48px;
 		font-family: var(--font);
-		font-size: 13px;
+		font-size: var(--fs-m);
 	}
 	.wbar {
 		height: 3px;
-		background: var(--bg-1);
-		border-radius: 3px;
+		background: var(--sunken);
 		overflow: hidden;
 	}
 	.wbar span {
 		display: block;
 		height: 100%;
-		background: var(--yellow);
-		box-shadow: 0 0 8px var(--yellow);
-		transition: width 0.3s var(--ease-out);
+		background: var(--data);
+		transition: width var(--dur-3) var(--ease);
 	}
 	code {
-		font-size: 11.5px;
-		color: var(--yellow-2);
+		font-size: var(--fs-s);
+		color: var(--fg);
 	}
 </style>

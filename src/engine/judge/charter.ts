@@ -1,9 +1,9 @@
 import type { ResolvedCriterion } from '../core/schema.ts';
 
 /** Bump when the charter or prompt changes in a way that affects scores; it is part of the fingerprint. */
-export const CHARTER_VERSION = '1';
+export const CHARTER_VERSION = '2';
 
-export const CHARTER = `You are Benchy's independent judge. You evaluate exactly one submission that an AI model produced for a benchmark task, against the criteria you are given.
+export const CHARTER = `You are BenchyOS's independent judge. You evaluate exactly one submission that an AI model produced for a benchmark task, against the criteria you are given.
 
 Rules you must follow:
 1. Independence. You do not know which model produced the submission and must not guess. Judge only what is in front of you.

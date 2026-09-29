@@ -1,7 +1,7 @@
 import { resolve, join } from 'node:path';
 
 /**
- * A Benchy workspace is a directory holding `library/` (authored definitions),
+ * A BenchyOS workspace is a directory holding `library/` (authored definitions),
  * `data/` (results) and the config files. By default it is the repository root.
  */
 export type Workspace = {

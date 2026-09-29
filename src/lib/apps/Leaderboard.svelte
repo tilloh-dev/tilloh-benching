@@ -9,7 +9,8 @@
 	import Score from '../ui/Score.svelte';
 	import Kind from '../ui/Kind.svelte';
 	import Empty from '../ui/Empty.svelte';
-	import { fmtCost, fmtDuration, fmtNum, scoreHue } from '../ui/format.ts';
+	import { fmtCost, fmtDuration, fmtNum } from '../ui/format.ts';
+	import { scoreColor } from '../design/score.ts';
 
 	let { win: _win }: { win: Win } = $props();
 
@@ -110,14 +111,9 @@
 			</thead>
 			<tbody>
 				{#each board.rows as r, i (r.key)}
-					<tr
-						class="clickable"
-						style="animation-delay:{Math.min(i, 20) * 25}ms"
-						onclick={() => wm.open('blueprints', { select: r.blueprint_id })}
-					>
+					<tr class="clickable" onclick={() => wm.open('blueprints', { select: r.blueprint_id })}>
 						<td class="num rank"
-							>{#if r.overall.mean !== null}{#if i < 3}<span class="medal m{i}">{i + 1}</span
-									>{:else}{i + 1}{/if}{/if}</td
+							>{#if r.overall.mean !== null}<span class:top={i === 0}>{i + 1}</span>{/if}</td
 						>
 						<td>
 							<div class="row">
@@ -153,19 +149,18 @@
 				<div class="col-head" title={benchy.testTitle(t)}><span>{t}</span></div>
 			{/each}
 			<div class="col-head overall"><span>overall</span></div>
-			{#each board.rows as r, ri (r.key)}
+			{#each board.rows as r (r.key)}
 				<div class="row-head">
 					<span class="ellipsis">{r.label}</span>{#if r.blueprint_hash}<small class="mono"
 							>{r.blueprint_hash.slice(0, 7)}</small
 						>{/if}
 				</div>
-				{#each board.tests as t, ti (t)}
+				{#each board.tests as t (t)}
 					{@const cell = r.per_test[t]}
 					{#if cell && cell.mean !== null}
 						<button
 							class="cell"
-							style="--h:{scoreHue(cell.mean)}; --a:{0.25 +
-								(cell.mean / 100) * 0.6}; animation-delay:{(ri * board.tests.length + ti) * 8}ms"
+							style="--c:{scoreColor(cell.mean)}"
 							onclick={() => openCell(r, t)}
 							onmouseenter={(e) => (hover = { row: r, test: t, x: e.clientX, y: e.clientY })}
 							onmouseleave={() => (hover = null)}
@@ -184,7 +179,7 @@
 				<div
 					class="cell overall"
 					class:none={r.overall.mean === null}
-					style="--h:{scoreHue(r.overall.mean ?? 0)}"
+					style="--c:{scoreColor(r.overall.mean)}"
 				>
 					{r.overall.mean?.toFixed(1) ?? '—'}
 				</div>
@@ -237,11 +232,12 @@
 							onmouseleave={() => (hoverPoint = null)}
 							onclick={() => wm.open('blueprints', { select: p.blueprint_id })}
 						>
-							<circle
-								cx={sx(p.mean_gen_tps ?? 0)}
-								cy={sy(p.overall.mean ?? 0)}
-								r="7"
-								style="--h:{scoreHue(p.overall.mean ?? 0)}"
+							<rect
+								x={sx(p.mean_gen_tps ?? 0) - 4}
+								y={sy(p.overall.mean ?? 0) - 4}
+								width="8"
+								height="8"
+								style="--c:{scoreColor(p.overall.mean)}"
 							/>
 							<text x={sx(p.mean_gen_tps ?? 0) + 11} y={sy(p.overall.mean ?? 0) + 4} class="lbl"
 								>{p.label}</text
@@ -268,179 +264,134 @@
 <style>
 	.select.sm {
 		width: auto;
-		height: 30px;
-		padding-top: 4px;
-		padding-bottom: 4px;
-		font-size: 12.5px;
 		max-width: 220px;
 	}
 	.body {
 		flex: 1;
-		padding: 0 0 12px;
-	}
-	tbody tr {
-		animation: fade-up 0.3s both;
+		padding-bottom: var(--sp-4);
 	}
 	.bp {
 		max-width: 320px;
-		color: var(--text);
+		color: var(--fg);
 	}
 	.hash {
-		font-size: 11px;
-		color: var(--text-4);
+		font-size: var(--fs-xs);
+		color: var(--fg-4);
 	}
 	.rank {
-		width: 44px;
-		color: var(--text-3);
+		width: 4ch;
+		color: var(--fg-3);
 	}
-	.medal {
-		display: inline-grid;
-		place-items: center;
-		width: 24px;
-		height: 24px;
-		border-radius: 50%;
-		font-weight: 700;
-		font-size: 12px;
-		color: var(--yellow-ink);
-	}
-	.m0 {
-		background: radial-gradient(circle at 35% 30%, #fff3b0, #ffd23f 55%, #c99b0a);
-		box-shadow: 0 0 14px rgba(255, 210, 63, 0.6);
-	}
-	.m1 {
-		background: radial-gradient(circle at 35% 30%, #ffffff, #c9d2ec 55%, #8f9bbf);
-	}
-	.m2 {
-		background: radial-gradient(circle at 35% 30%, #ffd9b8, #d9894a 55%, #9c5a26);
+	.rank .top {
+		color: var(--fg);
+		font-weight: var(--fw-strong);
 	}
 	.bad {
 		color: var(--bad);
-		font-weight: 600;
+		font-weight: var(--fw-strong);
 	}
 
 	.matrix {
 		display: grid;
-		grid-template-columns: minmax(180px, 260px) repeat(var(--cols), minmax(54px, 1fr)) 76px;
-		gap: 3px;
-		padding: 14px;
-		align-items: stretch;
+		grid-template-columns: minmax(170px, 240px) repeat(var(--cols), minmax(44px, 1fr)) 64px;
+		gap: var(--sp-1);
+		padding: var(--sp-5);
 	}
-	.corner {
-		height: 110px;
+	.corner,
+	.col-head {
+		height: 104px;
 	}
 	.col-head {
-		height: 110px;
 		display: flex;
 		align-items: flex-end;
 		justify-content: center;
-		padding-bottom: 4px;
+		padding-bottom: var(--sp-2);
 	}
 	.col-head span {
 		writing-mode: vertical-rl;
 		transform: rotate(180deg);
-		font-size: 11.5px;
-		color: var(--text-3);
-		white-space: nowrap;
-		max-height: 104px;
+		max-height: 100px;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-size: var(--fs-s);
+		color: var(--fg-3);
 	}
 	.col-head.overall span {
-		color: var(--yellow-2);
-		font-weight: 600;
+		color: var(--fg);
+		font-weight: var(--fw-strong);
 	}
 	.row-head {
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		padding: 0 8px;
-		font-size: 12.5px;
-		color: var(--text);
 		min-width: 0;
+		padding: 0 var(--sp-4);
+		color: var(--fg);
 	}
 	.row-head small {
-		font-size: 10px;
-		color: var(--text-4);
+		font-size: var(--fs-xs);
+		color: var(--fg-4);
 	}
+	/* heatmap cell: score-scale tint, number always printed */
 	.cell {
 		position: relative;
-		height: 38px;
-		border-radius: 7px;
-		border: 1px solid hsl(var(--h, 230) 70% 55% / 0.35);
-		background: hsl(var(--h, 230) 75% 45% / var(--a, 0.2));
-		color: #fff;
-		font-weight: 600;
-		font-size: 12.5px;
-		font-variant-numeric: tabular-nums;
 		display: grid;
 		place-items: center;
+		height: var(--row-h);
+		border: var(--bw) solid color-mix(in srgb, var(--c, var(--line)) 45%, transparent);
+		background: color-mix(in srgb, var(--c, transparent) 22%, transparent);
+		color: var(--fg);
+		font-weight: var(--fw-strong);
+		font-variant-numeric: tabular-nums;
 		cursor: pointer;
-		animation: fade-up 0.3s both;
-		transition:
-			transform 0.12s,
-			box-shadow 0.15s;
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+		transition: border-color var(--dur-1);
 	}
 	.cell:hover {
-		transform: scale(1.08);
-		z-index: 2;
-		box-shadow:
-			0 0 0 2px var(--yellow),
-			0 0 16px rgba(255, 210, 63, 0.4);
+		border-color: var(--fg);
 	}
 	.cell.pending {
-		background: var(--bg-3);
-		border-color: var(--line-soft);
-		color: var(--text-3);
-		font-size: 10.5px;
-		font-weight: 500;
+		border-color: var(--line);
+		background: var(--surface-2);
+		color: var(--fg-3);
+		font-size: var(--fs-xs);
+		font-weight: var(--fw);
 	}
 	.cell.empty {
+		border: var(--bw) dashed var(--line-soft);
 		background: transparent;
-		border: 1px dashed var(--line-soft);
 		cursor: default;
-		animation: none;
 	}
 	.cell.overall {
-		background: hsl(var(--h) 75% 45% / 0.18);
-		border: 1px solid var(--yellow-a35);
-		color: hsl(var(--h) 90% 75%);
+		border-color: var(--line-strong);
+		background: var(--surface);
+		color: var(--c);
 		cursor: default;
 	}
 	.cell.overall.none {
-		background: var(--bg-3);
-		border-color: var(--line-soft);
-		color: var(--text-4);
-	}
-	.cell.overall:hover {
-		transform: none;
-		box-shadow: none;
+		color: var(--fg-4);
 	}
 	.gate {
 		position: absolute;
-		top: 4px;
-		right: 4px;
-		width: 6px;
-		height: 6px;
-		border-radius: 50%;
+		top: 2px;
+		right: 2px;
+		width: 4px;
+		height: 4px;
 		background: var(--bad);
-		box-shadow: 0 0 6px var(--bad);
 	}
 	.tip {
 		position: fixed;
 		z-index: 30000;
-		padding: 8px 11px;
-		border-radius: 8px;
-		background: rgba(14, 22, 52, 0.97);
-		border: 1px solid var(--line-strong);
-		box-shadow: var(--shadow-pop);
-		font-size: 12px;
-		line-height: 1.55;
-		pointer-events: none;
 		max-width: 320px;
+		padding: var(--sp-3) var(--sp-4);
+		background: var(--surface);
+		border: var(--bw) solid var(--line-strong);
+		box-shadow: var(--shadow-pop);
+		font-size: var(--fs-s);
+		pointer-events: none;
 	}
 	.scatter {
-		margin: 14px;
+		margin: var(--sp-5);
 	}
 	svg {
 		width: 100%;
@@ -449,36 +400,34 @@
 	}
 	.gridline {
 		stroke: var(--line-soft);
-		stroke-dasharray: 3 4;
+		stroke-dasharray: 2 4;
 	}
 	.tick {
-		fill: var(--text-4);
-		font-size: 11px;
+		fill: var(--fg-4);
+		font-size: var(--fs-s);
+		font-family: var(--font);
 	}
 	.axis {
-		fill: var(--text-3);
-		font-size: 11.5px;
+		fill: var(--fg-3);
+		font-size: var(--fs-s);
+		font-family: var(--font);
 	}
-	.pt circle {
-		fill: hsl(var(--h) 85% 55%);
-		stroke: #fff;
-		stroke-width: 1.5;
-		filter: drop-shadow(0 0 6px hsl(var(--h) 90% 55% / 0.8));
+	.pt rect {
+		fill: var(--c);
+		stroke: var(--surface);
+		stroke-width: 1;
 		cursor: pointer;
-		transition: r 0.15s;
-	}
-	.pt:hover circle {
-		r: 10;
 	}
 	.pt.dim {
 		opacity: 0.25;
 	}
 	.lbl {
-		fill: var(--text-2);
-		font-size: 11.5px;
+		fill: var(--fg-2);
+		font-size: var(--fs-s);
+		font-family: var(--font);
 	}
 	.legend {
-		margin: 6px 4px 0;
-		font-size: 12px;
+		margin: var(--sp-3) var(--sp-2) 0;
+		font-size: var(--fs-s);
 	}
 </style>

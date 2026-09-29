@@ -9,7 +9,7 @@
 </script>
 
 <div class="empty">
-	<div class="ico"><Icon name={icon} size={30} /></div>
+	<Icon name={icon} size={24} />
 	<h3>{title}</h3>
 	{#if children}<div class="body">{@render children()}</div>{/if}
 </div>
@@ -20,33 +20,20 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		text-align: center;
-		gap: 6px;
-		padding: 40px 20px;
-		color: var(--text-3);
+		gap: var(--sp-3);
+		padding: var(--sp-7);
 		height: 100%;
-		animation: fade-up 0.3s both;
-	}
-	.ico {
-		display: grid;
-		place-items: center;
-		width: 60px;
-		height: 60px;
-		border-radius: 18px;
-		background: var(--bg-3);
-		border: 1px solid var(--line-soft);
-		color: var(--text-2);
-		box-shadow: var(--glow-soft);
-		margin-bottom: 6px;
+		text-align: center;
+		color: var(--fg-3);
+		animation: appear var(--dur-2) both;
 	}
 	h3 {
 		margin: 0;
-		font-size: 15px;
-		color: var(--text);
-		font-weight: 600;
+		font-size: var(--fs-m);
+		font-weight: var(--fw-strong);
+		color: var(--fg);
 	}
 	.body {
 		max-width: 420px;
-		font-size: 13px;
 	}
 </style>

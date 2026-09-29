@@ -13,7 +13,7 @@ export const PATH_KEYS = new Set([
 	'model-vocoder'
 ]);
 
-/** Keys Benchy owns (per server, not per model) or that would break the router's naming. */
+/** Keys BenchyOS owns (per server, not per model) or that would break the router's naming. */
 export const RESERVED_KEYS = new Set([
 	'host',
 	'port',

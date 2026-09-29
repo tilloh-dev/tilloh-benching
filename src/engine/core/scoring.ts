@@ -12,7 +12,7 @@ export type ScoreResult = {
 
 /**
  * Deterministic aggregation of per-criterion scores into 0–100. The judge only
- * scores criteria; weighting is Benchy's job so it stays reproducible.
+ * scores criteria; weighting is BenchyOS's job so it stays reproducible.
  * Criteria the verdict omits count as 0 and are reported as missing.
  */
 export function scoreCriteria(

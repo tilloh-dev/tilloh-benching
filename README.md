@@ -1,6 +1,6 @@
-# Benchy
+# BenchyOS
 
-Benchy benchmarks local and remote language models against your own prompts. Every result is stored as plain files and checked automatically. An independent Claude Code judge then scores it per criterion. BenchyOS, a desktop-style web UI, shows outputs, llama.cpp settings, run metadata and verdicts, and exports a read-only copy for sharing.
+BenchyOS benchmarks local and remote language models against your own prompts. Every result is stored as plain files and checked automatically. An independent Claude Code judge then scores it per criterion. BenchyOS, a desktop-style web UI, shows outputs, llama.cpp settings, run metadata and verdicts, and exports a read-only copy for sharing.
 
 ![One attempt: blueprint × test → generate → extract and check → judge → files, with re-judging as a loop](docs/assets/readme/attempt-pipeline.svg)
 
@@ -18,7 +18,7 @@ Benchy benchmarks local and remote language models against your own prompts. Eve
 
 **Blueprint kinds**
 
-- `llama-cpp` — Benchy starts llama-server on **this** host in router mode with a generated preset, one model at a time.
+- `llama-cpp` — BenchyOS starts llama-server on **this** host in router mode with a generated preset, one model at a time.
 - `openai-compatible` — any `/chat/completions` API with a key from `.env`: OpenRouter, Ollama Cloud, OpenAI, vLLM, LM Studio.
 - `claude-code` — `claude -p` as the subject, in `chat` mode (one answer, no tools) or `agentic` mode (writes files in a sandbox).
 - `dry-run` — canned responses, including deliberately broken ones. No network, no model.
@@ -74,7 +74,7 @@ Debian-based Linux (Pop!_OS, Ubuntu, Debian, or WSL on Windows) with:
 
 ## Run local models
 
-Benchy only ever controls llama-server on the machine it runs on. On **hermine** it runs inside WSL and drives the Windows CUDA build. On **Gertrude** it drives the native Vulkan build.
+BenchyOS only ever controls llama-server on the machine it runs on. On **hermine** it runs inside WSL and drives the Windows CUDA build. On **Gertrude** it drives the native Vulkan build.
 
 1. Import your router preset once. Every `[section]` becomes a blueprint:
 
@@ -90,7 +90,7 @@ Benchy only ever controls llama-server on the machine it runs on. On **hermine**
    ./bin/benchy run -s html-classics -b Qwen3.6-27B -b gemma-4-31B
    ```
 
-**How Benchy handles llama-server:**
+**How BenchyOS handles llama-server:**
 
 - **Own instance on port 8099.** It writes a preset with one section per blueprint and runs `llama-server --models-preset … --models-max 1`. The router loads each model when its turn comes. Your own router on 8081 is never touched.
 - **Refuses a busy GPU.** If any other llama-server runs, the preflight reports it and the run does not start.
@@ -105,7 +105,7 @@ The judge is `claude -p` with `claude-opus-5-5` at effort `xhigh` by default. Ch
 
 - **Isolated from your setup.** `--safe-mode` (static) or `--restricted` (interactive) with `--strict-mcp-config`: your CLAUDE.md, hooks, skills and MCP servers do not reach the judge.
 - **Blind.** It works in a neutral temp directory: task, criteria, submission, screenshots and check logs. Nothing names the model.
-- **Structured.** `--json-schema` forces a score, rationale and evidence per criterion. Benchy computes the 0–100 score from the weights. A `required` criterion below 5/10 fails the attempt's gate.
+- **Structured.** `--json-schema` forces a score, rationale and evidence per criterion. BenchyOS computes the 0–100 score from the weights. A `required` criterion below 5/10 fails the attempt's gate.
 - **Two depths per test.** `static` reads code, screenshots and logs. `interactive` also drives the page with Playwright MCP and may run programs with sandboxed Bash. Interactive is more thorough and much slower.
 
 Re-judge anything without regenerating:
@@ -166,4 +166,4 @@ pnpm test       # Vitest, including the dry-run pipeline with Chromium
 pnpm lint       # Prettier + ESLint
 ```
 
-Contributor and agent conventions are in [AGENTS.md](AGENTS.md).
+Contributor and agent conventions are in [AGENTS.md](AGENTS.md); the UI rules are in [docs/DESIGN.md](docs/DESIGN.md) and live in BenchyOS under **Start → Design system**. The top-bar theme switch cycles system → dark → light.

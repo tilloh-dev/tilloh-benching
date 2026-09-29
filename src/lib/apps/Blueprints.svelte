@@ -342,7 +342,7 @@
 					]}
 					align="right"
 				>
-					{#snippet trigger()}<Icon name="plus" size={16} />{/snippet}
+					{#snippet trigger()}<Icon name="plus" size={12} />{/snippet}
 				</Menu>
 			{/if}
 		</div>
@@ -350,7 +350,7 @@
 			<ListItem active={selected === b.id} onclick={() => select(b.id)}>
 				<div class="row">
 					<b class="ellipsis grow">{b.file.label ?? b.id}</b>
-					{#if !b.resolved}<span class="bad" title="invalid"><Icon name="alert" size={14} /></span
+					{#if !b.resolved}<span class="bad" title="invalid"><Icon name="alert" size={12} /></span
 						>{/if}
 				</div>
 				<div class="row meta">
@@ -369,7 +369,7 @@
 	{#snippet main()}
 		{#if importOpen}
 			<div class="dialog card">
-				<h3><Icon name="upload" size={18} /> Import router preset</h3>
+				<h3><Icon name="upload" size={12} /> Import router preset</h3>
 				<p class="muted">
 					Every <code>[section]</code> of a llama-server <code>--models-preset</code> INI becomes a
 					llama-cpp blueprint. <code>/home/USER</code> placeholders are replaced with your home directory.
@@ -456,7 +456,7 @@
 			{#if issues.length}
 				<div class="issues">
 					{#each issues as i (i.message)}<div>
-							<Icon name="alert" size={14} />
+							<Icon name="alert" size={12} />
 							{i.message}
 						</div>{/each}
 				</div>
@@ -540,7 +540,7 @@
 										onclick={() => {
 											serverRows = serverRows.filter((_, j) => j !== i);
 											touch();
-										}}><Icon name="close" size={13} /></button
+										}}><Icon name="close" size={12} /></button
 									>
 								{/each}
 							</div>
@@ -658,7 +658,7 @@
 							class="textarea"
 							rows="4"
 							bind:value={draft.system_prompt}
-							placeholder="Optional. Prepended to the test's own system text and Benchy's output instructions."
+							placeholder="Optional. Prepended to the test's own system text and BenchyOS's output instructions."
 						></textarea>
 
 						<div class="grid2">
@@ -706,23 +706,23 @@
 		top: 0;
 		z-index: 2;
 		display: flex;
-		gap: 6px;
-		padding: 10px;
-		background: var(--bg-2);
-		border-bottom: 1px solid var(--line-soft);
+		gap: var(--sp-3);
+		padding: var(--sp-5);
+		background: var(--surface);
+		border-bottom: var(--bw) solid var(--line-soft);
 	}
 	.meta {
-		font-size: 11.5px;
-		color: var(--text-3);
-		gap: 6px;
+		font-size: var(--fs-s);
+		color: var(--fg-3);
+		gap: var(--sp-3);
 	}
 	.ext {
-		font-size: 11px;
-		color: var(--text-3);
+		font-size: var(--fs-xs);
+		color: var(--fg-3);
 	}
 	.hash {
-		font-size: 10.5px;
-		color: var(--text-4);
+		font-size: var(--fs-xs);
+		color: var(--fg-4);
 	}
 	.bad {
 		color: var(--bad);
@@ -730,21 +730,20 @@
 	}
 	.head {
 		display: flex;
-		gap: 14px;
+		gap: var(--sp-6);
 		align-items: center;
-		padding: 12px 16px;
-		border-bottom: 1px solid var(--line-soft);
+		padding: var(--sp-5) var(--sp-6);
+		border-bottom: var(--bw) solid var(--line-soft);
 	}
 	h2 {
 		margin: 0;
-		font-size: 16px;
+		font-size: var(--fs-l);
 	}
 	.dirty {
-		font-size: 11px;
-		color: var(--yellow-2);
-		border: 1px solid var(--yellow-a35);
-		padding: 0 6px;
-		border-radius: 5px;
+		font-size: var(--fs-xs);
+		padding: 0 var(--sp-3);
+		color: var(--fg-2);
+		border: var(--bw) solid var(--line-strong);
 	}
 	.warn {
 		color: var(--warn);
@@ -753,22 +752,21 @@
 		display: flex;
 		flex-direction: column;
 		align-items: flex-end;
-		gap: 2px;
+		gap: var(--sp-1);
 	}
 	.small {
-		font-size: 12px;
+		font-size: var(--fs-s);
 	}
 	.issues {
-		padding: 8px 16px;
-		background: rgba(255, 93, 115, 0.08);
-		border-bottom: 1px solid rgba(255, 93, 115, 0.3);
-		color: #ffb3bd;
-		font-size: 12.5px;
+		padding: var(--sp-4) var(--sp-6);
+		border-bottom: var(--bw) solid var(--bad);
+		color: var(--bad);
+		font-size: var(--fs-m);
 		--icon-accent: var(--bad);
 	}
 	.form {
 		flex: 1;
-		padding: 14px 16px 24px;
+		padding: var(--sp-6) var(--sp-6) var(--sp-7);
 	}
 	fieldset {
 		border: 0;
@@ -776,37 +774,36 @@
 		margin: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 4px;
+		gap: var(--sp-2);
 		max-width: 880px;
 	}
 	fieldset .label {
-		margin-top: 10px;
+		margin-top: var(--sp-5);
 	}
 	.section-title {
-		margin-top: 22px;
+		margin-top: var(--sp-7);
 	}
 	.grid2 {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		gap: 0 12px;
+		gap: 0 var(--sp-5);
 	}
 	.kv-table {
 		display: grid;
 		grid-template-columns: minmax(160px, 1fr) 2fr 30px;
-		gap: 5px;
-		margin: 6px 0 8px;
+		gap: var(--sp-3);
+		margin: var(--sp-3) 0 var(--sp-4);
 	}
 	.kv-table .input {
-		padding: 5px 8px;
-		font-size: 12.5px;
+		padding: var(--sp-3) var(--sp-4);
+		font-size: var(--fs-m);
 	}
 	.rm {
 		display: grid;
 		place-items: center;
-		border: 1px solid var(--line-soft);
-		border-radius: 6px;
+		border: var(--bw) solid var(--line-soft);
 		background: transparent;
-		color: var(--text-3);
+		color: var(--fg-3);
 		cursor: pointer;
 	}
 	.rm:hover {
@@ -821,36 +818,34 @@
 	}
 	.hint code,
 	p code {
-		font-size: 11.5px;
-		color: var(--yellow-2);
+		font-size: var(--fs-s);
+		color: var(--fg);
 	}
 	.inherit {
 		display: flex;
 		align-items: center;
-		gap: 10px;
-		padding: 10px 12px;
+		gap: var(--sp-5);
+		padding: var(--sp-5) var(--sp-5);
 		border: 1px dashed var(--line);
-		border-radius: var(--radius);
-		font-size: 12.5px;
+		font-size: var(--fs-m);
 	}
 	.dialog {
-		margin: 12px 16px 0;
+		margin: var(--sp-5) var(--sp-6) 0;
 		display: flex;
 		flex-direction: column;
-		gap: 6px;
-		border-color: var(--yellow-a35);
-		box-shadow: var(--glow-soft);
-		animation: fade-up 0.2s both;
+		gap: var(--sp-3);
+		animation: appear var(--dur-3) both;
+		border-color: var(--line-strong);
 	}
 	.dialog h3 {
 		margin: 0;
 		display: flex;
-		gap: 8px;
+		gap: var(--sp-4);
 		align-items: center;
-		font-size: 14px;
+		font-size: var(--fs-l);
 	}
 	.dialog p {
 		margin: 0;
-		font-size: 12.5px;
+		font-size: var(--fs-m);
 	}
 </style>

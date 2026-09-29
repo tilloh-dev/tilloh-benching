@@ -139,7 +139,7 @@ export const Output = z.strictObject({
 	 */
 	mode: z.enum(OUTPUT_MODES).optional(),
 	files: z.array(OutputFile).optional(),
-	/** Replaces Benchy's generated output-format instruction when set. */
+	/** Replaces BenchyOS's generated output-format instruction when set. */
 	instructions: z.string().optional()
 });
 export type Output = z.infer<typeof Output>;
@@ -265,7 +265,7 @@ export const Settings = z.strictObject({
 			port: z.number().int().optional(),
 			/** Address llama-server binds to. wsl-exe needs 0.0.0.0. */
 			bind: z.string().optional(),
-			/** Address Benchy connects to. wsl-exe defaults to the WSL gateway. */
+			/** Address BenchyOS connects to. wsl-exe defaults to the WSL gateway. */
 			connect_host: z.string().optional(),
 			models_dir: z.string().optional(),
 			startup_timeout_s: z.number().positive().optional(),

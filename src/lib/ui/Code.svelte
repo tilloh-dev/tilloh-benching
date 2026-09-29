@@ -36,32 +36,31 @@
 	.code {
 		display: flex;
 		overflow: auto;
-		background: var(--bg-0);
-		border: 1px solid var(--line-soft);
-		border-radius: var(--radius);
-		font-family: var(--mono);
-		font-size: 12.5px;
+		background: var(--sunken);
+		border: var(--bw) solid var(--line-soft);
+		font-family: var(--font);
+		font-size: var(--fs-m);
 		line-height: 1.6;
 	}
 	pre {
 		margin: 0;
-		padding: 12px 14px;
+		padding: var(--sp-5) var(--sp-6);
 	}
 	.gutter {
 		position: sticky;
 		left: 0;
 		flex: none;
 		text-align: right;
-		color: var(--text-4);
-		background: var(--bg-0);
-		border-right: 1px solid var(--line-soft);
+		color: var(--fg-4);
+		background: var(--sunken);
+		border-right: var(--bw) solid var(--line-soft);
 		user-select: none;
-		padding-right: 10px;
+		padding-right: var(--sp-5);
 	}
 	.src {
 		flex: 1;
 		min-width: 0;
-		color: #d9e0ff;
+		color: var(--fg);
 	}
 	.wrap .src {
 		white-space: pre-wrap;
@@ -70,36 +69,36 @@
 	.code :global(.hljs-keyword),
 	.code :global(.hljs-selector-tag),
 	.code :global(.hljs-built_in) {
-		color: #ffd23f;
+		color: var(--syn-keyword);
 	}
 	.code :global(.hljs-string),
 	.code :global(.hljs-attr),
 	.code :global(.hljs-selector-attr) {
-		color: #7ee6c3;
+		color: var(--syn-string);
 	}
 	.code :global(.hljs-number),
 	.code :global(.hljs-literal) {
-		color: #ff9f7a;
+		color: var(--syn-number);
 	}
 	.code :global(.hljs-comment) {
-		color: #5d6ba3;
+		color: var(--syn-comment);
 		font-style: italic;
 	}
 	.code :global(.hljs-title),
 	.code :global(.hljs-name),
 	.code :global(.hljs-section) {
-		color: #8fb8ff;
+		color: var(--syn-name);
 	}
 	.code :global(.hljs-attribute),
 	.code :global(.hljs-variable),
 	.code :global(.hljs-template-variable),
 	.code :global(.hljs-property) {
-		color: #c9a8ff;
+		color: var(--syn-attr);
 	}
 	.code :global(.hljs-tag) {
-		color: #9fb0e6;
+		color: var(--syn-tag);
 	}
 	.code :global(.hljs-meta) {
-		color: #ff7ab8;
+		color: var(--syn-attr);
 	}
 </style>

@@ -187,28 +187,28 @@
 	.side-head {
 		display: flex;
 		align-items: center;
-		gap: 6px;
-		padding: 10px 12px;
-		border-bottom: 1px solid var(--line-soft);
+		gap: var(--sp-3);
+		padding: var(--sp-5) var(--sp-5);
+		border-bottom: var(--bw) solid var(--line-soft);
 	}
 	.meta {
-		font-size: 11.5px;
-		color: var(--text-3);
+		font-size: var(--fs-s);
+		color: var(--fg-3);
 	}
 	.head {
 		display: flex;
-		gap: 8px;
+		gap: var(--sp-4);
 		align-items: center;
-		padding: 12px 16px;
-		border-bottom: 1px solid var(--line-soft);
+		padding: var(--sp-5) var(--sp-6);
+		border-bottom: var(--bw) solid var(--line-soft);
 	}
 	h2 {
 		margin: 0;
-		font-size: 16px;
+		font-size: var(--fs-l);
 	}
 	.form {
 		flex: 1;
-		padding: 14px 16px 24px;
+		padding: var(--sp-6) var(--sp-6) var(--sp-7);
 	}
 	fieldset {
 		border: 0;
@@ -216,38 +216,37 @@
 		padding: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 4px;
+		gap: var(--sp-2);
 		max-width: 820px;
 	}
 	fieldset .label {
-		margin-top: 8px;
+		margin-top: var(--sp-4);
 	}
 	.grid2 {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		gap: 0 12px;
+		gap: 0 var(--sp-5);
 	}
 	.checks {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-		gap: 4px;
+		gap: var(--sp-2);
 	}
 	.opt {
 		display: flex;
 		align-items: center;
-		gap: 8px;
-		padding: 6px 9px;
-		border-radius: 8px;
-		border: 1px solid var(--line-soft);
+		gap: var(--sp-4);
+		padding: var(--sp-3) var(--sp-4);
+		border: var(--bw) solid var(--line-soft);
 		cursor: pointer;
-		font-size: 12.5px;
+		font-size: var(--fs-m);
 		min-width: 0;
 	}
 	.opt.on {
-		border-color: var(--yellow-a35);
-		background: var(--yellow-a10);
+		border-color: var(--accent);
+		background: var(--accent-soft);
 	}
 	.opt input {
-		accent-color: var(--yellow);
+		accent-color: var(--accent);
 	}
 </style>

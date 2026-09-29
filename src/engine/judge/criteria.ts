@@ -5,7 +5,7 @@ import { CriteriaSuggestion } from '../core/schema.ts';
 import type { ResolvedSettings } from '../core/settings.ts';
 import { runClaude } from '../util/claude.ts';
 
-const SUGGEST_SYSTEM = `You design evaluation rubrics for Benchy, a benchmark that runs AI models against tasks and has an independent judge score each result per criterion on a 0–10 scale.
+const SUGGEST_SYSTEM = `You design evaluation rubrics for BenchyOS, a benchmark that runs AI models against tasks and has an independent judge score each result per criterion on a 0–10 scale.
 
 Write criteria that:
 - together cover every explicit requirement of the task, grouped sensibly (not one criterion per bullet if bullets belong together);

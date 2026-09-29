@@ -50,7 +50,7 @@ export async function preflight(o: {
 			const mode = modeFor(binary, o.settings.llama.mode);
 			add('llama.cpp', 'ok', `${binary} (${mode})`);
 			if (o.llamaBusy)
-				add('llama.cpp', 'warn', 'another Benchy run is using llama-server; this run will wait');
+				add('llama.cpp', 'warn', 'another BenchyOS run is using llama-server; this run will wait');
 			else {
 				const conflicts = await o.llama.conflicts(mode);
 				for (const c of conflicts) add('llama.cpp', 'error', `GPU busy: ${c}`);

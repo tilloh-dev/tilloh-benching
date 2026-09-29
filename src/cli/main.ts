@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { c } from './format.ts';
 
-const HELP = `${c.bold('benchy')} — benchmark local and remote models, judged by Claude Code
+const HELP = `${c.bold('BenchyOS')} — benchmark local and remote models, judged by Claude Code
 
 ${c.bold('Usage')}
   benchy <command> [options]

@@ -159,7 +159,7 @@
 
 <div class="viewer">
 	<div class="bar">
-		<Icon name="cube" size={15} />
+		<Icon name="cube" size={12} />
 		{#if stats}<span class="muted"
 				>{stats.vertices.toLocaleString()} vertices · {stats.triangles.toLocaleString()} triangles · {stats.size}</span
 			>{/if}
@@ -184,42 +184,40 @@
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-		border: 1px solid var(--line-soft);
-		border-radius: var(--radius);
+		border: var(--bw) solid var(--line-soft);
 		overflow: hidden;
 	}
 	.bar {
 		flex: none;
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		gap: var(--sp-4);
 		height: 34px;
-		padding: 0 8px 0 12px;
-		background: var(--bg-3);
-		border-bottom: 1px solid var(--line-soft);
-		font-size: 12px;
-		color: var(--text-2);
+		padding: 0 var(--sp-4) 0 var(--sp-5);
+		background: var(--surface-2);
+		border-bottom: var(--bw) solid var(--line-soft);
+		font-size: var(--fs-s);
+		color: var(--fg-2);
 	}
 	.tb {
 		height: 24px;
-		padding: 0 8px;
-		border-radius: 6px;
-		border: 1px solid transparent;
+		padding: 0 var(--sp-4);
+		border: var(--bw) solid transparent;
 		background: transparent;
-		color: var(--text-3);
-		font-size: 11.5px;
+		color: var(--fg-3);
+		font-size: var(--fs-s);
 		cursor: pointer;
 		display: grid;
 		place-items: center;
 	}
 	.tb:hover {
-		background: var(--bg-4);
-		color: var(--text);
+		background: var(--hover);
+		color: var(--fg);
 		text-decoration: none;
 	}
 	.tb.on {
-		color: var(--yellow-2);
 		border-color: var(--line);
+		color: var(--fg);
 	}
 	.canvas {
 		position: relative;
@@ -234,8 +232,8 @@
 		inset: 0;
 		display: grid;
 		place-items: center;
-		color: var(--text-3);
-		padding: 20px;
+		color: var(--fg-3);
+		padding: var(--sp-7);
 		text-align: center;
 	}
 </style>

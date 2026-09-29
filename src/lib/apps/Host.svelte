@@ -26,16 +26,16 @@
 host:
   name: hermine
 llama:
-  # WSL → Windows build (CUDA). Benchy starts it via PowerShell and stops it by PID.
+  # WSL → Windows build (CUDA). BenchyOS starts it via PowerShell and stops it by PID.
   binary: /mnt/c/Users/<you>/tooling/llama.cpp/vendor/llama.cpp/llama-b10786/llama-server.exe
   models_dir: /mnt/c/Users/<you>/AppData/Local/llama.cpp/models
-  port: 8099          # Benchy's own port — your router on 8081 is never touched`;
+  port: 8099          # BenchyOS's own port — your router on 8081 is never touched`;
 </script>
 
 <div class="host scroll">
 	{#if host}
 		<section class="card hero">
-			<div class="chip-ico"><Icon name="chip" size={30} /></div>
+			<div class="chip-ico"><Icon name="chip" size={24} /></div>
 			<div class="grow">
 				<h2>{host.name}</h2>
 				<p class="muted">
@@ -45,7 +45,7 @@ llama:
 				<p class="muted">{host.cpus}× {host.cpu} · {host.mem_gb} GB RAM</p>
 			</div>
 			<div class="gpus">
-				{#each host.gpus as g (g)}<span class="gpu"><Icon name="flame" size={14} />{g}</span
+				{#each host.gpus as g (g)}<span class="gpu"><Icon name="flame" size={12} />{g}</span
 					>{:else}<span class="muted">no GPU detected</span>{/each}
 			</div>
 		</section>
@@ -78,20 +78,21 @@ llama:
 			{#if conflicts !== null}
 				{#if conflicts.length}
 					<div class="conflicts">
-						{#each conflicts as c (c)}<div><Icon name="alert" size={14} /> {c}</div>{/each}
+						{#each conflicts as c (c)}<div><Icon name="alert" size={12} /> {c}</div>{/each}
 						<p class="small">
-							Benchy will not start its own server while these run (it only stops what it started).
+							BenchyOS will not start its own server while these run (it only stops what it
+							started).
 						</p>
 					</div>
 				{:else}
 					<p class="ok small">
-						<Icon name="check" size={14} /> GPU free — no other llama-server is running.
+						<Icon name="check" size={12} /> GPU free — no other llama-server is running.
 					</p>
 				{/if}
 			{/if}
 			<p class="hint">
-				Benchy runs llama-server in router mode with a preset it generates per run (one section per
-				blueprint, <code>--models-max 1</code>) on port
+				BenchyOS runs llama-server in router mode with a preset it generates per run (one section
+				per blueprint, <code>--models-max 1</code>) on port
 				<b>{benchy.status?.settings?.llama_port}</b>, and stops it when the run ends.
 			</p>
 		</section>
@@ -130,87 +131,82 @@ llama:
 <style>
 	.host {
 		flex: 1;
-		padding: 14px;
+		padding: var(--sp-6);
 		display: flex;
 		flex-direction: column;
-		gap: 12px;
+		gap: var(--sp-5);
 	}
 	.hero {
 		display: flex;
-		gap: 16px;
+		gap: var(--sp-6);
 		align-items: center;
-		background:
-			radial-gradient(80% 120% at 0% 0%, rgba(255, 210, 63, 0.08), transparent 60%), var(--bg-3);
+		background: var(--surface-2);
 	}
 	.chip-ico {
 		display: grid;
 		place-items: center;
 		width: 60px;
 		height: 60px;
-		border-radius: 16px;
-		background: var(--bg-4);
-		border: 1px solid var(--line-strong);
-		box-shadow: var(--glow-soft);
+		background: var(--hover);
+		border: var(--bw) solid var(--line-strong);
 	}
 	h2 {
 		margin: 0;
-		font-size: 20px;
+		font-size: var(--fs-xl);
 	}
 	.hero p {
-		margin: 2px 0 0;
-		font-size: 12.5px;
+		margin: var(--sp-1) 0 0;
+		font-size: var(--fs-m);
 	}
 	.gpus {
 		display: flex;
 		flex-direction: column;
-		gap: 4px;
+		gap: var(--sp-2);
 		align-items: flex-end;
 	}
 	.gpu {
 		display: inline-flex;
-		gap: 6px;
+		gap: var(--sp-3);
 		align-items: center;
-		font-size: 12.5px;
-		padding: 4px 10px;
-		border-radius: 999px;
-		border: 1px solid var(--yellow-a35);
-		color: var(--yellow-2);
+		font-size: var(--fs-m);
+		padding: var(--sp-2) var(--sp-5);
+		color: var(--fg-2);
+		border: var(--bw) solid var(--line);
 	}
 	.small {
-		font-size: 12px;
+		font-size: var(--fs-s);
 	}
 	.err {
 		color: var(--bad);
 		white-space: pre-wrap;
-		font-size: 12.5px;
+		font-size: var(--fs-m);
 	}
 	.ok {
 		color: var(--ok);
 		--icon-accent: var(--ok);
 	}
 	.conflicts {
-		margin-top: 8px;
-		padding: 8px 10px;
-		border-radius: 8px;
-		border: 1px solid rgba(255, 181, 71, 0.4);
+		margin-top: var(--sp-4);
+		padding: var(--sp-4) var(--sp-5);
+		border: var(--bw) solid var(--warn);
 		color: var(--warn);
-		font-size: 12.5px;
+		font-size: var(--fs-m);
 		--icon-accent: var(--warn);
 	}
 	.kv {
 		display: grid;
 		grid-template-columns: max-content 1fr;
-		gap: 4px 16px;
-		font-size: 12.5px;
+		gap: var(--sp-2) var(--sp-6);
+		font-size: var(--fs-m);
 	}
 	.kv span {
-		color: var(--text-3);
+		color: var(--fg-3);
 	}
 	.kv b {
-		font-weight: 500;
+		font-weight: var(--fw);
 	}
 	code {
-		color: var(--yellow-2);
-		font-size: 11.5px;
+		font-size: var(--fs-s);
+		color: var(--fg);
 	}
 </style>

@@ -30,10 +30,9 @@
 
 <footer class="taskbar" bind:this={root}>
 	<button class="start" class:open={startOpen} onclick={() => (startOpen = !startOpen)}>
-		<Logo size={22} />
+		<Logo size={12} />
 		<span>Start</span>
 	</button>
-	<div class="sep"></div>
 	<div class="windows">
 		{#each wm.windows.filter((w) => w.phase !== 'closing') as w (w.id)}
 			<button
@@ -44,7 +43,7 @@
 				onclick={() => wm.toggleFromTaskbar(w.id)}
 				title={w.title}
 			>
-				<Icon name={w.icon} size={15} />
+				<Icon name={w.icon} size={12} />
 				<span class="ellipsis">{w.title}</span>
 			</button>
 		{/each}
@@ -52,22 +51,22 @@
 	<div class="tray">
 		{#if benchy.live}
 			<button class="tray-btn" title="New run" onclick={() => wm.open('launcher')}
-				><Icon name="play" size={15} /></button
+				><Icon name="play" size={12} /></button
 			>
 		{/if}
-		<div class="clock">
-			<b>{now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</b>
-			<span>{now.toLocaleDateString([], { day: '2-digit', month: 'short' })}</span>
-		</div>
+		<span class="clock"
+			>{now.toLocaleDateString([], { day: '2-digit', month: '2-digit' })}
+			{now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span
+		>
 	</div>
 
 	{#if startOpen}
 		<div class="start-menu">
 			<div class="sm-head">
-				<Logo size={34} />
+				<Logo size={24} />
 				<div>
-					<div class="sm-title">Benchy</div>
-					<div class="muted small">
+					<div class="sm-title">BenchyOS</div>
+					<div class="muted">
 						{benchy.status?.host.name ?? ''} · {benchy.live ? 'live' : 'static export'}
 					</div>
 				</div>
@@ -82,7 +81,7 @@
 								wm.open(a.id);
 							}}
 						>
-							<AppTile icon={a.icon} hue={a.hue} size={34} />
+							<AppTile icon={a.icon} size={24} />
 							<span class="grow">
 								<b>{a.title}</b>
 								{#if a.description}<small>{a.description}</small>{/if}
@@ -106,7 +105,7 @@
 							>
 						</button>
 					{:else}
-						<p class="muted small">No runs yet.</p>
+						<p class="muted">No runs yet.</p>
 					{/each}
 				</div>
 			</div>
@@ -124,241 +123,168 @@
 		height: var(--taskbar-h);
 		display: flex;
 		align-items: center;
-		gap: 6px;
-		padding: 0 8px;
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 45%),
-			linear-gradient(180deg, rgba(16, 25, 58, 0.96), rgba(8, 13, 32, 0.98));
-		border-top: 1px solid var(--line-strong);
-		backdrop-filter: blur(14px);
-		box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.35);
+		gap: var(--sp-2);
+		padding: 0 var(--sp-2);
+		background: var(--surface);
+		border-top: var(--bw) solid var(--line);
 	}
 	.start {
 		display: flex;
 		align-items: center;
-		gap: 8px;
-		height: 38px;
-		padding: 0 16px 0 10px;
-		border-radius: 10px;
-		border: 1px solid var(--yellow-deep);
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 55%),
-			linear-gradient(180deg, #ffd23f, #e0a800);
-		color: var(--yellow-ink);
-		font-weight: 700;
-		letter-spacing: 0.01em;
+		gap: var(--sp-3);
+		height: var(--control-h);
+		padding: 0 var(--sp-4);
+		border: var(--bw) solid var(--line-strong);
+		background: var(--surface-2);
+		color: var(--fg);
+		font-weight: var(--fw-strong);
 		cursor: pointer;
-		box-shadow:
-			0 0 18px rgba(255, 210, 63, 0.35),
-			0 1px 0 rgba(255, 255, 255, 0.4) inset;
-		transition:
-			box-shadow 0.2s,
-			transform 0.1s;
-	}
-	.start :global(.logo) {
-		filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.3));
 	}
 	.start:hover,
 	.start.open {
-		box-shadow:
-			0 0 28px rgba(255, 210, 63, 0.6),
-			0 1px 0 rgba(255, 255, 255, 0.5) inset;
-	}
-	.start:active {
-		transform: translateY(1px);
-	}
-	.sep {
-		width: 1px;
-		height: 30px;
-		background: var(--line);
-		margin: 0 4px;
+		border-color: var(--fg-3);
 	}
 	.windows {
 		flex: 1;
 		display: flex;
-		gap: 5px;
+		gap: var(--sp-2);
 		min-width: 0;
 		overflow: hidden;
 	}
 	.win-btn {
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		gap: var(--sp-3);
 		min-width: 0;
-		max-width: 210px;
-		flex: 0 1 210px;
-		height: 38px;
-		padding: 0 12px;
-		border-radius: 9px;
-		border: 1px solid var(--line-soft);
-		background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0));
-		color: var(--text-2);
+		max-width: 200px;
+		flex: 0 1 200px;
+		height: var(--control-h);
+		padding: 0 var(--sp-4);
+		border: var(--bw) solid var(--line);
+		border-bottom-width: 2px;
+		background: var(--surface);
+		color: var(--fg-3);
+		font-size: var(--fs-s);
 		cursor: pointer;
-		font-size: 12.5px;
-		position: relative;
-		transition:
-			background 0.15s,
-			border-color 0.15s,
-			color 0.15s;
-		animation: fade-up 0.2s both;
 	}
 	.win-btn:hover {
-		background: var(--bg-4);
-		color: var(--text);
+		color: var(--fg);
 	}
 	.win-btn.active {
-		background: linear-gradient(180deg, #1f2f6e, #172458);
-		border-color: var(--line-strong);
-		color: var(--text);
-	}
-	.win-btn.active::after {
-		content: '';
-		position: absolute;
-		left: 12px;
-		right: 12px;
-		bottom: 3px;
-		height: 2px;
-		border-radius: 2px;
-		background: var(--yellow);
-		box-shadow: 0 0 10px var(--yellow);
+		color: var(--fg);
+		background: var(--surface-2);
+		border-bottom-color: var(--accent);
 	}
 	.win-btn.min {
-		opacity: 0.6;
+		color: var(--fg-4);
 	}
 	.tray {
 		display: flex;
 		align-items: center;
-		gap: 6px;
-		padding-left: 10px;
-		border-left: 1px solid var(--line-soft);
-		height: 34px;
+		gap: var(--sp-3);
+		padding-left: var(--sp-4);
+		border-left: var(--bw) solid var(--line);
+		height: 100%;
 	}
 	.tray-btn {
 		display: grid;
 		place-items: center;
-		width: 32px;
-		height: 32px;
-		border-radius: 8px;
-		border: 1px solid var(--line);
-		background: var(--bg-3);
-		color: var(--yellow);
+		width: var(--control-h);
+		height: var(--control-h);
+		border: var(--bw) solid var(--line);
+		background: var(--surface);
+		color: var(--fg-2);
 		cursor: pointer;
 	}
 	.tray-btn:hover {
-		box-shadow: var(--glow);
+		color: var(--fg);
+		border-color: var(--line-strong);
 	}
 	.clock {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		line-height: 1.15;
-		padding: 0 6px;
-		font-size: 11px;
-		color: var(--text-3);
+		padding: 0 var(--sp-3);
+		font-size: var(--fs-s);
+		color: var(--fg-2);
 		font-variant-numeric: tabular-nums;
 	}
-	.clock b {
-		font-size: 13px;
-		color: var(--text);
-		font-weight: 600;
-	}
-
 	.start-menu {
 		position: absolute;
-		left: 8px;
-		bottom: calc(var(--taskbar-h) + 6px);
-		width: 620px;
+		left: var(--sp-2);
+		bottom: calc(var(--taskbar-h) + var(--sp-2));
+		width: 560px;
 		max-width: calc(100vw - 16px);
-		border-radius: var(--radius-l);
-		background: rgba(14, 22, 52, 0.98);
-		border: 1px solid var(--line-strong);
-		box-shadow:
-			var(--shadow-pop),
-			0 0 40px rgba(255, 210, 63, 0.08);
-		overflow: hidden;
-		animation: sm-in 0.2s var(--ease-out) both;
-		transform-origin: bottom left;
-	}
-	@keyframes sm-in {
-		from {
-			opacity: 0;
-			transform: translateY(12px) scale(0.97);
-		}
+		background: var(--surface);
+		border: var(--bw) solid var(--line-strong);
+		box-shadow: var(--shadow-pop);
+		animation: step-unfold var(--dur-2) steps(var(--steps)) both;
 	}
 	.sm-head {
 		display: flex;
 		align-items: center;
-		gap: 12px;
-		padding: 14px 16px;
-		background: linear-gradient(90deg, rgba(255, 210, 63, 0.14), transparent 70%);
-		border-bottom: 1px solid var(--line);
+		gap: var(--sp-4);
+		padding: var(--sp-4) var(--sp-5);
+		border-bottom: var(--bw) solid var(--line);
+		background: var(--surface-2);
+		font-size: var(--fs-s);
 	}
 	.sm-title {
-		font-size: 17px;
-		font-weight: 700;
-	}
-	.small {
-		font-size: 12px;
+		font-size: var(--fs-l);
+		font-weight: var(--fw-strong);
 	}
 	.sm-body {
 		display: grid;
-		grid-template-columns: 1fr 210px;
+		grid-template-columns: 1fr 200px;
 	}
 	.sm-apps {
-		padding: 8px;
+		padding: var(--sp-2);
 		display: grid;
-		gap: 2px;
 		max-height: 60vh;
 		overflow: auto;
 	}
 	.sm-app {
 		display: flex;
 		align-items: center;
-		gap: 11px;
-		padding: 6px 8px;
+		gap: var(--sp-4);
+		padding: var(--sp-2) var(--sp-3);
 		border: 0;
-		border-radius: 9px;
 		background: transparent;
+		color: var(--fg);
 		text-align: left;
 		cursor: pointer;
-		color: var(--text);
 	}
 	.sm-app:hover {
-		background: linear-gradient(90deg, var(--yellow-a20), var(--yellow-a10));
+		background: var(--hover);
 	}
 	.sm-app b {
 		display: block;
-		font-weight: 600;
-		font-size: 13px;
+		font-weight: var(--fw-strong);
 	}
 	.sm-app small {
 		display: block;
-		color: var(--text-3);
-		font-size: 11.5px;
+		color: var(--fg-3);
+		font-size: var(--fs-s);
 	}
 	.sm-side {
-		padding: 12px;
-		background: var(--bg-2);
-		border-left: 1px solid var(--line);
 		display: flex;
 		flex-direction: column;
-		gap: 4px;
+		gap: var(--sp-1);
+		padding: var(--sp-4);
+		border-left: var(--bw) solid var(--line);
+		background: var(--surface-2);
 	}
 	.sm-run {
 		display: flex;
 		justify-content: space-between;
-		gap: 8px;
-		padding: 6px 8px;
+		gap: var(--sp-3);
+		padding: var(--sp-2) var(--sp-3);
 		border: 0;
-		border-radius: 7px;
 		background: transparent;
-		color: var(--text-2);
-		cursor: pointer;
+		color: var(--fg-2);
+		font-size: var(--fs-s);
 		text-align: left;
-		font-size: 12px;
+		cursor: pointer;
 	}
 	.sm-run:hover {
-		background: var(--bg-4);
-		color: var(--text);
+		background: var(--hover);
+		color: var(--fg);
 	}
 </style>

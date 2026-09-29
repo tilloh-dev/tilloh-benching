@@ -107,16 +107,16 @@
 		flex-direction: column;
 		height: 100%;
 		min-height: 0;
-		gap: 8px;
+		gap: var(--sp-4);
 	}
 	.switch {
 		flex: none;
 		display: flex;
 		align-items: center;
-		gap: 12px;
+		gap: var(--sp-5);
 	}
 	.small {
-		font-size: 11.5px;
+		font-size: var(--fs-s);
 	}
 	.stage {
 		flex: 1;
@@ -129,9 +129,8 @@
 		display: grid;
 		place-items: center;
 		overflow: auto;
-		border: 1px solid var(--line-soft);
-		border-radius: var(--radius);
-		background: repeating-conic-gradient(#e9ecf5 0% 25%, #ffffff 0% 50%) 50% / 20px 20px;
+		border: var(--bw) solid var(--line-soft);
+		background: var(--sunken);
 	}
 	.img-stage img {
 		max-width: 100%;
@@ -144,25 +143,24 @@
 		min-height: 0;
 	}
 	.md-stage {
-		padding: 6px 20px 20px;
-		border: 1px solid var(--line-soft);
-		border-radius: var(--radius);
-		background: var(--bg-1);
+		padding: var(--sp-3) var(--sp-7) var(--sp-7);
+		border: var(--bw) solid var(--line-soft);
+		background: var(--sunken);
 	}
 	.code-stage {
 		display: flex;
 		flex-direction: column;
-		gap: 10px;
+		gap: var(--sp-5);
 	}
 	.log summary {
 		cursor: pointer;
-		color: var(--text-2);
-		padding: 4px 0;
+		color: var(--fg-2);
+		padding: var(--sp-2) 0;
 	}
 	.bin {
 		display: grid;
 		place-items: center;
 		height: 100%;
-		color: var(--text-3);
+		color: var(--fg-3);
 	}
 </style>

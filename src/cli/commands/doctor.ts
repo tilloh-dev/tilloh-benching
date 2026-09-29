@@ -28,7 +28,7 @@ export default async function doctor(args: string[]): Promise<number> {
 	add(
 		major >= 24 ? 'ok' : 'error',
 		'node',
-		`v${process.versions.node}${major < 24 ? ' — Benchy needs Node 24+' : ''}`
+		`v${process.versions.node}${major < 24 ? ' — BenchyOS needs Node 24+' : ''}`
 	);
 	const host = await hostInfo(s.host.name);
 	add(
@@ -122,7 +122,7 @@ export default async function doctor(args: string[]): Promise<number> {
 		);
 		const conflicts = await engine.llama.conflicts(mode);
 		if (conflicts.length) for (const x of conflicts) add('warn', 'gpu busy', x);
-		else add('ok', 'gpu busy', `no other llama-server; Benchy will use port ${s.llama.port}`);
+		else add('ok', 'gpu busy', `no other llama-server; BenchyOS will use port ${s.llama.port}`);
 		if (s.llama.models_dir)
 			add((await exists(s.llama.models_dir)) ? 'ok' : 'warn', 'models dir', s.llama.models_dir);
 	} else

@@ -16,7 +16,8 @@
 	import Code from '../ui/Code.svelte';
 	import JsonTree from '../ui/JsonTree.svelte';
 	import Kind from '../ui/Kind.svelte';
-	import { fmtAgo, fmtDate, fmtDuration, fmtNum, scoreHue } from '../ui/format.ts';
+	import { fmtAgo, fmtDate, fmtDuration, fmtNum } from '../ui/format.ts';
+	import { scoreColor } from '../design/score.ts';
 
 	let { win, props }: { win: Win; props: Record<string, unknown> } = $props();
 
@@ -164,9 +165,8 @@
 							: ''}</span
 					>
 					<span class="spacer"></span>
-					{#if r.mean_score !== null}<b
-							class="mean"
-							style="color:hsl({scoreHue(r.mean_score)} 90% 70%)">{r.mean_score.toFixed(1)}</b
+					{#if r.mean_score !== null}<b class="mean" style="color:{scoreColor(r.mean_score)}"
+							>{r.mean_score.toFixed(1)}</b
 						>{/if}
 				</div>
 				{#if r.status === 'running'}
@@ -309,7 +309,7 @@
 									{#each matrix.cells.get(`${bp}|${t}`) ?? [] as a (a.id)}
 										<button
 											class="rep st-{a.error ? 'failed' : a.stage}"
-											style={a.score !== null ? `--h:${scoreHue(a.score)}` : ''}
+											style={a.score !== null ? `--c:${scoreColor(a.score)}` : ''}
 											onclick={() => openAttempt(a)}
 											title="#{a.rep} · {a.stage}{a.status ? ` · ${a.status}` : ''}{a.error
 												? ` · ${a.error}`
@@ -447,67 +447,58 @@
 		top: 0;
 		z-index: 2;
 		display: flex;
-		gap: 6px;
-		padding: 10px;
-		background: var(--bg-2);
-		border-bottom: 1px solid var(--line-soft);
+		gap: var(--sp-3);
+		padding: var(--sp-5);
+		background: var(--surface);
+		border-bottom: var(--bw) solid var(--line-soft);
 	}
 	.meta {
-		font-size: 11.5px;
-		color: var(--text-3);
-		gap: 5px;
+		font-size: var(--fs-s);
+		color: var(--fg-3);
+		gap: var(--sp-3);
 	}
 	.mean {
 		font-variant-numeric: tabular-nums;
 	}
 	.mini {
 		height: 3px;
-		border-radius: 3px;
-		background: var(--bg-1);
+		background: var(--sunken);
 		overflow: hidden;
-		margin-top: 3px;
+		margin-top: var(--sp-2);
 	}
 	.mini span {
 		display: block;
 		height: 100%;
-		background: linear-gradient(
-			90deg,
-			var(--yellow-deep),
-			var(--yellow),
-			var(--yellow-2),
-			var(--yellow)
-		);
-		background-size: 200% 100%;
-		animation: shimmer 1.6s linear infinite;
-		transition: width 0.4s;
+		background: var(--data);
+		transition: width var(--dur-2);
 	}
 	.head {
 		display: flex;
-		gap: 16px;
-		padding: 14px 16px 10px;
+		gap: var(--sp-6);
+		padding: var(--sp-6) var(--sp-6) var(--sp-5);
 		align-items: flex-start;
 	}
 	h2 {
 		margin: 0;
-		font-size: 17px;
+		font-size: var(--fs-xl);
 	}
 	.note {
-		margin: 6px 0 0;
-		font-size: 12.5px;
-		color: var(--text-2);
+		margin: var(--sp-3) 0 0;
+		font-size: var(--fs-m);
+		color: var(--fg-2);
 	}
 	.err {
 		color: var(--bad);
-		font-size: 12.5px;
+		font-size: var(--fs-m);
 		white-space: pre-wrap;
-		margin: 6px 0 0;
+		margin: var(--sp-3) 0 0;
 	}
 	.small {
-		font-size: 12px;
+		font-size: var(--fs-s);
 	}
 	.stats {
 		display: flex;
-		gap: 16px;
+		gap: var(--sp-6);
 	}
 	.stats div {
 		display: flex;
@@ -515,21 +506,21 @@
 		align-items: flex-end;
 	}
 	.stats b {
-		font-size: 20px;
+		font-size: var(--fs-xl);
 		font-variant-numeric: tabular-nums;
 	}
 	.stats b.bad {
 		color: var(--bad);
 	}
 	.stats span {
-		font-size: 11px;
-		color: var(--text-3);
+		font-size: var(--fs-xs);
+		color: var(--fg-3);
 	}
 	.actions {
 		display: flex;
-		gap: 8px;
+		gap: var(--sp-4);
 		flex-wrap: wrap;
-		padding: 0 16px 10px;
+		padding: 0 var(--sp-6) var(--sp-5);
 	}
 	.tab-body {
 		flex: 1;
@@ -537,14 +528,14 @@
 	.matrix {
 		display: grid;
 		grid-template-columns: minmax(170px, 240px) repeat(var(--cols), minmax(92px, 1fr));
-		gap: 4px;
-		padding: 14px;
+		gap: var(--sp-2);
+		padding: var(--sp-6);
 	}
 	.th {
-		font-size: 11px;
-		color: var(--text-3);
+		font-size: var(--fs-xs);
+		color: var(--fg-3);
 		text-align: center;
-		padding: 0 2px 6px;
+		padding: 0 var(--sp-1) var(--sp-3);
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -553,19 +544,18 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		gap: 3px;
-		padding-right: 8px;
+		gap: var(--sp-2);
+		padding-right: var(--sp-4);
 		min-width: 0;
-		font-size: 12.5px;
+		font-size: var(--fs-m);
 	}
 	.cell {
 		display: flex;
-		gap: 3px;
+		gap: var(--sp-2);
 		min-height: 40px;
-		padding: 3px;
-		border-radius: 8px;
-		background: var(--bg-1);
-		border: 1px solid var(--line-soft);
+		padding: var(--sp-2);
+		background: var(--sunken);
+		border: var(--bw) solid var(--line-soft);
 	}
 	.rep {
 		position: relative;
@@ -573,47 +563,39 @@
 		min-width: 0;
 		display: grid;
 		place-items: center;
-		border-radius: 6px;
-		border: 1px solid var(--line);
-		background: var(--bg-3);
-		color: var(--text-3);
-		font-size: 11px;
+		border: var(--bw) solid var(--line);
+		background: var(--surface-2);
+		color: var(--fg-3);
+		font-size: var(--fs-xs);
 		cursor: pointer;
 		overflow: hidden;
-		transition:
-			transform 0.12s,
-			box-shadow 0.15s;
+		transition: border-color var(--dur-1);
 	}
 	.rep:hover {
-		transform: scale(1.06);
-		box-shadow: 0 0 0 2px var(--yellow);
-		z-index: 2;
+		border-color: var(--fg);
 	}
 	.rep b {
-		color: #fff;
-		font-size: 13px;
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+		color: var(--fg);
+		font-size: var(--fs-m);
+		font-variant-numeric: tabular-nums;
 	}
 	.rep.st-judged {
-		background: hsl(var(--h) 75% 42% / 0.55);
-		border-color: hsl(var(--h) 75% 55% / 0.5);
+		background: color-mix(in srgb, var(--c) 22%, transparent);
+		border-color: color-mix(in srgb, var(--c) 45%, transparent);
 	}
 	.rep.st-failed {
-		background: rgba(255, 93, 115, 0.15);
-		border-color: rgba(255, 93, 115, 0.4);
+		border-color: var(--bad);
 		color: var(--bad);
 	}
 	.rep.st-generating,
 	.rep.st-checking,
 	.rep.st-judging {
-		border-color: var(--yellow-a35);
-		background: linear-gradient(90deg, var(--bg-3), rgba(255, 210, 63, 0.15), var(--bg-3));
-		background-size: 200% 100%;
-		animation: shimmer 1.4s linear infinite;
-		color: var(--yellow-2);
+		border-color: var(--fg-3);
+		color: var(--fg);
+		animation: blink 1s steps(2) infinite;
 	}
 	.live {
-		font-size: 10px;
+		font-size: var(--fs-xs);
 	}
 	.gate {
 		position: absolute;
@@ -621,31 +603,29 @@
 		right: 3px;
 		width: 6px;
 		height: 6px;
-		border-radius: 50%;
 		background: var(--bad);
 	}
 	.kv {
 		display: grid;
 		grid-template-columns: max-content 1fr;
-		gap: 4px 16px;
-		font-size: 12.5px;
+		gap: var(--sp-2) var(--sp-6);
+		font-size: var(--fs-m);
 	}
 	.kv span {
-		color: var(--text-3);
+		color: var(--fg-3);
 	}
 	.kv b {
-		font-weight: 500;
-		color: var(--text);
+		font-weight: var(--fw);
+		color: var(--fg);
 		word-break: break-all;
 	}
 	.live-log {
-		font-size: 12px;
-		background: var(--bg-0);
-		border: 1px solid var(--yellow-a35);
-		border-radius: var(--radius);
-		padding: 10px 12px;
+		font-size: var(--fs-s);
+		background: var(--sunken);
+		padding: var(--sp-5) var(--sp-5);
 		max-height: 260px;
 		overflow: auto;
+		border: var(--bw) solid var(--line-strong);
 	}
 	.ll.warn {
 		color: var(--warn);
@@ -655,7 +635,7 @@
 	}
 	details summary {
 		cursor: pointer;
-		margin: 8px 0 4px;
-		font-size: 12px;
+		margin: var(--sp-4) 0 var(--sp-2);
+		font-size: var(--fs-s);
 	}
 </style>

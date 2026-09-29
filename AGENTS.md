@@ -1,10 +1,10 @@
-# AGENTS.md — Benchy
+# AGENTS.md — BenchyOS
 
 Guidance for AI agents (Claude Code, OpenCode, …) working in this repository. User-facing docs are in [README.md](README.md).
 
 ## Project
 
-Benchy benchmarks **blueprints** (a model plus its settings) against **bench tests** (prompt, expected files, checks, judge criteria). Each attempt is generated, extracted, checked automatically and scored by an independent `claude -p` judge. Results are plain files under `data/runs/`. **BenchyOS** is a Svelte 5 SPA shaped like a desktop OS; the same build serves the live app and the static export.
+BenchyOS benchmarks **blueprints** (a model plus its settings) against **bench tests** (prompt, expected files, checks, judge criteria). Each attempt is generated, extracted, checked automatically and scored by an independent `claude -p` judge. Results are plain files under `data/runs/`. **BenchyOS** is a Svelte 5 SPA shaped like a desktop OS; the same build serves the live app and the static export.
 
 Target platform: Debian-based Linux (native or WSL) with Node 24, pnpm and Claude Code. Everything in the repository is English.
 
@@ -31,17 +31,21 @@ data/runs/                 results (tracked); data/.cache is not
 tests/                     Vitest, including a real dry-run pipeline
 ```
 
-## Rules that keep Benchy correct
+## Rules that keep BenchyOS correct
 
 - **Engine code runs on Node without a build.** Relative imports carry `.ts`, only erasable TypeScript (no `enum`, no parameter properties, no namespaces), `import type` for types. The UI imports engine code only from `core/` (isomorphic files) and type-only elsewhere.
 - **Files are the source of truth.** Never add a database. The index is rebuilt from `data/runs`; write JSON with `writeJson`/`writeFileAtomic`.
 - **Status values are exactly** `ok | warnings | broken | failed`. Adding one means updating `overallStatus`, the UI `Status` component and the leaderboard.
-- **Scores are computed by Benchy**, never taken from the judge: criterion scores 0–10, weighted to 0–100, `required` below 5 fails the gate (`core/scoring.ts`).
+- **Scores are computed by BenchyOS**, never taken from the judge: criterion scores 0–10, weighted to 0–100, `required` below 5 fails the gate (`core/scoring.ts`).
 - **The dry-run subject and dry-run judge never touch the network.** They make the pipeline testable in CI.
 - **llama-server is only started locally and only stopped by its own PID.** Never kill by image name (`taskkill /IM`) — that also kills the person's own router. If another llama-server runs, refuse; do not stop it.
 - **`claude -p` must stay isolated** from the person's setup: `--safe-mode` or `--restricted`, always `--strict-mcp-config`, and a working directory outside the repository (Claude Code discovers `CLAUDE.md` and `.claude/` by walking up). The judge must not learn which model produced a submission.
 - **Generated artifacts are untrusted.** Programs run only via `program.run` in bubblewrap without network. HTML runs only in `sandbox="allow-scripts"` iframes and behind the `/files` CSP sandbox header.
 - **Hashes decide comparability.** `blueprintHash` ignores cosmetic fields; `testHashes` separates task, rubric and checks. Changing what goes into a hash changes every leaderboard grouping — do it deliberately.
+
+## UI changes
+
+Follow [docs/DESIGN.md](docs/DESIGN.md): tokens only (`src/lib/design/tokens.css`), square corners, no gradients or soft shadows, the amber accent only for primary action, active tab, selection mark and focus, pixel icons at 12/24/36 px, and every change checked in dark **and** light — the **Design system** app shows both side by side.
 
 ## Gates before every commit
 
@@ -68,5 +72,5 @@ Every test uses the phase markers `// arrange`, `// act`, `// assume` (lowercase
 
 - Commit `.env`, `benchy.local.yaml` or `data/.cache/`.
 - Bind the server to anything but `127.0.0.1` by default — the API starts processes.
-- Add SSH or any remote control of other hosts. Benchy controls only the host it runs on.
-- Put formatting rules into prompts ("Output ONLY the HTML"); Benchy's output contract in `artifacts/prompt.ts` handles that.
+- Add SSH or any remote control of other hosts. BenchyOS controls only the host it runs on.
+- Put formatting rules into prompts ("Output ONLY the HTML"); BenchyOS's output contract in `artifacts/prompt.ts` handles that.

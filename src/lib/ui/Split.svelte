@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	let { side, main, width = 290 }: { side: Snippet; main: Snippet; width?: number } = $props();
+	let { side, main, width = 260 }: { side: Snippet; main: Snippet; width?: number } = $props();
 </script>
 
 <div class="split" style="--w:{width}px">
@@ -18,8 +18,8 @@
 	.side {
 		min-height: 0;
 		overflow: auto;
-		border-right: 1px solid var(--line-soft);
-		background: linear-gradient(180deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.18));
+		border-right: var(--bw) solid var(--line);
+		background: var(--surface);
 	}
 	.main {
 		min-height: 0;

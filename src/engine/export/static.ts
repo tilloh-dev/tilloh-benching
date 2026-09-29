@@ -68,7 +68,7 @@ export async function exportStatic(
 				await cp(join(src, entry), join(dst, entry), { recursive: true });
 		}
 	}
-	const readme = `Benchy static export — ${new Date().toISOString()}\nServe this directory with any static web server (ES modules do not load from file://), e.g.\n  python3 -m http.server --directory . 8000\n`;
+	const readme = `BenchyOS static export — ${new Date().toISOString()}\nServe this directory with any static web server (ES modules do not load from file://), e.g.\n  python3 -m http.server --directory . 8000\n`;
 	await writeFile(join(outDir, 'README.txt'), readme);
 	return { runs: runIds.length, attempts: attempts.length };
 }

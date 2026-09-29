@@ -1,0 +1,202 @@
+/*
+ * BenchyOS design tokens — the only place colours, spacing, type and motion
+ * are defined. Components use the semantic names below, never raw values.
+ * Rules and usage: docs/DESIGN.md.
+ *
+ * Theme: dark by default; light via [data-theme='light'] (on <html> or on any
+ * container, e.g. the side-by-side preview), or the OS setting when nothing is forced.
+ */
+
+:root,
+[data-theme='dark'] {
+	/* ---- surfaces (back to front) ---- */
+	--bg: #0a0c10; /* desktop */
+	--surface: #0e1116; /* windows, bars, panels */
+	--surface-2: #12161d; /* title bars, table headers, secondary buttons */
+	--sunken: #07090c; /* inputs, code, tracks */
+	--hover: #171c25; /* hover fill for rows and ghost controls */
+
+	/* ---- lines ---- */
+	--line: #232a35; /* default border */
+	--line-soft: #181d25; /* dividers inside a surface */
+	--line-strong: #303846; /* control borders, focused window */
+
+	/* ---- text ---- */
+	--fg: #d8dde6; /* primary */
+	--fg-2: #9aa3b2; /* secondary */
+	--fg-3: #6b7383; /* labels, meta */
+	--fg-4: #4b5361; /* disabled, placeholders */
+
+	/* ---- accent: primary action, active tab, selection mark, focus. Nothing else. ---- */
+	--accent: #e5b93f;
+	--accent-text: #e5b93f; /* accent used as text */
+	--accent-fg: #0a0c10; /* text on a filled accent surface */
+	--accent-soft: #1d1a10; /* selected row / icon background */
+
+	/* ---- status (never the accent) ---- */
+	--ok: #6ccf9a;
+	--warn: #f08a4b;
+	--bad: #ef6f73;
+	--info: #7fa7d9;
+	--muted: #6b7383;
+
+	/* ---- data ---- */
+	--data: #7fa7d9; /* bars, lines, points */
+	--track: #181d25; /* empty part of a meter */
+	/* score scale 0–100 in five steps: <20, <40, <60, <80, ≥80 */
+	--score-1: #ef6f73;
+	--score-2: #f08a4b;
+	--score-3: #b9a86a;
+	--score-4: #8cc79c;
+	--score-5: #6ccf9a;
+
+	/* ---- focus ---- */
+	--focus: #e5b93f;
+
+	/* ---- syntax (code views only) ---- */
+	--syn-keyword: #b39ddb;
+	--syn-string: #8cc79c;
+	--syn-number: #e0a37a;
+	--syn-comment: #5c6575;
+	--syn-name: #7fa7d9;
+	--syn-attr: #c9a6d9;
+	--syn-tag: #9aa3b2;
+
+	/* ---- type: one family, IBM Plex Mono ---- */
+	--font: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+	--fs-xs: 10.5px; /* badges, uppercase labels */
+	--fs-s: 11.5px; /* meta, table headers */
+	--fs-m: 12.5px; /* body — the default */
+	--fs-l: 14px; /* window headings */
+	--fs-xl: 18px; /* big numbers */
+	--fs-xxl: 26px; /* hero numbers */
+	--lh: 1.45;
+	--fw: 400;
+	--fw-strong: 600;
+
+	/* ---- spacing: 2 px grid, compact ---- */
+	--sp-1: 2px;
+	--sp-2: 4px;
+	--sp-3: 6px;
+	--sp-4: 8px;
+	--sp-5: 12px;
+	--sp-6: 16px;
+	--sp-7: 24px;
+
+	/* ---- sizes ---- */
+	--control-h: 24px; /* buttons, inputs, selects */
+	--control-h-s: 20px;
+	--row-h: 26px; /* table rows, list items */
+	--titlebar-h: 28px;
+	--topbar-h: 30px;
+	--taskbar-h: 36px;
+
+	/* ---- shape: square everywhere; 1 px borders ---- */
+	--bw: 1px;
+	--radius: 0;
+
+	/* ---- elevation: no soft shadows. Popovers get a 1-step hard offset. ---- */
+	--shadow-pop: 3px 3px 0 #000;
+
+	/* ---- motion ---- */
+	--dur-1: 80ms; /* hover, press */
+	--dur-2: 140ms; /* menus, tabs */
+	--dur-3: 220ms; /* windows */
+	--steps: 4; /* retro stepped transitions */
+	--ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+	color-scheme: dark;
+}
+
+/* Light theme: warm paper. Applied when forced, or when the OS prefers light and nothing is forced. */
+[data-theme='light'] {
+	--bg: #f5f4ef;
+	--surface: #fbfaf6;
+	--surface-2: #efede5;
+	--sunken: #ffffff;
+	--hover: #efede5;
+	--line: #d8d6cc;
+	--line-soft: #e8e6de;
+	--line-strong: #bfbcb0;
+	--fg: #1c1f25;
+	--fg-2: #4b505b;
+	--fg-3: #7c818c;
+	--fg-4: #a4a8b0;
+	--accent: #a87c00;
+	--accent-text: #8a6500;
+	--accent-fg: #fbfaf6;
+	--accent-soft: #f6ecc8;
+	--ok: #1f7a4f;
+	--warn: #b0501a;
+	--bad: #b3353a;
+	--info: #3d5f95;
+	--muted: #7c818c;
+	--data: #3d5f95;
+	--track: #e8e6de;
+	--score-1: #b3353a;
+	--score-2: #b0501a;
+	--score-3: #8a7a2e;
+	--score-4: #4f8a5e;
+	--score-5: #1f7a4f;
+	--focus: #a87c00;
+	--syn-keyword: #6a4c9c;
+	--syn-string: #2f7a47;
+	--syn-number: #a0522d;
+	--syn-comment: #8e929a;
+	--syn-name: #3d5f95;
+	--syn-attr: #8a4f9e;
+	--syn-tag: #4b505b;
+	--shadow-pop: 3px 3px 0 #1c1f25;
+	color-scheme: light;
+}
+
+@media (prefers-color-scheme: light) {
+	:root:not([data-theme]) {
+		--bg: #f5f4ef;
+		--surface: #fbfaf6;
+		--surface-2: #efede5;
+		--sunken: #ffffff;
+		--hover: #efede5;
+		--line: #d8d6cc;
+		--line-soft: #e8e6de;
+		--line-strong: #bfbcb0;
+		--fg: #1c1f25;
+		--fg-2: #4b505b;
+		--fg-3: #7c818c;
+		--fg-4: #a4a8b0;
+		--accent: #a87c00;
+		--accent-text: #8a6500;
+		--accent-fg: #fbfaf6;
+		--accent-soft: #f6ecc8;
+		--ok: #1f7a4f;
+		--warn: #b0501a;
+		--bad: #b3353a;
+		--info: #3d5f95;
+		--muted: #7c818c;
+		--data: #3d5f95;
+		--track: #e8e6de;
+		--score-1: #b3353a;
+		--score-2: #b0501a;
+		--score-3: #8a7a2e;
+		--score-4: #4f8a5e;
+		--score-5: #1f7a4f;
+		--focus: #a87c00;
+		--syn-keyword: #6a4c9c;
+		--syn-string: #2f7a47;
+		--syn-number: #a0522d;
+		--syn-comment: #8e929a;
+		--syn-name: #3d5f95;
+		--syn-attr: #8a4f9e;
+		--syn-tag: #4b505b;
+		--shadow-pop: 3px 3px 0 #1c1f25;
+		color-scheme: light;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--dur-1: 0ms;
+		--dur-2: 0ms;
+		--dur-3: 0ms;
+	}
+}

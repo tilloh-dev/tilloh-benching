@@ -8,22 +8,21 @@
 
 <label class="toggle" class:disabled>
 	<input type="checkbox" bind:checked {disabled} />
-	<span class="track"><span class="knob"></span></span>
-	{#if label}<span class="text">{label}</span>{/if}
+	<span class="box" aria-hidden="true">{checked ? '■' : ''}</span>
+	{#if label}<span>{label}</span>{/if}
 </label>
 
 <style>
 	.toggle {
 		display: inline-flex;
 		align-items: center;
-		gap: 8px;
+		gap: var(--sp-3);
 		cursor: pointer;
-		font-size: 13px;
-		color: var(--text-2);
+		color: var(--fg-2);
 		user-select: none;
 	}
 	.disabled {
-		opacity: 0.5;
+		color: var(--fg-4);
 		cursor: default;
 	}
 	input {
@@ -31,41 +30,19 @@
 		opacity: 0;
 		pointer-events: none;
 	}
-	.track {
-		position: relative;
-		width: 34px;
-		height: 20px;
-		border-radius: 20px;
-		background: var(--bg-1);
-		border: 1px solid var(--line-strong);
-		transition:
-			background 0.2s,
-			border-color 0.2s,
-			box-shadow 0.2s;
-	}
-	.knob {
-		position: absolute;
-		top: 2px;
-		left: 2px;
+	.box {
+		display: grid;
+		place-items: center;
 		width: 14px;
 		height: 14px;
-		border-radius: 50%;
-		background: var(--text-3);
-		transition:
-			transform 0.22s var(--ease-spring),
-			background 0.2s;
+		border: var(--bw) solid var(--line-strong);
+		background: var(--sunken);
+		color: var(--fg);
+		font-size: var(--fs-xs);
+		line-height: 1;
 	}
-	input:checked + .track {
-		background: var(--yellow-a20);
-		border-color: var(--yellow);
-		box-shadow: 0 0 12px var(--yellow-a20);
-	}
-	input:checked + .track .knob {
-		transform: translateX(14px);
-		background: var(--yellow);
-	}
-	input:focus-visible + .track {
-		outline: 2px solid var(--yellow);
-		outline-offset: 2px;
+	input:focus-visible + .box {
+		outline: 1px solid var(--focus);
+		outline-offset: 1px;
 	}
 </style>

@@ -1,9 +1,11 @@
 <script lang="ts">
-	/** Score 0–100 as a number plus an animated bar; colour runs red → yellow → teal. */
+	import { scoreColor } from '../design/score.ts';
+
+	/** A 0–100 score: the number (always), a data meter, and the gate marker. */
 	let {
 		value,
 		gate = false,
-		width = 90,
+		width = 80,
 		big = false,
 		stddev = null
 	}: {
@@ -13,9 +15,6 @@
 		big?: boolean;
 		stddev?: number | null;
 	} = $props();
-	const hue = $derived(
-		value == null ? 0 : value < 50 ? 350 + (value / 50) * 60 : 45 + ((value - 50) / 50) * 120
-	);
 </script>
 
 {#if value == null}
@@ -24,12 +23,12 @@
 	<span
 		class="score"
 		class:big
-		style="--w:{width}px; --p:{Math.max(2, Math.min(100, value))}%; --h:{hue % 360}"
+		style="--w:{width}px; --p:{Math.max(0, Math.min(100, value))}%; --c:{scoreColor(value)}"
 	>
 		<b>{value.toFixed(1)}</b>
 		{#if stddev}<small>±{stddev.toFixed(1)}</small>{/if}
-		{#if gate}<em title="a required criterion failed">gate</em>{/if}
-		<span class="bar"><span></span></span>
+		<span class="meter" aria-hidden="true"><span></span></span>
+		{#if gate}<em title="a required criterion failed">✕ gate</em>{/if}
 	</span>
 {/if}
 
@@ -37,61 +36,44 @@
 	.score {
 		display: inline-flex;
 		align-items: center;
-		gap: 8px;
+		gap: var(--sp-3);
 		font-variant-numeric: tabular-nums;
 	}
 	b {
-		min-width: 34px;
+		min-width: 4ch;
 		text-align: right;
-		font-weight: 600;
-		color: hsl(var(--h) 90% 72%);
+		font-weight: var(--fw-strong);
+		color: var(--c);
 	}
 	small {
-		color: var(--text-3);
-		font-size: 11px;
+		color: var(--fg-3);
+		font-size: var(--fs-s);
 	}
 	em {
 		font-style: normal;
-		font-size: 10px;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		font-size: var(--fs-xs);
+		font-weight: var(--fw-strong);
 		color: var(--bad);
-		border: 1px solid color-mix(in srgb, var(--bad) 50%, transparent);
-		padding: 0 5px;
-		border-radius: 4px;
 	}
-	.bar {
+	.meter {
 		width: var(--w);
 		height: 6px;
-		border-radius: 6px;
-		background: var(--bg-1);
-		box-shadow: 0 0 0 1px var(--line-soft) inset;
-		overflow: hidden;
+		background: var(--track);
 	}
-	.bar span {
+	.meter span {
 		display: block;
 		height: 100%;
 		width: var(--p);
-		border-radius: inherit;
-		background: linear-gradient(90deg, hsl(var(--h) 85% 45%), hsl(var(--h) 90% 62%));
-		box-shadow: 0 0 10px hsl(var(--h) 90% 55% / 0.6);
-		animation: grow 0.6s var(--ease-out) both;
-		transform-origin: left;
-	}
-	@keyframes grow {
-		from {
-			transform: scaleX(0);
-		}
+		background: var(--data);
 	}
 	.big b {
-		font-size: 30px;
+		font-size: var(--fs-xxl);
 		line-height: 1;
 	}
-	.big .bar {
+	.big .meter {
 		height: 8px;
 	}
 	.none {
-		color: var(--text-4);
+		color: var(--fg-4);
 	}
 </style>

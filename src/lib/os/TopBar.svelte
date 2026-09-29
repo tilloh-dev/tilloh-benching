@@ -5,6 +5,7 @@
 	import Menu, { type MenuItem } from './Menu.svelte';
 	import { wm } from './wm.svelte.ts';
 	import { toasts } from './toasts.svelte.ts';
+	import { theme } from '../design/theme.svelte.ts';
 
 	let { onpalette }: { onpalette: () => void } = $props();
 
@@ -51,8 +52,9 @@
 			: [{ label: 'No open windows', disabled: true, action: () => {} }]
 	);
 	const benchyItems = $derived<MenuItem[]>([
-		{ label: 'About Benchy', icon: 'info', action: () => wm.open('welcome') },
+		{ label: 'About BenchyOS', icon: 'info', action: () => wm.open('welcome') },
 		{ label: 'Host & llama.cpp', icon: 'chip', action: () => wm.open('host') },
+		{ label: 'Design system', icon: 'grid', action: () => wm.open('design') },
 		'sep',
 		{
 			label: 'Rescan results',
@@ -72,8 +74,8 @@
 <header class="topbar">
 	<Menu items={benchyItems}>
 		{#snippet trigger()}
-			<Logo size={20} />
-			<span class="brand">benchy</span>
+			<Logo size={12} />
+			<span class="brand">BenchyOS</span>
 		{/snippet}
 	</Menu>
 	<Menu items={appItems}>
@@ -87,12 +89,12 @@
 
 	{#if benchy.client && !benchy.live}
 		<span class="chip static" title="Read-only export"
-			><Icon name="eye" size={14} />static export</span
+			><Icon name="eye" size={12} />static export</span
 		>
 	{/if}
 	{#if benchy.status}
 		<button class="chip" title="Host" onclick={() => wm.open('host')}>
-			<Icon name="chip" size={14} />
+			<Icon name="chip" size={12} />
 			<span>{benchy.status.host.name}</span>
 			{#if gpu}<span class="muted ellipsis gpu">{gpu}</span>{/if}
 		</button>
@@ -109,14 +111,14 @@
 		</button>
 		{#if progress !== null}
 			<button class="chip run" onclick={() => wm.open('runs', { select: activeRuns[0]?.id })}>
-				<Icon name="rocket" size={14} />
+				<Icon name="rocket" size={12} />
 				<span>{activeRuns.length} running</span>
 				<span class="bar"><span style="width:{progress}%"></span></span>
 				<span class="mono">{progress}%</span>
 			</button>
 		{/if}
 		{#if (benchy.status?.engine?.judge_jobs ?? 0) > 0}
-			<span class="chip"><Icon name="gavel" size={14} />{benchy.status?.engine?.judge_jobs}</span>
+			<span class="chip"><Icon name="gavel" size={12} />{benchy.status?.engine?.judge_jobs}</span>
 		{/if}
 		<span
 			class="conn"
@@ -124,9 +126,17 @@
 			title={benchy.connected ? 'live' : 'reconnecting…'}
 		></span>
 	{/if}
+	<button
+		class="chip"
+		title="Theme: {theme.choice} (click to change)"
+		onclick={() => theme.cycle()}
+	>
+		<Icon name={theme.resolved === 'light' ? 'sun' : 'moon'} size={12} />
+		<span>{theme.choice}</span>
+	</button>
 	<button class="chip search" onclick={onpalette} title="Search (Ctrl K)">
-		<Icon name="search" size={14} />
-		<span class="muted">Search</span>
+		<Icon name="search" size={12} />
+		<span class="muted">search</span>
 		<kbd>Ctrl K</kbd>
 	</button>
 </header>
@@ -141,43 +151,34 @@
 		height: var(--topbar-h);
 		display: flex;
 		align-items: center;
-		gap: 4px;
-		padding: 0 10px;
-		background: linear-gradient(180deg, rgba(14, 22, 52, 0.94), rgba(10, 16, 40, 0.94));
-		border-bottom: 1px solid var(--line);
-		backdrop-filter: blur(14px);
-		box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+		gap: var(--sp-2);
+		padding: 0 var(--sp-3);
+		background: var(--surface);
+		border-bottom: var(--bw) solid var(--line);
 	}
 	.brand {
-		font-weight: 700;
-		letter-spacing: -0.01em;
-		color: var(--text);
+		font-weight: var(--fw-strong);
+		color: var(--fg);
 	}
 	.chip {
 		display: inline-flex;
 		align-items: center;
-		gap: 7px;
-		height: 26px;
-		padding: 0 10px;
-		border-radius: 999px;
-		border: 1px solid var(--line-soft);
-		background: rgba(255, 255, 255, 0.02);
-		color: var(--text-2);
-		font-size: 12px;
+		gap: var(--sp-3);
+		height: var(--control-h-s);
+		padding: 0 var(--sp-3);
+		border: var(--bw) solid var(--line);
+		background: var(--surface);
+		color: var(--fg-2);
+		font-size: var(--fs-s);
 		cursor: pointer;
 		max-width: 300px;
-		transition:
-			border-color 0.15s,
-			background 0.15s;
+		transition: border-color var(--dur-1);
 	}
 	.chip:hover {
 		border-color: var(--line-strong);
-		background: var(--bg-4);
-		color: var(--text);
+		color: var(--fg);
 	}
 	.chip.static {
-		color: var(--yellow-2);
-		border-color: var(--yellow-a35);
 		cursor: default;
 	}
 	.gpu,
@@ -185,64 +186,41 @@
 		max-width: 150px;
 	}
 	.led {
-		width: 8px;
-		height: 8px;
-		border-radius: 50%;
+		width: 6px;
+		height: 6px;
 		background: var(--muted);
-		color: var(--muted);
 	}
 	.led.ok {
 		background: var(--ok);
-		color: var(--ok);
-		box-shadow: 0 0 8px var(--ok);
 	}
 	.led.busy {
-		background: var(--yellow);
-		color: var(--yellow);
-		animation: pulse-led 1s ease-in-out infinite;
+		background: var(--fg);
+		animation: blink var(--dur-3) steps(2) infinite;
 	}
 	.led.bad {
 		background: var(--bad);
-		color: var(--bad);
-		box-shadow: 0 0 8px var(--bad);
-	}
-	.run {
-		border-color: var(--yellow-a35);
-		color: var(--yellow-2);
 	}
 	.bar {
-		width: 60px;
-		height: 5px;
-		border-radius: 5px;
-		background: var(--bg-1);
-		overflow: hidden;
+		width: 56px;
+		height: 6px;
+		background: var(--track);
 	}
 	.bar span {
 		display: block;
 		height: 100%;
-		background: linear-gradient(
-			90deg,
-			var(--yellow-deep),
-			var(--yellow),
-			var(--yellow-2),
-			var(--yellow)
-		);
-		background-size: 200% 100%;
-		animation: shimmer 1.6s linear infinite;
-		transition: width 0.4s var(--ease-out);
+		background: var(--data);
+		transition: width var(--dur-2);
 	}
 	.conn {
-		width: 7px;
-		height: 7px;
-		margin: 0 6px;
-		border-radius: 50%;
+		width: 6px;
+		height: 6px;
+		margin: 0 var(--sp-2);
 		background: var(--bad);
 	}
 	.conn.on {
 		background: var(--ok);
-		box-shadow: 0 0 6px var(--ok);
 	}
 	.search kbd {
-		margin-left: 6px;
+		margin-left: var(--sp-2);
 	}
 </style>

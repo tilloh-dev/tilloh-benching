@@ -96,7 +96,7 @@ describe('dry-run pipeline', () => {
 
 		// act
 		const second = Engine.open(ws.root, { exclusive: true });
-		await expect(second).rejects.toThrow(/another Benchy engine/);
+		await expect(second).rejects.toThrow(/another BenchyOS engine/);
 		await first.close();
 		const third = await Engine.open(ws.root, { exclusive: true });
 		const final = await third.runToCompletion(run.id);

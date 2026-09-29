@@ -49,56 +49,56 @@
 
 <style>
 	.node {
-		font-family: var(--mono);
-		font-size: 12px;
+		font-family: var(--font);
+		font-size: var(--fs-s);
 		line-height: 1.7;
 	}
 	.children {
-		padding-left: 16px;
+		padding-left: var(--sp-6);
 		border-left: 1px dashed var(--line-soft);
-		margin-left: 5px;
+		margin-left: var(--sp-3);
 	}
 	.toggler {
 		display: inline-flex;
-		gap: 6px;
+		gap: var(--sp-3);
 		align-items: baseline;
 		background: none;
 		border: 0;
 		padding: 0;
 		cursor: pointer;
-		color: var(--text-2);
+		color: var(--fg-2);
 	}
 	.caret {
 		display: inline-block;
 		width: 10px;
-		color: var(--text-3);
-		transition: transform 0.15s;
+		color: var(--fg-3);
+		transition: transform var(--dur-2);
 	}
 	.caret.open {
 		transform: rotate(90deg);
 	}
 	.k {
-		color: #8fb8ff;
+		color: var(--syn-name);
 	}
 	.p {
-		color: var(--text-4);
+		color: var(--fg-4);
 	}
 	.leaf {
-		padding-left: 16px;
+		padding-left: var(--sp-6);
 		word-break: break-all;
-		color: var(--text-3);
+		color: var(--fg-3);
 	}
 	.v.string {
-		color: #7ee6c3;
+		color: var(--syn-string);
 	}
 	.v.number {
-		color: #ff9f7a;
+		color: var(--syn-number);
 	}
 	.v.boolean {
-		color: var(--yellow);
+		color: var(--syn-number);
 	}
 	.more {
-		color: var(--text-4);
-		padding-left: 16px;
+		color: var(--fg-4);
+		padding-left: var(--sp-6);
 	}
 </style>

@@ -1,56 +1,46 @@
 <script lang="ts">
+	/** Every check or run state: symbol + word, so status never depends on color alone. */
 	let { status, label }: { status: string | null | undefined; label?: string } = $props();
-	const map: Record<string, string> = {
-		ok: 'ok',
-		pass: 'ok',
-		done: 'ok',
-		judged: 'ok',
-		warnings: 'warn',
-		warn: 'warn',
-		interrupted: 'warn',
-		broken: 'bad',
-		fail: 'bad',
-		failed: 'bad',
-		error: 'bad',
-		cancelled: 'muted',
-		skipped: 'muted',
-		queued: 'info',
-		pending: 'muted',
-		running: 'live',
-		generating: 'live',
-		checking: 'live',
-		judging: 'live',
-		generated: 'info',
-		checked: 'info'
+	const map: Record<string, [tone: string, symbol: string]> = {
+		ok: ['ok', '●'],
+		pass: ['ok', '●'],
+		done: ['ok', '●'],
+		judged: ['ok', '●'],
+		warnings: ['warn', '▲'],
+		warn: ['warn', '▲'],
+		interrupted: ['warn', '▲'],
+		broken: ['bad', '✕'],
+		fail: ['bad', '✕'],
+		failed: ['bad', '✕'],
+		error: ['bad', '✕'],
+		cancelled: ['muted', '○'],
+		skipped: ['muted', '○'],
+		pending: ['muted', '○'],
+		queued: ['info', '○'],
+		generated: ['info', '◇'],
+		checked: ['info', '◆'],
+		running: ['live', '◐'],
+		generating: ['live', '◐'],
+		checking: ['live', '◐'],
+		judging: ['live', '◐']
 	};
-	const tone = $derived(map[status ?? ''] ?? 'muted');
+	const [tone, symbol] = $derived(map[status ?? ''] ?? ['muted', '·']);
 </script>
 
-<span class="badge {tone}"><i></i>{label ?? status ?? '—'}</span>
+<span class="status {tone}"><i aria-hidden="true">{symbol}</i>{label ?? status ?? '—'}</span>
 
 <style>
-	.badge {
+	.status {
 		display: inline-flex;
 		align-items: center;
-		gap: 6px;
-		height: 22px;
-		padding: 0 9px 0 7px;
-		border-radius: 999px;
-		font-size: 11.5px;
-		font-weight: 600;
-		letter-spacing: 0.02em;
+		gap: var(--sp-2);
+		font-size: var(--fs-s);
+		font-weight: var(--fw-strong);
 		white-space: nowrap;
-		border: 1px solid color-mix(in srgb, var(--c) 40%, transparent);
-		background: color-mix(in srgb, var(--c) 12%, transparent);
-		color: color-mix(in srgb, var(--c) 85%, white);
+		color: var(--c);
 	}
 	i {
-		width: 7px;
-		height: 7px;
-		border-radius: 50%;
-		background: var(--c);
-		color: var(--c);
-		box-shadow: 0 0 8px var(--c);
+		font-style: normal;
 	}
 	.ok {
 		--c: var(--ok);
@@ -68,9 +58,9 @@
 		--c: var(--info);
 	}
 	.live {
-		--c: var(--yellow);
+		--c: var(--fg);
 	}
 	.live i {
-		animation: pulse-led 1.2s ease-in-out infinite;
+		animation: blink var(--dur-3) steps(2) infinite;
 	}
 </style>

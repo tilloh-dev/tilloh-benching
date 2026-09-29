@@ -14,35 +14,23 @@
 		display: flex;
 		flex-direction: column;
 		align-items: stretch;
-		gap: 3px;
+		gap: var(--sp-1);
 		width: 100%;
-		padding: 9px 12px;
+		padding: var(--sp-3) var(--sp-4);
 		border: 0;
-		border-bottom: 1px solid var(--line-soft);
+		border-bottom: var(--bw) solid var(--line-soft);
 		background: transparent;
+		color: var(--fg-2);
 		text-align: left;
 		cursor: pointer;
-		color: var(--text-2);
-		position: relative;
-		transition: background 0.12s;
 	}
 	.li:hover {
-		background: rgba(255, 255, 255, 0.03);
-		color: var(--text);
+		background: var(--hover);
+		color: var(--fg);
 	}
 	.li.active {
-		background: linear-gradient(90deg, var(--yellow-a20), transparent);
-		color: var(--text);
-	}
-	.li.active::before {
-		content: '';
-		position: absolute;
-		left: 0;
-		top: 6px;
-		bottom: 6px;
-		width: 3px;
-		border-radius: 0 3px 3px 0;
-		background: var(--yellow);
-		box-shadow: 0 0 10px var(--yellow);
+		background: var(--accent-soft);
+		color: var(--fg);
+		box-shadow: inset 2px 0 0 var(--accent);
 	}
 </style>

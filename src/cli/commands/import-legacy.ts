@@ -9,7 +9,7 @@ import { importLegacyRuns } from '../../engine/legacy/llm-check.ts';
 const HELP = `benchy import-legacy <runs-dir> — import llm-check results (one run per model directory)
 
       --preset <models.ini>   router preset to reconstruct llama.cpp settings from
-      --no-recheck            keep llm-check's validation instead of re-running Benchy's checks
+      --no-recheck            keep llm-check's validation instead of re-running BenchyOS's checks
       --overwrite             replace runs that were imported before`;
 
 export default async function importLegacy(args: string[]): Promise<number> {

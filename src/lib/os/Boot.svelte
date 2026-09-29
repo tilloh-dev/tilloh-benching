@@ -5,13 +5,12 @@
 
 <div class="boot" class:done>
 	<div class="center">
-		<Logo size={84} />
-		<h1>benchy<span>os</span></h1>
+		<Logo size={36} />
+		<h1>BenchyOS</h1>
 		{#if error}
-			<p class="err">{error}</p>
+			<p class="err">✕ {error}</p>
 		{:else}
-			<div class="progress"><span></span></div>
-			<p class="muted">loading results…</p>
+			<p class="line caret">loading results</p>
 		{/if}
 	</div>
 </div>
@@ -23,64 +22,34 @@
 		z-index: 50000;
 		display: grid;
 		place-items: center;
-		background:
-			radial-gradient(60% 50% at 50% 42%, rgba(255, 210, 63, 0.1), transparent 70%), var(--bg-0);
-		transition:
-			opacity 0.5s ease 0.15s,
-			visibility 0s linear 0.65s;
+		background: var(--bg);
+		color: var(--fg);
 	}
+	/* Retro moment: the boot screen dissolves in visible steps. */
 	.boot.done {
-		opacity: 0;
-		visibility: hidden;
+		animation: boot-out var(--dur-3) steps(var(--steps)) forwards;
+		pointer-events: none;
+	}
+	@keyframes boot-out {
+		to {
+			opacity: 0;
+			visibility: hidden;
+		}
 	}
 	.center {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 14px;
-		animation: fade-up 0.5s var(--ease-out) both;
-	}
-	.center :global(.logo) {
-		animation: breathe 2.4s ease-in-out infinite;
-	}
-	@keyframes breathe {
-		50% {
-			filter: drop-shadow(0 0 22px rgba(255, 210, 63, 0.85));
-		}
+		gap: var(--sp-4);
 	}
 	h1 {
 		margin: 0;
-		font-size: 34px;
-		font-weight: 700;
-		letter-spacing: -0.02em;
+		font-size: var(--fs-xl);
+		font-weight: var(--fw-strong);
 	}
-	h1 span {
-		color: var(--yellow);
-		text-shadow: 0 0 18px rgba(255, 210, 63, 0.6);
-	}
-	.progress {
-		width: 220px;
-		height: 6px;
-		border-radius: 6px;
-		background: var(--bg-3);
-		overflow: hidden;
-		box-shadow: 0 0 0 1px var(--line) inset;
-	}
-	.progress span {
-		display: block;
-		height: 100%;
-		width: 40%;
-		border-radius: inherit;
-		background: linear-gradient(90deg, transparent, var(--yellow), transparent);
-		animation: slide 1.1s ease-in-out infinite;
-	}
-	@keyframes slide {
-		from {
-			transform: translateX(-100%);
-		}
-		to {
-			transform: translateX(250%);
-		}
+	.line {
+		margin: 0;
+		color: var(--fg-3);
 	}
 	.err {
 		color: var(--bad);

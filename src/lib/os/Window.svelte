@@ -91,17 +91,6 @@
 		el.addEventListener('pointermove', move);
 		el.addEventListener('pointerup', up);
 	}
-
-	/** Where the minimize animation flies to: this window's taskbar button. */
-	const minimizeTarget = $derived.by(() => {
-		if (win.phase !== 'minimizing' && win.phase !== 'restoring') return '';
-		const btn = document.querySelector(`[data-taskbar="${win.id}"]`) as HTMLElement | null;
-		if (!btn) return 'translate(0, 60vh) scale(0.2)';
-		const r = btn.getBoundingClientRect();
-		const tx = r.left + r.width / 2 - (win.x + win.w / 2);
-		const ty = r.top + r.height / 2 - (win.y + win.h / 2);
-		return `translate(${tx}px, ${ty}px) scale(${Math.max(0.08, r.width / win.w)}, ${Math.max(0.05, r.height / win.h)})`;
-	});
 </script>
 
 {#if snapHint}
@@ -114,8 +103,7 @@
 	class:dragging
 	class:maximized={win.state === 'maximized'}
 	class:hidden={win.state === 'minimized'}
-	style="left:{win.x}px; top:{win.y}px; width:{win.w}px; height:{win.h}px; z-index:{win.z}; --fly:{minimizeTarget ||
-		'none'}"
+	style="left:{win.x}px; top:{win.y}px; width:{win.w}px; height:{win.h}px; z-index:{win.z}"
 	role="dialog"
 	tabindex="-1"
 	aria-label={win.title}
@@ -129,23 +117,23 @@
 		onpointerdown={onTitleDown}
 		ondblclick={() => wm.toggleMax(win.id)}
 	>
-		<span class="app-icon"><Icon name={win.icon} size={16} /></span>
+		<span class="app-icon"><Icon name={win.icon} size={12} /></span>
 		<span class="title ellipsis">{win.title}</span>
 		{#if win.subtitle}<span class="subtitle ellipsis">{win.subtitle}</span>{/if}
 		<span class="spacer"></span>
 		<div class="controls">
 			<button class="ctl" title="Minimize" onclick={() => wm.minimize(win.id)}
-				><Icon name="minimize" size={14} /></button
+				><Icon name="minimize" size={12} /></button
 			>
 			<button
 				class="ctl"
 				title={win.state === 'maximized' ? 'Restore' : 'Maximize'}
 				onclick={() => wm.toggleMax(win.id)}
 			>
-				<Icon name={win.state === 'maximized' ? 'restore' : 'maximize'} size={13} />
+				<Icon name={win.state === 'maximized' ? 'restore' : 'maximize'} size={12} />
 			</button>
 			<button class="ctl close" title="Close" onclick={() => wm.close(win.id)}
-				><Icon name="close" size={14} /></button
+				><Icon name="close" size={12} /></button
 			>
 		</div>
 	</div>
@@ -168,19 +156,14 @@
 		position: absolute;
 		display: flex;
 		flex-direction: column;
-		background: var(--bg-2);
-		border: 1px solid var(--line);
-		border-radius: var(--radius-l);
-		box-shadow: var(--shadow-window);
+		background: var(--surface);
+		border: var(--bw) solid var(--line);
 		overflow: hidden;
-		transform-origin: 50% 60%;
 		transition:
-			box-shadow 0.2s,
-			border-color 0.2s,
-			left 0.22s var(--ease-out),
-			top 0.22s var(--ease-out),
-			width 0.22s var(--ease-out),
-			height 0.22s var(--ease-out);
+			left var(--dur-3) var(--ease),
+			top var(--dur-3) var(--ease),
+			width var(--dur-3) var(--ease),
+			height var(--dur-3) var(--ease);
 	}
 	.window.dragging {
 		transition: none;
@@ -188,135 +171,76 @@
 	}
 	.window.focused {
 		border-color: var(--line-strong);
-		box-shadow:
-			var(--shadow-window),
-			0 0 0 1px rgba(255, 210, 63, 0.12),
-			0 0 40px rgba(255, 210, 63, 0.06);
-	}
-	.window.maximized {
-		border-radius: var(--radius);
 	}
 	.window.hidden {
 		visibility: hidden;
 		pointer-events: none;
 	}
-	.phase-opening {
-		animation: win-open 0.22s var(--ease-out) both;
-	}
-	.phase-closing {
-		animation: win-close 0.17s ease-in both;
-		pointer-events: none;
-	}
-	.phase-minimizing {
-		animation: win-min 0.26s cubic-bezier(0.5, 0, 0.75, 0) both;
-		pointer-events: none;
-	}
+	/* Retro moments: windows unfold and fold in visible steps. */
+	.phase-opening,
 	.phase-restoring {
-		animation: win-restore 0.26s var(--ease-out) both;
+		animation: step-unfold var(--dur-3) steps(var(--steps)) both;
 	}
-	@keyframes win-open {
-		from {
-			opacity: 0;
-			transform: translateY(10px) scale(0.94);
-		}
-	}
-	@keyframes win-close {
-		to {
-			opacity: 0;
-			transform: translateY(6px) scale(0.95);
-		}
-	}
-	@keyframes win-min {
-		to {
-			opacity: 0.2;
-			transform: var(--fly);
-		}
-	}
-	@keyframes win-restore {
-		from {
-			opacity: 0.2;
-			transform: var(--fly);
-		}
+	.phase-closing,
+	.phase-minimizing {
+		animation: step-fold var(--dur-3) steps(var(--steps)) both;
+		pointer-events: none;
 	}
 
 	.titlebar {
 		flex: none;
 		display: flex;
 		align-items: center;
-		gap: 8px;
-		height: 38px;
-		padding: 0 6px 0 12px;
+		gap: var(--sp-3);
+		height: var(--titlebar-h);
+		padding: 0 var(--sp-2) 0 var(--sp-4);
+		background: var(--surface-2);
+		border-bottom: var(--bw) solid var(--line);
+		color: var(--fg-3);
 		cursor: default;
 		user-select: none;
 		touch-action: none;
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0) 55%),
-			linear-gradient(180deg, #16214a, #111a3b);
-		border-bottom: 1px solid var(--line-soft);
-		position: relative;
 	}
-	.focused .titlebar::after {
-		content: '';
-		position: absolute;
-		left: 12px;
-		right: 12px;
-		bottom: -1px;
-		height: 1px;
-		background: linear-gradient(90deg, transparent, var(--yellow-a35), transparent);
+	.focused .titlebar {
+		color: var(--fg);
 	}
 	.app-icon {
 		display: grid;
 		place-items: center;
-		width: 22px;
-		height: 22px;
-		border-radius: 6px;
-		background: var(--bg-4);
-		color: var(--text);
-		box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset;
-	}
-	.focused .app-icon {
-		color: var(--yellow);
+		color: inherit;
 	}
 	.title {
-		font-weight: 600;
-		font-size: 13px;
-		color: var(--text);
+		font-weight: var(--fw-strong);
+		font-size: var(--fs-m);
 	}
 	.subtitle {
-		font-size: 12px;
-		color: var(--text-3);
-	}
-	.window:not(.focused) .title {
-		color: var(--text-2);
+		font-size: var(--fs-s);
+		color: var(--fg-3);
 	}
 	.controls {
 		display: flex;
-		gap: 4px;
+		gap: var(--sp-1);
 	}
 	.ctl {
 		display: grid;
 		place-items: center;
-		width: 26px;
-		height: 24px;
-		border-radius: 7px;
-		border: 1px solid transparent;
-		background: transparent;
-		color: var(--text-3);
+		width: 20px;
+		height: 18px;
+		border: var(--bw) solid var(--line);
+		background: var(--surface);
+		color: var(--fg-3);
 		cursor: pointer;
 		transition:
-			background 0.12s,
-			color 0.12s,
-			border-color 0.12s;
+			color var(--dur-1),
+			border-color var(--dur-1);
 	}
 	.ctl:hover {
-		background: var(--bg-4);
-		color: var(--text);
-		border-color: var(--line);
+		color: var(--fg);
+		border-color: var(--fg-3);
 	}
 	.ctl.close:hover {
-		background: #7a1c2b;
-		border-color: #b3344a;
-		color: #fff;
+		color: var(--bad);
+		border-color: var(--bad);
 	}
 	.body {
 		flex: 1;
@@ -332,9 +256,9 @@
 	}
 	.rz-n,
 	.rz-s {
-		left: 10px;
-		right: 10px;
-		height: 7px;
+		left: 8px;
+		right: 8px;
+		height: 6px;
 		cursor: ns-resize;
 	}
 	.rz-n {
@@ -345,9 +269,9 @@
 	}
 	.rz-e,
 	.rz-w {
-		top: 10px;
-		bottom: 10px;
-		width: 7px;
+		top: 8px;
+		bottom: 8px;
+		width: 6px;
 		cursor: ew-resize;
 	}
 	.rz-e {
@@ -360,8 +284,8 @@
 	.rz-nw,
 	.rz-se,
 	.rz-sw {
-		width: 14px;
-		height: 14px;
+		width: 12px;
+		height: 12px;
 	}
 	.rz-ne {
 		top: -3px;
@@ -387,26 +311,22 @@
 	.snap-hint {
 		position: fixed;
 		z-index: 9000;
-		border: 2px solid var(--yellow);
-		background: var(--yellow-a10);
-		border-radius: var(--radius-l);
-		box-shadow: var(--glow);
+		border: var(--bw) dashed var(--fg-3);
 		pointer-events: none;
-		animation: fade-up 0.15s both;
 	}
 	.snap-hint.top {
-		inset: calc(var(--topbar-h) + 6px) 6px calc(var(--taskbar-h) + 6px) 6px;
+		inset: calc(var(--topbar-h) + 4px) 4px calc(var(--taskbar-h) + 4px) 4px;
 	}
 	.snap-hint.left {
-		top: calc(var(--topbar-h) + 6px);
-		bottom: calc(var(--taskbar-h) + 6px);
-		left: 6px;
-		width: calc(50% - 9px);
+		top: calc(var(--topbar-h) + 4px);
+		bottom: calc(var(--taskbar-h) + 4px);
+		left: 4px;
+		width: calc(50% - 6px);
 	}
 	.snap-hint.right {
-		top: calc(var(--topbar-h) + 6px);
-		bottom: calc(var(--taskbar-h) + 6px);
-		right: 6px;
-		width: calc(50% - 9px);
+		top: calc(var(--topbar-h) + 4px);
+		bottom: calc(var(--taskbar-h) + 4px);
+		right: 4px;
+		width: calc(50% - 6px);
 	}
 </style>

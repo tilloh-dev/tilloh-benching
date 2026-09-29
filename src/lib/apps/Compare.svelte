@@ -114,40 +114,40 @@
 <style>
 	.bar {
 		display: flex;
-		gap: 8px;
+		gap: var(--sp-4);
 		align-items: center;
-		padding: 10px 12px;
-		border-bottom: 1px solid var(--line-soft);
+		padding: var(--sp-5) var(--sp-5);
+		border-bottom: var(--bw) solid var(--line-soft);
 	}
 	.vs {
 		display: grid;
 		place-items: center;
 		width: 22px;
 		height: 22px;
-		border-radius: 50%;
-		background: var(--yellow);
-		color: var(--yellow-ink);
-		font-weight: 700;
-		font-size: 11px;
+		font-weight: var(--fw-strong);
+		font-size: var(--fs-xs);
 		flex: none;
+		background: var(--surface-2);
+		color: var(--fg);
+		border: var(--bw) solid var(--line-strong);
 	}
 	.sides {
 		flex: 1;
 		min-height: 0;
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		gap: 10px;
-		padding: 10px;
+		gap: var(--sp-5);
+		padding: var(--sp-5);
 	}
 	.side {
 		display: flex;
 		flex-direction: column;
 		min-height: 0;
-		gap: 8px;
+		gap: var(--sp-4);
 	}
 	.side-head {
 		display: flex;
-		gap: 10px;
+		gap: var(--sp-5);
 		align-items: center;
 	}
 	.prev {
@@ -158,9 +158,9 @@
 	}
 	.crit {
 		max-height: 34%;
-		border-top: 1px solid var(--line-soft);
+		border-top: var(--bw) solid var(--line-soft);
 	}
 	td.win {
-		background: var(--yellow-a10);
+		font-weight: var(--fw-strong);
 	}
 </style>

@@ -53,7 +53,7 @@
 						}}
 					>
 						<span class="ico"
-							>{#if item.icon}<Icon name={item.icon} size={15} />{/if}</span
+							>{#if item.icon}<Icon name={item.icon} size={12} />{/if}</span
 						>
 						<span class="grow">{item.label}</span>
 						{#if item.hint}<span class="hint">{item.hint}</span>{/if}
@@ -71,84 +71,70 @@
 	.trigger {
 		display: flex;
 		align-items: center;
-		gap: 7px;
-		height: 28px;
-		padding: 0 10px;
-		border-radius: 7px;
-		border: 1px solid transparent;
+		gap: var(--sp-3);
+		height: var(--control-h-s);
+		padding: 0 var(--sp-3);
+		border: var(--bw) solid transparent;
 		background: transparent;
-		color: var(--text-2);
+		color: var(--fg-2);
 		cursor: pointer;
-		font-weight: 500;
 	}
 	.trigger:hover,
 	.trigger.open {
-		background: var(--bg-4);
-		color: var(--text);
+		color: var(--fg);
 		border-color: var(--line);
+		background: var(--surface-2);
 	}
 	.menu {
 		position: absolute;
-		top: calc(100% + 6px);
+		top: calc(100% + var(--sp-1));
 		z-index: 30000;
-		min-width: 230px;
-		padding: 5px;
-		border-radius: var(--radius);
-		background: rgba(18, 28, 65, 0.97);
-		border: 1px solid var(--line-strong);
+		min-width: 220px;
+		padding: var(--sp-1);
+		background: var(--surface);
+		border: var(--bw) solid var(--line-strong);
 		box-shadow: var(--shadow-pop);
-		backdrop-filter: blur(12px);
-		animation: menu-in 0.14s var(--ease-out) both;
-		transform-origin: top left;
+		animation: step-unfold var(--dur-2) steps(var(--steps)) both;
 	}
 	.menu.right {
 		right: 0;
-		transform-origin: top right;
-	}
-	@keyframes menu-in {
-		from {
-			opacity: 0;
-			transform: scale(0.96) translateY(-4px);
-		}
 	}
 	.item {
 		display: flex;
 		align-items: center;
-		gap: 9px;
+		gap: var(--sp-3);
 		width: 100%;
-		height: 32px;
-		padding: 0 10px 0 8px;
+		height: var(--row-h);
+		padding: 0 var(--sp-4) 0 var(--sp-3);
 		border: 0;
-		border-radius: 7px;
 		background: transparent;
-		color: var(--text-2);
-		cursor: pointer;
+		color: var(--fg-2);
 		text-align: left;
-		font-size: 13px;
+		cursor: pointer;
 	}
 	.item:hover:not(:disabled) {
-		background: linear-gradient(90deg, var(--yellow-a20), var(--yellow-a10));
-		color: var(--text);
+		background: var(--hover);
+		color: var(--fg);
 	}
 	.item:disabled {
-		opacity: 0.4;
+		color: var(--fg-4);
 		cursor: default;
 	}
 	.item.danger:hover {
-		background: #4a1420;
+		color: var(--bad);
 	}
 	.ico {
-		width: 18px;
+		width: 12px;
 		display: grid;
 		place-items: center;
 	}
 	.hint {
-		font-size: 11px;
-		color: var(--text-4);
+		font-size: var(--fs-xs);
+		color: var(--fg-4);
 	}
 	.sep {
-		height: 1px;
-		margin: 5px 6px;
+		height: var(--bw);
+		margin: var(--sp-1) var(--sp-2);
 		background: var(--line);
 	}
 </style>

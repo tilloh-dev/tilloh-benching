@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 330" role="img" aria-labelledby="title description">
-  <title id="title">How one attempt flows through Benchy</title>
+  <title id="title">How one attempt flows through BenchyOS</title>
   <desc id="description">A blueprint and a test go to the generator, the answer is extracted and checked, Claude Code judges it, and everything is stored as files. Stored attempts can be judged again without regenerating.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">

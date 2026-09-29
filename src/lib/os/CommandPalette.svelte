@@ -98,7 +98,7 @@
 			onkeydown={key}
 		>
 			<div class="field">
-				<Icon name="search" size={18} />
+				<span class="prompt">&gt;</span>
 				<input
 					bind:this={input}
 					bind:value={q}
@@ -117,7 +117,7 @@
 							open = false;
 						}}
 					>
-						<Icon name={h.icon} size={16} />
+						<Icon name={h.icon} size={12} />
 						<span class="grow ellipsis">{h.label}</span>
 						<span class="sub">{h.sub}</span>
 					</button>
@@ -134,79 +134,71 @@
 		position: fixed;
 		inset: 0;
 		z-index: 45000;
-		background: rgba(3, 6, 14, 0.55);
-		backdrop-filter: blur(3px);
 		display: flex;
 		justify-content: center;
 		align-items: flex-start;
 		padding-top: 14vh;
-		animation: fade-up 0.12s both;
+		background: color-mix(in srgb, var(--bg) 60%, transparent);
 	}
 	.palette {
-		width: 620px;
+		width: 600px;
 		max-width: calc(100vw - 24px);
-		border-radius: var(--radius-l);
-		background: rgba(16, 25, 58, 0.98);
-		border: 1px solid var(--line-strong);
-		box-shadow:
-			var(--shadow-pop),
-			0 0 50px rgba(255, 210, 63, 0.1);
-		overflow: hidden;
-		animation: pop 0.18s var(--ease-spring) both;
-	}
-	@keyframes pop {
-		from {
-			transform: scale(0.96);
-			opacity: 0;
-		}
+		background: var(--surface);
+		border: var(--bw) solid var(--line-strong);
+		box-shadow: var(--shadow-pop);
+		animation: step-unfold var(--dur-2) steps(var(--steps)) both;
 	}
 	.field {
 		display: flex;
 		align-items: center;
-		gap: 10px;
-		padding: 0 14px;
-		height: 54px;
-		border-bottom: 1px solid var(--line);
-		color: var(--yellow);
+		gap: var(--sp-3);
+		height: 36px;
+		padding: 0 var(--sp-4);
+		border-bottom: var(--bw) solid var(--line);
+		color: var(--fg-3);
+	}
+	.prompt {
+		color: var(--fg-3);
 	}
 	input {
 		flex: 1;
 		border: 0;
 		outline: none;
 		background: transparent;
-		font-size: 16px;
-		color: var(--text);
+		color: var(--fg);
+		font-size: var(--fs-l);
+		caret-color: var(--accent);
 	}
 	.list {
 		max-height: 50vh;
 		overflow: auto;
-		padding: 6px;
+		padding: var(--sp-1);
 	}
 	.hit {
 		display: flex;
 		align-items: center;
-		gap: 10px;
+		gap: var(--sp-3);
 		width: 100%;
-		height: 38px;
-		padding: 0 10px;
+		height: var(--row-h);
+		padding: 0 var(--sp-3);
 		border: 0;
-		border-radius: 8px;
 		background: transparent;
-		color: var(--text-2);
-		cursor: pointer;
+		color: var(--fg-2);
 		text-align: left;
+		cursor: pointer;
 	}
 	.hit.sel {
-		background: linear-gradient(90deg, var(--yellow-a20), var(--yellow-a10));
-		color: var(--text);
+		background: var(--accent-soft);
+		color: var(--fg);
+		box-shadow: inset 2px 0 0 var(--accent);
 	}
 	.sub {
-		font-size: 11.5px;
-		color: var(--text-4);
+		font-size: var(--fs-s);
+		color: var(--fg-3);
 	}
 	.none {
-		padding: 20px;
+		padding: var(--sp-6);
 		text-align: center;
-		color: var(--text-3);
+		color: var(--fg-3);
 	}
 </style>

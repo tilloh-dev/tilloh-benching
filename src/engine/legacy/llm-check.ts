@@ -269,7 +269,7 @@ export async function importLegacyRuns(
 				: null;
 			const response = raw ?? html;
 			await writeFileAtomic(join(dir, 'response.md'), response);
-			// The raw response is re-extracted with Benchy's extractor, which recovers
+			// The raw response is re-extracted with BenchyOS's extractor, which recovers
 			// documents llm-check missed (commentary around a fenced block, etc.).
 			let artifactText = html;
 			const notes = ['imported from llm-check'];

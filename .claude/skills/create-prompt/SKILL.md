@@ -1,9 +1,9 @@
 ---
 name: create-prompt
-description: Erzeugt einen neuen Benchy-Bench-Test (Prompt, erwartete Dateien, Checks, Judge-Kriterien) in library/tests/ mit fortlaufender Nummer. Auslösen bei Anfragen wie "neuen Prompt erstellen", "Prompt hinzufügen", "Benchmark-Aufgabe anlegen", "Test anlegen", "leg einen Prompt für X an" oder dem Befehl /create-prompt.
+description: Erzeugt einen neuen BenchyOS-Bench-Test (Prompt, erwartete Dateien, Checks, Judge-Kriterien) in library/tests/ mit fortlaufender Nummer. Auslösen bei Anfragen wie "neuen Prompt erstellen", "Prompt hinzufügen", "Benchmark-Aufgabe anlegen", "Test anlegen", "leg einen Prompt für X an" oder dem Befehl /create-prompt.
 ---
 
-Lege einen neuen Bench-Test für Benchy an. Falls `$ARGUMENTS` übergeben wurde, ist das die Aufgabenidee. Sonst frage knapp nach dem Thema und nach dem erwarteten Ergebnistyp.
+Lege einen neuen Bench-Test für BenchyOS an. Falls `$ARGUMENTS` übergeben wurde, ist das die Aufgabenidee. Sonst frage knapp nach dem Thema und nach dem erwarteten Ergebnistyp.
 
 ## Was ein Test ist
 
@@ -14,7 +14,7 @@ Ein Test liegt unter `library/tests/NN-slug/`:
 | `prompt.md` | die Aufgabe, wörtlich so, wie das Modell sie bekommt (Englisch) |
 | `test.yaml` | id, title, erwartete Dateien, Checks, Judge-Kriterien |
 
-Benchy hängt selbst eine Formatregel an ("Datei in genau einem Codeblock liefern"). **Der Prompt enthält deshalb keine Formatierungsregeln** wie "Output ONLY the HTML" oder "no markdown fences".
+BenchyOS hängt selbst eine Formatregel an ("Datei in genau einem Codeblock liefern"). **Der Prompt enthält deshalb keine Formatierungsregeln** wie "Output ONLY the HTML" oder "no markdown fences".
 
 Das Schema ist strikt (unbekannte Schlüssel sind Fehler): `src/engine/core/schema.ts` (`TestFile`). Gute Vorlagen: `library/tests/09-violin-3d/`, `12-word-frequency-cli/`, `13-essay-local-llms/`.
 

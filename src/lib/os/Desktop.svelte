@@ -10,6 +10,7 @@
 	import TopBar from './TopBar.svelte';
 	import Window from './Window.svelte';
 	import { wm } from './wm.svelte.ts';
+	import { theme } from '../design/theme.svelte.ts';
 
 	wm.register(APPS);
 
@@ -20,6 +21,7 @@
 	const icons = $derived(APPS.filter((a) => a.desktop !== false && (benchy.live || !a.liveOnly)));
 
 	onMount(() => {
+		theme.init();
 		benchy.init().then(() => {
 			setTimeout(() => (booted = true), 350);
 			// Hash router: the query lives inside the hash (#/?open=attempt:…).
@@ -56,25 +58,20 @@
 <Boot done={booted} error={benchy.error} />
 
 <main class="desktop" onpointerdown={(e) => e.target === e.currentTarget && (selected = null)}>
-	<div class="wallpaper" aria-hidden="true">
-		<div class="glow g1"></div>
-		<div class="glow g2"></div>
-		<div class="grid"></div>
-		<div class="mark">benchy</div>
-	</div>
+	<div class="wallpaper" aria-hidden="true"><span class="mark">BenchyOS</span></div>
 
 	<nav class="icons" class:in={booted} aria-label="Desktop">
 		{#each icons as app, i (app.id)}
 			<button
 				class="desk-icon"
 				class:selected={selected === app.id}
-				style="animation-delay:{120 + i * 45}ms"
+				style="animation-delay:{i * 40}ms"
 				onclick={() => (selected = app.id)}
 				ondblclick={() => wm.open(app.id)}
 				onkeydown={(e) => e.key === 'Enter' && wm.open(app.id)}
 				title={app.description}
 			>
-				<AppTile icon={app.icon} hue={app.hue} />
+				<AppTile icon={app.icon} size={48} selected={selected === app.id} />
 				<span class="name">{app.title}</span>
 			</button>
 		{/each}
@@ -103,118 +100,60 @@
 	}
 	.wallpaper {
 		position: absolute;
-		inset: calc(-1 * var(--topbar-h)) 0 calc(-1 * var(--taskbar-h)) 0;
-		background:
-			radial-gradient(120% 80% at 50% 120%, #0f1a45 0%, transparent 60%),
-			linear-gradient(180deg, #060b1d 0%, #0a1230 55%, #0b1438 100%);
-		pointer-events: none;
-	}
-	.glow {
-		position: absolute;
-		border-radius: 50%;
-		filter: blur(60px);
-	}
-	.g1 {
-		width: 620px;
-		height: 620px;
-		right: -120px;
-		top: -160px;
-		background: radial-gradient(circle, rgba(255, 210, 63, 0.16), transparent 65%);
-		animation: drift 18s ease-in-out infinite alternate;
-	}
-	.g2 {
-		width: 700px;
-		height: 500px;
-		left: -200px;
-		bottom: -180px;
-		background: radial-gradient(circle, rgba(70, 110, 255, 0.18), transparent 65%);
-		animation: drift 22s ease-in-out infinite alternate-reverse;
-	}
-	@keyframes drift {
-		to {
-			transform: translate(-60px, 40px) scale(1.08);
-		}
-	}
-	.grid {
-		position: absolute;
 		inset: 0;
-		background-image: radial-gradient(rgba(140, 160, 255, 0.13) 1px, transparent 1.2px);
-		background-size: 26px 26px;
-		mask-image: radial-gradient(80% 70% at 55% 45%, #000 40%, transparent 100%);
+		background: var(--bg);
+		pointer-events: none;
 	}
 	.mark {
 		position: absolute;
-		right: 48px;
-		bottom: calc(var(--taskbar-h) + 30px);
-		font-size: 120px;
-		font-weight: 700;
-		letter-spacing: -0.05em;
-		color: transparent;
-		-webkit-text-stroke: 1px rgba(255, 210, 63, 0.09);
+		right: var(--sp-7);
+		bottom: var(--sp-6);
+		font-size: var(--fs-xxl);
+		font-weight: var(--fw-strong);
+		color: var(--line-soft);
 		user-select: none;
 	}
-
 	.icons {
 		position: absolute;
-		top: 16px;
-		left: 14px;
-		bottom: 16px;
+		top: var(--sp-5);
+		left: var(--sp-5);
+		bottom: var(--sp-5);
 		display: grid;
 		grid-auto-flow: column;
-		grid-template-rows: repeat(auto-fill, 98px);
-		grid-auto-columns: 96px;
-		gap: 6px 8px;
+		grid-template-rows: repeat(auto-fill, 84px);
+		grid-auto-columns: 88px;
+		gap: var(--sp-3);
 		align-content: start;
 	}
 	.desk-icon {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 7px;
-		padding: 8px 4px 6px;
-		border-radius: 12px;
-		border: 1px solid transparent;
+		gap: var(--sp-2);
+		padding: var(--sp-2);
+		border: var(--bw) solid transparent;
 		background: transparent;
-		color: var(--text);
+		color: var(--fg-2);
 		cursor: default;
 		opacity: 0;
 	}
 	.icons.in .desk-icon {
-		animation: icon-in 0.4s var(--ease-spring) both;
+		animation: appear var(--dur-3) steps(var(--steps)) both;
 	}
-	@keyframes icon-in {
-		from {
-			opacity: 0;
-			transform: translateY(10px) scale(0.9);
-		}
-		to {
-			opacity: 1;
-			transform: none;
-		}
+	.icons.in .desk-icon {
+		opacity: 1;
 	}
 	.desk-icon:hover {
-		background: rgba(255, 255, 255, 0.04);
-	}
-	.desk-icon:hover :global(.tile) {
-		transform: translateY(-2px) scale(1.04);
-	}
-	.desk-icon.selected {
-		background: var(--yellow-a10);
-		border-color: var(--yellow-a35);
-	}
-	.desk-icon.selected :global(.tile) {
-		box-shadow:
-			0 0 0 2px var(--yellow),
-			0 0 24px rgba(255, 210, 63, 0.45);
+		color: var(--fg);
 	}
 	.name {
-		font-size: 12px;
-		font-weight: 500;
+		font-size: var(--fs-s);
 		text-align: center;
-		line-height: 1.25;
-		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+		line-height: 1.2;
 	}
 	.selected .name {
-		color: var(--yellow-2);
+		color: var(--fg);
+		background: var(--accent-soft);
+		padding: 0 var(--sp-1);
 	}
 </style>
