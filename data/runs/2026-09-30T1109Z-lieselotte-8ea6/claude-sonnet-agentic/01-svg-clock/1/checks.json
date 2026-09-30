@@ -1,0 +1,64 @@
+{
+	"status": "ok",
+	"checks_hash": "7f3fa454dc74",
+	"finished_at": "2026-09-30T11:09:26.349Z",
+	"results": [
+		{
+			"id": "output.files",
+			"duration_ms": 1,
+			"status": "pass",
+			"issues": [],
+			"evidence": [],
+			"data": {
+				"files": [
+					"index.html"
+				]
+			}
+		},
+		{
+			"id": "html.parse",
+			"duration_ms": 11,
+			"status": "pass",
+			"issues": [],
+			"evidence": [],
+			"data": {
+				"index.html": {
+					"bytes": 4068,
+					"lines": 129,
+					"scripts": 1,
+					"doctype": true
+				}
+			}
+		},
+		{
+			"id": "html.render",
+			"duration_ms": 3455,
+			"status": "pass",
+			"issues": [],
+			"evidence": [
+				{
+					"path": "evidence/html-render-1.png",
+					"kind": "image",
+					"label": "Screenshot t=3000ms",
+					"check": "html.render"
+				},
+				{
+					"path": "evidence/html-render-0.png",
+					"kind": "image",
+					"label": "Screenshot t=500ms",
+					"check": "html.render"
+				}
+			],
+			"data": {
+				"load_ms": 10,
+				"title": "Analog Clock",
+				"dom_nodes": 91,
+				"text_chars": 35,
+				"visual_elements": 1,
+				"canvases": 0,
+				"blank": false,
+				"console_warnings": []
+			}
+		}
+	]
+}

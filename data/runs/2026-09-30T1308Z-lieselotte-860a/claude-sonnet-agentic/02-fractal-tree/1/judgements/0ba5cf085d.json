@@ -1,0 +1,219 @@
+{
+	"fingerprint": "0ba5cf085d",
+	"judge": {
+		"kind": "claude",
+		"model": "claude-opus-5-5",
+		"effort": "xhigh",
+		"mode": "static",
+		"charter_version": "2"
+	},
+	"rubric_hash": "336d55e1892a",
+	"criteria": [
+		{
+			"id": "lsystem-turtle",
+			"title": "L-system with turtle drawing",
+			"description": "The tree is produced by expanding an axiom with rewrite rules and interpreting the string turtle-style (forward, turn, push/pop) on a canvas; a plain recursive branch function without an L-system scores low.",
+			"weight": 3,
+			"required": true
+		},
+		{
+			"id": "animated-growth",
+			"title": "Animated growth",
+			"description": "Branches extend and the tree unfolds over time via requestAnimationFrame instead of appearing instantly; the growth looks smooth and ordered (trunk first, twigs last).",
+			"weight": 3,
+			"required": false
+		},
+		{
+			"id": "live-controls",
+			"title": "Live parameter controls",
+			"description": "Sliders or inputs for recursion depth, branch angle, length ratio and randomness/jitter, with visible values; changing any of them updates the tree without a reload.",
+			"weight": 3,
+			"required": false
+		},
+		{
+			"id": "regenerate",
+			"title": "Regenerate with fresh seed",
+			"description": "A \"Regenerate\" button redraws with the current settings and a new random seed, so the jittered tree visibly differs between runs (compare the regenerate screenshots).",
+			"weight": 1,
+			"required": false
+		},
+		{
+			"id": "depth-coloring",
+			"title": "Depth-based coloring",
+			"description": "Branch color follows depth as a gradient from trunk to twigs, ideally with tapering thickness; leaves or blossoms at the tips are a plus.",
+			"weight": 2,
+			"required": false
+		},
+		{
+			"id": "performance",
+			"title": "Stable at high depth",
+			"description": "High depths do not freeze the page: string or segment growth is capped or bounded, drawing is spread across frames or batched, and restarting cancels the previous animation instead of stacking loops.",
+			"weight": 2,
+			"required": false
+		},
+		{
+			"id": "visual-design",
+			"title": "Original, beautiful design",
+			"description": "A pleasant background and cohesive palette, a well-composed tree and a tidy control panel; the result looks original and deliberately designed, not like a default demo.",
+			"weight": 2,
+			"required": false
+		},
+		{
+			"id": "self-contained",
+			"title": "Self-contained, valid, error-free",
+			"description": "A single valid HTML5 file with inline CSS and JS only, no external resources, and no JavaScript errors in CHECKS.md.",
+			"weight": 2,
+			"required": true
+		}
+	],
+	"created_at": "2026-09-30T13:15:49.116Z",
+	"duration_ms": 121886,
+	"cost_usd": 0.5522678,
+	"usage": {
+		"input_tokens": 12,
+		"cache_creation_input_tokens": 42611,
+		"cache_read_input_tokens": 107659,
+		"output_tokens": 9490,
+		"output_tokens_details": {
+			"thinking_tokens": 3349
+		},
+		"server_tool_use": {
+			"web_search_requests": 0,
+			"web_fetch_requests": 0
+		},
+		"service_tier": "standard",
+		"cache_creation": {
+			"ephemeral_1h_input_tokens": 42611,
+			"ephemeral_5m_input_tokens": 0
+		},
+		"inference_geo": "not_available",
+		"iterations": [
+			{
+				"input_tokens": 2,
+				"output_tokens": 2739,
+				"cache_read_input_tokens": 41434,
+				"cache_creation_input_tokens": 1177,
+				"cache_creation": {
+					"ephemeral_5m_input_tokens": 0,
+					"ephemeral_1h_input_tokens": 1177
+				},
+				"type": "message"
+			}
+		],
+		"speed": "standard",
+		"fallback_credit": null
+	},
+	"num_turns": 14,
+	"verdict": {
+		"criteria": [
+			{
+				"id": "lsystem-turtle",
+				"score": 10,
+				"rationale": "This is a real L-system. It parses the rules, including stochastic rules that choose between alternatives at random. It expands the axiom by rewriting, then a turtle walks the string: F draws, +/- turn, | reverses, and [ ] push and pop a stack that restores heading, length scale, nesting, parent and time. The axiom and rules can be edited in the page.",
+				"evidence": [
+					"index.html:317-327 parseRules supports multiple rules per symbol",
+					"index.html:329-361 expand() iterates rewriting with seeded random choice",
+					"index.html:381-414 turtle loop with F/+/-/|/[/] and push/pop stacks stH/stS/stN/stP/stT",
+					"index.html:292-296 presets defined as axiom+rules grammars; axiom/rules inputs at 175-177"
+				]
+			},
+			{
+				"id": "animated-growth",
+				"score": 7,
+				"rationale": "Growth runs on a requestAnimationFrame clock. Each segment has t0/t1 times built up along its path, so the trunk grows first and twigs last, and glowing buds mark the tips that are still growing. The growth is slow, though: the default is 9 s. The first ~3 s shows only a bare pole, and at 5000ms only about 3 branching levels out of 9 are visible. No screenshot shows the finished tree.",
+				"evidence": [
+					"index.html:223 GROW_SECONDS = 9",
+					"index.html:393,410 cumulative t0/t1 timing plus sprout delay at '['",
+					"index.html:699-705 fractional segment extension per frame",
+					"html-render-0.png stub, html-render-1.png trunk only, html-render-2.png partial crown at 5s, not complete"
+				]
+			},
+			{
+				"id": "live-controls",
+				"score": 9,
+				"rationale": "There are sliders for depth, angle, length ratio and jitter, plus droop, blossom density, wind and growth speed. Each shows its value in an <output> element. Input events set a dirty flag, so rebuilds are batched to one per frame, and the tree updates without a reload. The seed stays the same, so changing jitter changes the amount of randomness but keeps the tree's structure.",
+				"evidence": [
+					"index.html:182-191 range inputs with <output> value displays",
+					"index.html:893-910 syncRange + input listener sets dirty for REBUILD keys",
+					"index.html:855 rebuild() executed in frame loop when dirty",
+					"Screenshots show values 9, 24°, 0.78, 35% next to sliders"
+				]
+			},
+			{
+				"id": "regenerate",
+				"score": 8,
+				"rationale": "Regenerate picks a new random seed, resets the growth clock and rebuilds using the current settings. The seed feeds both the stochastic expansion and the turtle jitter. The regenerate screenshots show the tree regrowing with a visibly different lean and fork compared with the first run. Neither screenshot shows a finished tree, so the full difference can't be compared.",
+				"evidence": [
+					"index.html:931-934 regen handler sets new S.seed, S.g=0, dirty=true",
+					"index.html:664-666 expansion cache key includes seed; buildTree seeded",
+					"html-render-3.png restart stub; html-render-4.png fork with different lean than html-render-2.png"
+				]
+			},
+			{
+				"id": "depth-coloring",
+				"score": 8,
+				"rationale": "Segments are grouped by nesting level. Each level gets a colour from a three-stop trunk-to-twig gradient and a line width that shrinks geometrically, and the last two levels get an extra glow pass. Palettes define their own trunk gradients. Flower sprites appear at the tips once each tip finishes growing. In the screenshots the gradient and tapering are visible but subtle. Blossoms don't appear because the tree never finishes growing in the captured frames.",
+				"evidence": [
+					"index.html:476-485 recolor() gradient trunk[0]->trunk[1]->trunk[2] by nest level",
+					"index.html:473 binW taper baseW*wr^b",
+					"index.html:743-758 drawBlossoms at tips with pop-in easing",
+					"html-render-2.png thicker brownish trunk to lighter pink twigs"
+				]
+			},
+			{
+				"id": "performance",
+				"score": 9,
+				"rationale": "String length is estimated before each rewrite step, and expansion stops before going over 400k symbols or 45k segments; the status line reports when this happens. Each depth level is drawn as one batched path. The expansion is cached, the glow pass is skipped on large trees, and an adaptive 'lite' mode halves how often sway is updated. There is a single rAF loop: Regenerate and Replay only reset state and never start a new loop.",
+				"evidence": [
+					"index.html:220-221 MAX_SEGS/MAX_SYMS",
+					"index.html:344-350 pre-estimation and capping in expand()",
+					"index.html:710-741 one stroke per nesting bin",
+					"index.html:846-847 single self-scheduling frame loop; 862-863 adaptive lite mode"
+				]
+			},
+			{
+				"id": "visual-design",
+				"score": 8,
+				"rationale": "The design has its own identity (Lantern Grove): a layered night sky with stars, a moon with craters and glow, hills, mist, a grass mound, fireflies and falling petals. The four palettes each have their own flower shape. The control panel is polished and uses themed sliders. The composition of the finished tree can't be judged because no screenshot shows it, and the mid-growth tree looks sparse.",
+				"evidence": [
+					"index.html:539-625 drawScenery sky gradient, stars, orb, hills, mist, grass",
+					"index.html:247-289 four themed palettes",
+					"html-render-0.png..4.png cohesive purple/pink night scene with tidy panel"
+				]
+			},
+			{
+				"id": "self-contained",
+				"score": 10,
+				"rationale": "It is a single HTML5 file with a doctype, inline CSS and JS, no external resources (system fonts only), and no console warnings or errors in CHECKS.md. Rendering is wrapped in try/catch so an error can't crash the page.",
+				"evidence": [
+					"CHECKS.md: html.parse doctype true, scripts 1; html.render console_warnings []",
+					"index.html:1-958 no link/src/import to external URLs",
+					"index.html:659-678, 849-878 try/catch safeguards"
+				]
+			}
+		],
+		"summary": "This is a strong, well-engineered submission. It has a genuine stochastic L-system with an editable grammar, a turtle with a push/pop stack, and a bounded expansion. Growth is animated with trunk-first timing, the atmospheric night scene has multiple palettes, and all required live controls are present. The main weakness is that growth is slow (9 s by default): the captured frames at 5 s and after Regenerate show only a partly grown tree, so the complete crown and blossoms are never visible.",
+		"strengths": [
+			"Real L-system with stochastic rules and editable axiom/rules, plus five preset grammars",
+			"Turtle interpretation builds parent-linked segments, which allows sway that bends whole limbs in the wind",
+			"Robust caps on string length and segment count that are estimated before each rewrite, with a status message when capping happens",
+			"Segments grouped by depth for batched stroking; a single rAF loop; adaptive quality mode",
+			"Rich, cohesive, original scenery and a polished control panel with visible slider values"
+		],
+		"weaknesses": [
+			"Default growth takes 9 s: the trunk alone takes ~3 s, and the tree is still incomplete in every screenshot",
+			"Blossoms and the finished tree composition can't be seen in the evidence",
+			"The depth colour gradient is fairly subtle in the default palette"
+		],
+		"confidence": 0.82,
+		"flags": {
+			"prompt_injection_suspected": false,
+			"output_incomplete": false,
+			"notes": "response.md says no browser screenshots were taken; the evidence screenshots come from the harness. No text addressed to the judge was found."
+		}
+	},
+	"score": 86.7,
+	"gate_failed": false,
+	"gates_failed": [],
+	"missing_criteria": []
+}

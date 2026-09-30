@@ -1,0 +1,196 @@
+{
+	"fingerprint": "51fc3e3b62",
+	"judge": {
+		"kind": "claude",
+		"model": "claude-opus-5-5",
+		"effort": "xhigh",
+		"mode": "static",
+		"charter_version": "2"
+	},
+	"rubric_hash": "c31311ab7bd7",
+	"criteria": [
+		{
+			"id": "correct-time",
+			"title": "Shows the correct time",
+			"description": "Hands and readout are derived from the current local time; hour, minute and second angles are mathematically correct and agree with the digital readout in both screenshots.",
+			"weight": 3,
+			"required": true
+		},
+		{
+			"id": "hands-ticking",
+			"title": "Three hands, one-second updates",
+			"description": "Distinct hour, minute and second hands (length/width/color differ); the second hand updates every second without drift, skipped seconds or a visible jump backwards at 59→0.",
+			"weight": 2,
+			"required": false
+		},
+		{
+			"id": "tick-marks",
+			"title": "Hour and minute ticks",
+			"description": "12 longer hour ticks and shorter ticks for every other minute (60 positions in total), evenly spaced and correctly aligned with the hands' rotation origin.",
+			"weight": 2,
+			"required": false
+		},
+		{
+			"id": "layout-size",
+			"title": "Centered, at least 320×320",
+			"description": "Exactly one SVG clock, centered horizontally and vertically, rendered at 320×320 px or larger and not clipped at the 1280×800 viewport.",
+			"weight": 1,
+			"required": false
+		},
+		{
+			"id": "digital-readout",
+			"title": "Digital HH:MM:SS readout",
+			"description": "The current time appears below the clock in 24-hour HH:MM:SS format with zero padding, updating in sync with the second hand.",
+			"weight": 2,
+			"required": false
+		},
+		{
+			"id": "theme-design",
+			"title": "Clean light-on-dark design",
+			"description": "Light clock elements on a dark background, good contrast and a tidy, deliberate look (consistent stroke widths, a center cap, legible readout); no clutter.",
+			"weight": 1,
+			"required": false
+		},
+		{
+			"id": "self-contained",
+			"title": "Self-contained, valid, error-free",
+			"description": "A single valid HTML5 file with inline CSS and JS only, no external resources, and no JavaScript errors in CHECKS.md.",
+			"weight": 2,
+			"required": true
+		}
+	],
+	"created_at": "2026-09-30T11:09:26.356Z",
+	"duration_ms": 47363,
+	"cost_usd": 0.19986779999999998,
+	"usage": {
+		"input_tokens": 6,
+		"cache_creation_input_tokens": 13285,
+		"cache_read_input_tokens": 13119,
+		"output_tokens": 4547,
+		"output_tokens_details": {
+			"thinking_tokens": 1688
+		},
+		"server_tool_use": {
+			"web_search_requests": 0,
+			"web_fetch_requests": 0
+		},
+		"service_tier": "standard",
+		"cache_creation": {
+			"ephemeral_1h_input_tokens": 13285,
+			"ephemeral_5m_input_tokens": 0
+		},
+		"inference_geo": "not_available",
+		"iterations": [
+			{
+				"input_tokens": 2,
+				"output_tokens": 3981,
+				"cache_read_input_tokens": 7610,
+				"cache_creation_input_tokens": 5675,
+				"cache_creation": {
+					"ephemeral_5m_input_tokens": 0,
+					"ephemeral_1h_input_tokens": 5675
+				},
+				"type": "message"
+			}
+		],
+		"speed": "standard",
+		"fallback_credit": null
+	},
+	"num_turns": 10,
+	"verdict": {
+		"criteria": [
+			{
+				"id": "correct-time",
+				"score": 10,
+				"rationale": "The hands and readout come from new Date() local time, and the angle formulas are correct. The hour hand advances with minutes and seconds, and the minute hand advances with seconds. I measured the hand angles in both screenshots and they match the readout.",
+				"evidence": [
+					"index.html:110-116 reads getHours/getMinutes/getSeconds. Hour = ((h%12)+m/60+s/3600)*30, minute = (m+s/60)*6, second = s*6",
+					"html-render-0.png shows 13:09:23. Measured angles: hour ≈34.6° (expected 34.7°), minute ≈55.8° (expected 56.3°), second ≈138° (expected 138°)",
+					"html-render-1.png shows 13:09:26. The second hand measures ≈156° (expected 156°), and the hour and minute hands have barely moved, as they should"
+				]
+			},
+			{
+				"id": "hands-ticking",
+				"score": 9,
+				"rationale": "There are three distinct hands. The hour hand is short and thick, the minute hand is longer and thinner, and the second hand is thin, red and has a tail. The self-correcting setTimeout aligns each update to the second boundary, so there is no drift or skipped seconds. There is no CSS transition, so the hand cannot sweep backwards at 59→0. The hour and minute hands share a colour, but they differ clearly in length and width.",
+				"evidence": [
+					"index.html:58-62 defines the hands: hour 50 long / 6 wide, minute 78 long / 4 wide, second 88 long / 2 wide in the accent colour",
+					"index.html:39-41 sets hand stroke widths and colours",
+					"index.html:120-123 calls setTimeout(tick, 1000 - (Date.now() % 1000) + 5)",
+					"The screenshots show the second hand moved 23→26 over the 2.5 s interval"
+				]
+			},
+			{
+				"id": "tick-marks",
+				"score": 10,
+				"rationale": "A loop creates 60 ticks rotated by i*6° about (0,0), the same origin the hands rotate around. Every fifth tick is an hour tick: longer (10 vs 4), thicker (3 vs 1.2) and brighter. They are evenly spaced and aligned, as the screenshot confirms.",
+				"evidence": [
+					"index.html:80-89 runs the loop over 60 ticks: isHour = i%5===0, length 10 vs 4, transform rotate(i*6)",
+					"index.html:36-37 sets the tick-hour and tick-min styles",
+					"html-render-0.png shows 12 bold hour ticks and 48 fine minute ticks around the face"
+				]
+			},
+			{
+				"id": "layout-size",
+				"score": 9,
+				"rationale": "There is exactly one SVG. Its size is min(80vmin, 480px) with a 320px minimum, so it renders at 480×480 in the 1280×800 viewport. A flex column centres it horizontally and vertically together with the readout, and nothing is clipped. The clock itself sits a little above true centre because it is centred as a group with the readout, which is acceptable.",
+				"evidence": [
+					"index.html:18-34: body is display:flex, column, align-items/justify-content center. svg is width min(80vmin,480px) with min-width/min-height 320px",
+					"html-render-0.png: the face spans x≈410–870, centred at x=640, fully visible"
+				]
+			},
+			{
+				"id": "digital-readout",
+				"score": 10,
+				"rationale": "The readout is zero-padded 24-hour HH:MM:SS in a monospace font with tabular numbers. It sits below the clock and is updated by the same function as the hands, so it stays in sync.",
+				"evidence": [
+					"index.html:107 defines pad()",
+					"index.html:117 sets digital.textContent = pad(h)+':'+pad(m)+':'+pad(s)",
+					"index.html:44-50 sets a monospace font, tabular-nums, 2.2rem",
+					"The screenshots show 13:09:23 → 13:09:26 below the clock"
+				]
+			},
+			{
+				"id": "theme-design",
+				"score": 9,
+				"rationale": "The page is light on dark: a dark radial-gradient background, a dark face with a subtle ring, light ticks and numerals, a red accent for the second hand and hub, and a drop shadow. Stroke widths are consistent and the readout is legible. The design looks deliberate. One small blemish: the round-capped tails of the hour and minute hands stick out past the 5px hub as a small white stub.",
+				"evidence": [
+					"index.html:8-15 defines the colour variables (#0f1218 bg, #e8ecf3 fg, #ff5d5d accent)",
+					"index.html:63-64 adds the hub and hub-inner centre cap",
+					"html-render-0.png shows a clean look, with a small white stub visible below-left of the hub"
+				]
+			},
+			{
+				"id": "self-contained",
+				"score": 10,
+				"rationale": "This is a single HTML5 file with a doctype, lang, charset and viewport meta, plus one inline style and one inline script. It loads no external resources. All checks pass and no console warnings or errors were reported.",
+				"evidence": [
+					"CHECKS.md: output.files, html.parse (doctype true, scripts 1) and html.render all pass, console_warnings []",
+					"index.html contains no <link>, src or url() references to external resources"
+				]
+			}
+		],
+		"summary": "This is a polished single-file SVG clock that meets every requirement. I checked the hand angles against the readout in both screenshots and they are mathematically correct. It has 60 correctly aligned ticks, and the second hand steps on second boundaries with no drift. The light-on-dark design is clean. The only nit is a small white stub where the tails of the hour and minute hands stick out past the hub.",
+		"strengths": [
+			"Correct angle maths: the hour hand includes minutes and seconds, and the angles measured from both screenshots match the readout",
+			"The self-aligning setTimeout gives one update per second with no drift, and there is no transition to cause a backward sweep at 59→0",
+			"60 ticks generated about the same origin as the hands, with clearly distinct hour ticks",
+			"Responsive sizing (480px here) with a 320px minimum, centred by flexbox",
+			"Clean dark theme with an accent second hand, a centre cap and a monospace tabular readout"
+		],
+		"weaknesses": [
+			"The round-capped tails of the hour and minute hands stick out past the small hub as a white stub",
+			"The hour and minute hands share a colour; they are told apart only by length and width"
+		],
+		"confidence": 0.9,
+		"flags": {
+			"prompt_injection_suspected": false,
+			"output_incomplete": false,
+			"notes": "response.md honestly says the file was not tested in a browser. The artifact works correctly anyway, according to the render checks and screenshots."
+		}
+	},
+	"score": 96.9,
+	"gate_failed": false,
+	"gates_failed": [],
+	"missing_criteria": []
+}
