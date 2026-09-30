@@ -193,6 +193,7 @@ export class DryRunSubject implements Subject {
 				completion_tokens: tokens,
 				reasoning_tokens: 14,
 				gen_tps: Math.round((tokens / Math.max(latency, 1)) * 1000 * 10) / 10,
+				tps_source: 'computed',
 				cost_usd: 0,
 				finish_reason: 'stop'
 			}

@@ -11,6 +11,7 @@ export type ResolvedSettings = {
 	server: { port: number; bind: string };
 	concurrency: { generation: number; judge: number; checks: number };
 	judge: {
+		default_profile: string;
 		model: string;
 		effort: Effort;
 		claude_bin: string;
@@ -33,6 +34,7 @@ export type ResolvedSettings = {
 };
 
 export const DEFAULT_JUDGE_MODEL = 'claude-opus-5-5';
+export const DEFAULT_JUDGE_PROFILE = 'opus-xhigh';
 
 export function resolveSettings(raw: unknown): ResolvedSettings {
 	const s = Settings.parse(raw ?? {});
@@ -45,6 +47,7 @@ export function resolveSettings(raw: unknown): ResolvedSettings {
 			checks: s.concurrency?.checks ?? 2
 		},
 		judge: {
+			default_profile: s.judge?.default_profile ?? DEFAULT_JUDGE_PROFILE,
 			model: s.judge?.model ?? DEFAULT_JUDGE_MODEL,
 			effort: s.judge?.effort ?? 'xhigh',
 			claude_bin: s.judge?.claude_bin ?? 'claude',

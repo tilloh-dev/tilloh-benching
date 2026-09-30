@@ -11,6 +11,7 @@ import Judge from './Judge.svelte';
 import Host from './Host.svelte';
 import Compare from './Compare.svelte';
 import DesignSystem from './DesignSystem.svelte';
+import Settings from './Settings.svelte';
 
 export const APPS: AppDef[] = [
 	{
@@ -84,7 +85,17 @@ export const APPS: AppDef[] = [
 		component: Judge as AppDef['component'],
 		size: { w: 960, h: 640 },
 		singleton: true,
-		description: 'Queue, calibration against your ratings'
+		description: 'Profiles, queue, calibration against your ratings'
+	},
+	{
+		id: 'settings',
+		title: 'Settings',
+		icon: 'gear',
+		component: Settings as AppDef['component'],
+		size: { w: 920, h: 560 },
+		singleton: true,
+		liveOnly: true,
+		description: 'API keys for remote blueprints and judges'
 	},
 	{
 		id: 'compare',

@@ -2,7 +2,8 @@ import type {
 	AttemptDetail,
 	IndexPayload,
 	LibraryPayload,
-	RunDetail
+	RunDetail,
+	SecretInfo
 } from '$engine/api-types.ts';
 import type { PreflightReport } from '$engine/run/preflight.ts';
 import type { CriteriaSuggestion, RunRecord, RunSpec } from '$engine/core/schema.ts';
@@ -152,8 +153,28 @@ export class DataClient {
 	setRunNote(id: string, note: string) {
 		return this.#send('PATCH', `/api/runs/${encodeURIComponent(id)}`, { note });
 	}
-	judge(ids: string[], override: Record<string, unknown> = {}, rubric: 'current' | 'snapshot' = 'current') {
-		return this.#send<{ queued: number }>('POST', '/api/judge', { ids, override, rubric });
+	judge(
+		ids: string[],
+		override: { profile?: string; mode_override?: 'static' | 'interactive' } = {},
+		rubric: 'current' | 'snapshot' = 'current'
+	) {
+		return this.#send<{ queued: number }>('POST', '/api/judge', { ids, ...override, rubric });
+	}
+	saveJudge(originalId: string, profile: unknown): Promise<LibraryPayload> {
+		return this.#send('PUT', `/api/judges/${encodeURIComponent(originalId)}`, profile);
+	}
+	deleteJudge(id: string): Promise<LibraryPayload> {
+		return this.#send('DELETE', `/api/judges/${encodeURIComponent(id)}`);
+	}
+	/** Names, whether each key is set and who uses it — never values. */
+	secrets(): Promise<SecretInfo[]> {
+		return this.#send('GET', '/api/secrets');
+	}
+	setSecret(name: string, value: string): Promise<SecretInfo[]> {
+		return this.#send('PUT', `/api/secrets/${encodeURIComponent(name)}`, { value });
+	}
+	deleteSecret(name: string): Promise<SecretInfo[]> {
+		return this.#send('DELETE', `/api/secrets/${encodeURIComponent(name)}`);
 	}
 	rateHuman(id: string, rating: { score?: number; criteria?: Record<string, number>; notes?: string }) {
 		return this.#send<AttemptDetail>('POST', `/api/attempt/human?id=${encodeURIComponent(id)}`, rating);

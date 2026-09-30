@@ -1,0 +1,6 @@
+id: opus-xhigh
+label: Opus 5.5 · xhigh
+description: Reference judge. Claude Code (claude -p), best available model at the highest practical effort.
+kind: claude
+model: claude-opus-5-5
+effort: xhigh

@@ -125,7 +125,7 @@
 		align-items: center;
 		gap: var(--sp-2);
 		padding: 0 var(--sp-2);
-		background: var(--surface);
+		background: var(--surface-2);
 		border-top: var(--bw) solid var(--line);
 	}
 	.start {

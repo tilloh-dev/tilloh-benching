@@ -7,7 +7,7 @@
 
 	let { win: _win }: { win: Win } = $props();
 
-	const judged = $derived(benchy.attempts.filter((a) => a.score !== null).length);
+	const judged = $derived(benchy.attempts.filter((a) => a.judge_score !== null).length);
 	const stats = $derived([
 		['runs', benchy.runs.length],
 		['attempts', benchy.attempts.length],

@@ -11,6 +11,7 @@
 	import Kind from '../ui/Kind.svelte';
 	import Button from '../ui/Button.svelte';
 	import Spinner from '../ui/Spinner.svelte';
+	import Busy from '../ui/Busy.svelte';
 	import Empty from '../ui/Empty.svelte';
 	import Markdown from '../ui/Markdown.svelte';
 	import Code from '../ui/Code.svelte';
@@ -94,7 +95,10 @@
 		humanNotes = detail.human?.notes ?? '';
 	});
 
-	async function rejudge(override: Record<string, unknown>, label: string) {
+	async function rejudge(
+		override: { profile?: string; mode_override?: 'static' | 'interactive' },
+		label: string
+	) {
 		busy = 'judge';
 		try {
 			await benchy.api.judge([id], override);
@@ -126,9 +130,11 @@
 		navigator.clipboard?.writeText(url).then(() => toasts.push('ok', 'Link copied', url));
 	}
 
+	const judges = $derived(benchy.library?.judges ?? []);
+	const defaultJudge = $derived(judges.find((j) => j.default)?.profile);
 	const judgeItems = $derived([
 		{
-			label: `Re-judge (${benchy.status?.settings?.judge.model ?? 'default'})`,
+			label: `Re-judge (${defaultJudge?.label ?? defaultJudge?.id ?? 'default'})`,
 			icon: 'gavel',
 			action: () => rejudge({}, 'default judge')
 		},
@@ -143,13 +149,24 @@
 			action: () => rejudge({ mode_override: 'interactive' }, 'interactive mode')
 		},
 		'sep' as const,
-		{
-			label: 'Quick check with Haiku',
-			icon: 'bolt',
-			action: () => rejudge({ model: 'haiku', effort: 'low' }, 'haiku')
-		},
-		{ label: 'Dry-run judge', icon: 'flask', action: () => rejudge({ kind: 'dry-run' }, 'dry-run') }
+		...judges
+			.filter((j) => !j.default)
+			.map((j) => ({
+				label: `${j.profile.label ?? j.profile.id}${j.key_set === false ? ' (key missing)' : ''}${a?.judgements?.[j.profile.id] ? ' ✓' : ''}`,
+				icon: j.profile.kind === 'dry-run' ? 'flask' : 'gavel',
+				action: () => rejudge({ profile: j.profile.id }, j.profile.label ?? j.profile.id)
+			}))
 	]);
+
+	function judgementLabel(j: {
+		judge: { kind: string; profile_id?: string; model: string; effort?: string; mode: string };
+	}) {
+		const p =
+			j.judge.profile_id && judges.find((x) => x.profile.id === j.judge.profile_id)?.profile;
+		if (p) return `${p.label ?? p.id} · ${j.judge.mode}`;
+		if (j.judge.kind === 'dry-run') return 'dry-run';
+		return `${j.judge.model} @ ${j.judge.effort ?? 'default'} · ${j.judge.mode}`;
+	}
 
 	const metrics = $derived(a?.metrics ?? {});
 </script>
@@ -183,9 +200,13 @@
 		</div>
 		<div class="big-score">
 			<Score value={detail.row.score} gate={detail.row.gate_failed} big width={110} />
-			<span class="muted small"
-				>{detail.row.judge ?? 'not judged'}{detail.row.human_score !== null
-					? ` · human ${detail.row.human_score.toFixed(1)}`
+			<span
+				class="muted small"
+				title="Combined: the mean of every judge profile's latest score and yours"
+				>{detail.row.judge_scores.length
+					? detail.row.judge_scores.map((j) => `${j.label} ${j.score.toFixed(1)}`).join(' · ')
+					: 'not judged'}{detail.row.human_score !== null
+					? ` · you ${detail.row.human_score.toFixed(1)}`
 					: ''}</span
 			>
 		</div>
@@ -193,9 +214,8 @@
 			{#if benchy.live && !a.error}
 				<Menu items={judgeItems} align="right">
 					{#snippet trigger()}
-						<Icon name="gavel" size={12} /> Judge {#if busy === 'judge' || a.stage === 'judging'}<span
-								class="dotspin"
-							></span>{/if}
+						<Icon name="gavel" size={12} /> Judge {#if busy === 'judge' || a.stage === 'judging'}<Busy
+							/>{/if}
 					{/snippet}
 				</Menu>
 			{/if}
@@ -384,11 +404,9 @@
 							<select class="select" style="width:auto" bind:value={judgementFp}>
 								{#each detail.judgements as j (j.fingerprint)}
 									<option value={j.fingerprint}
-										>{j.judge.kind === 'dry-run'
-											? 'dry-run'
-											: `${j.judge.model} @ ${j.judge.effort ?? 'default'} · ${j.judge.mode}`} — {j.score?.toFixed(
-											1
-										) ?? 'error'} · {fmtDate(j.created_at)}</option
+										>{judgementLabel(j)} — {j.score?.toFixed(1) ?? 'error'} · {fmtDate(
+											j.created_at
+										)}</option
 									>
 								{/each}
 							</select>
@@ -408,9 +426,9 @@
 								<p class="summary">{v.summary}</p>
 								<div class="row wrap small muted">
 									<span
-										>{judgement.judge.kind === 'dry-run'
-											? 'dry-run judge'
-											: `${judgement.judge.model} · effort ${judgement.judge.effort ?? 'default'} · ${judgement.judge.mode}`}</span
+										>{judgementLabel(judgement)}{judgement.judge.kind !== 'dry-run'
+											? ` · ${judgement.judge.model}${judgement.judge.effort ? ` · effort ${judgement.judge.effort}` : ''}`
+											: ''}</span
 									>
 									<span>·</span><span>confidence {Math.round(v.confidence * 100)}%</span>
 									<span>·</span><span>{fmtDuration(judgement.duration_ms)}</span>
@@ -538,7 +556,19 @@
 					<div><span>completion tokens</span><b>{fmtNum(metrics.completion_tokens, 0)}</b></div>
 					<div><span>reasoning tokens</span><b>{fmtNum(metrics.reasoning_tokens, 0)}</b></div>
 					<div><span>prompt t/s</span><b>{fmtNum(metrics.prompt_tps)}</b></div>
-					<div><span>generation t/s</span><b>{fmtNum(metrics.gen_tps)}</b></div>
+					<div>
+						<span
+							>generation t/s{metrics.tps_source && metrics.tps_source !== 'server'
+								? ` (${metrics.tps_source})`
+								: ''}</span
+						><b
+							>{metrics.tps_source &&
+							metrics.tps_source !== 'server' &&
+							metrics.gen_tps !== undefined
+								? '~'
+								: ''}{fmtNum(metrics.gen_tps)}</b
+						>
+					</div>
 					<div>
 						<span>draft accepted</span><b
 							>{metrics.draft_n
@@ -686,18 +716,6 @@
 		align-items: center;
 		gap: var(--sp-2);
 	}
-	.dotspin {
-		width: 10px;
-		height: 10px;
-		border-right-color: transparent;
-		animation: spin var(--dur-3) linear infinite;
-		border: 2px solid var(--fg);
-	}
-	@keyframes spin {
-		to {
-			transform: rotate(360deg);
-		}
-	}
 	.body {
 		flex: 1;
 		min-height: 0;
@@ -791,6 +809,12 @@
 		font-weight: var(--fw-strong);
 		text-transform: uppercase;
 		min-width: 52px;
+	}
+	.issues .error {
+		background: var(--bad-soft);
+	}
+	.issues .warning {
+		background: var(--warn-soft);
 	}
 	.issues .error .sev {
 		color: var(--bad);

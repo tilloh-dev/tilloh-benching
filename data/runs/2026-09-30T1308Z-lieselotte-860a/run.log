@@ -1,0 +1,4 @@
+2026-09-30T13:08:29.191Z INFO created run: 1 blueprint(s) × 1 test(s) × 1
+2026-09-30T13:08:29.193Z INFO generate claude-sonnet-agentic × 02-fractal-tree #1
+2026-09-30T13:15:49.116Z INFO judge claude-sonnet-agentic × 02-fractal-tree #1 (claude-opus-5-5@xhigh·static)
+2026-09-30T13:17:51.006Z INFO run done: 1/1 complete, 0 failed

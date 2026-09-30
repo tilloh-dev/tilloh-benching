@@ -8,7 +8,6 @@
 	import Button from '../ui/Button.svelte';
 	import Kind from '../ui/Kind.svelte';
 	import Icon from '../os/Icon.svelte';
-	import Segmented from '../ui/Segmented.svelte';
 
 	let { win: _win, props }: { win: Win; props: Record<string, unknown> } = $props();
 
@@ -17,9 +16,8 @@
 	let suite = $state('');
 	let selectedTests = $state<string[]>([]);
 	let reps = $state(1);
-	let judgeKind = $state('claude');
-	let judgeModel = $state('');
-	let judgeEffort = $state('');
+	/** '' = the default profile, 'none' = skip judging, else a profile id. */
+	let judgeProfile = $state('');
 	let judgeMode = $state('');
 	let label = $state('');
 	let preflight = $state<PreflightReport | null>(null);
@@ -72,12 +70,13 @@
 		blueprints: selectedBps,
 		tests: selectedTests,
 		repetitions: reps,
-		judge: {
-			kind: judgeKind as 'claude' | 'dry-run' | 'none',
-			model: judgeKind === 'claude' && judgeModel ? judgeModel : undefined,
-			effort: judgeKind === 'claude' && judgeEffort ? (judgeEffort as never) : undefined,
-			mode_override: judgeMode ? (judgeMode as never) : undefined
-		}
+		judge:
+			judgeProfile === 'none'
+				? { kind: 'none' }
+				: {
+						profile: judgeProfile || undefined,
+						mode_override: judgeMode ? (judgeMode as never) : undefined
+					}
 	});
 	$effect(() => {
 		void spec;
@@ -199,43 +198,20 @@
 			</div>
 
 			<span class="label">Judge</span>
-			<Segmented
-				options={[
-					{ id: 'claude', label: 'Claude' },
-					{ id: 'dry-run', label: 'Dry-run' },
-					{ id: 'none', label: 'None' }
-				]}
-				bind:value={judgeKind}
-			/>
-			{#if judgeKind === 'claude'}
-				<div class="two">
-					<div>
-						<label class="label" for="l-model">Model</label>
-						<input
-							id="l-model"
-							class="input"
-							list="judge-models"
-							placeholder={benchy.status?.settings?.judge.model ?? 'claude-opus-5-5'}
-							bind:value={judgeModel}
-						/>
-						<datalist id="judge-models"
-							><option value="claude-opus-5-5"></option><option value="claude-sonnet-5-5"
-							></option><option value="claude-fable-5-1"></option><option value="haiku"
-							></option></datalist
-						>
-					</div>
-					<div>
-						<label class="label" for="l-effort">Effort</label>
-						<select id="l-effort" class="select" bind:value={judgeEffort}>
-							<option value="">default ({benchy.status?.settings?.judge.effort ?? 'xhigh'})</option>
-							{#each ['low', 'medium', 'high', 'xhigh', 'max'] as e (e)}<option value={e}
-									>{e}</option
-								>{/each}
-						</select>
-					</div>
-				</div>
-			{/if}
-			{#if judgeKind !== 'none'}
+			<select class="select" bind:value={judgeProfile} aria-label="Judge profile">
+				{#each benchy.library?.judges ?? [] as j (j.profile.id)}
+					<option value={j.default ? '' : j.profile.id}
+						>{j.profile.label ?? j.profile.id}{j.default ? ' — default' : ''}{j.key_set === false
+							? ' (API key missing)'
+							: ''}</option
+					>
+				{/each}
+				<option value="none">None — judge later</option>
+			</select>
+			<p class="hint muted">
+				Profiles live in the Judge app. Every profile adds one vote to the score.
+			</p>
+			{#if judgeProfile !== 'none'}
 				<label class="label" for="l-mode">Judge depth</label>
 				<select id="l-mode" class="select" bind:value={judgeMode}>
 					<option value="">per test (static / interactive)</option>
@@ -284,6 +260,10 @@
 </div>
 
 <style>
+	.hint {
+		margin: var(--sp-1) 0 0;
+		font-size: var(--fs-s);
+	}
 	.launcher {
 		flex: 1;
 		min-height: 0;

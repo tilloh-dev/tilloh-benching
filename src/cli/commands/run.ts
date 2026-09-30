@@ -13,9 +13,10 @@ const HELP = `benchy run — run blueprints against tests
   -b, --blueprint <id>      blueprint to run (repeatable)
   -t, --test <id>           test to run (repeatable; overrides the suite's tests)
   -n, --reps <n>            repetitions per blueprint × test (default: suite or 1)
-      --judge <kind>        claude | dry-run | none (default: claude)
-      --judge-model <m>     judge model (default: settings, claude-opus-5-5)
-      --judge-effort <e>    low | medium | high | xhigh | max
+      --judge-profile <id>  judge profile from library/judges (default: opus-xhigh)
+      --judge <kind>        dry-run | none — shorthands that skip the profile
+      --judge-model <m>     ad-hoc claude judge model instead of a profile
+      --judge-effort <e>    low | medium | high | xhigh | max (with --judge-model)
       --judge-mode <m>      force static | interactive for every test
       --label <text>        human-readable run label
       --force               start even if the preflight reports errors
@@ -85,6 +86,7 @@ export default async function run(args: string[]): Promise<number> {
 			test: { type: 'string', short: 't', multiple: true },
 			reps: { type: 'string', short: 'n' },
 			judge: { type: 'string' },
+			'judge-profile': { type: 'string' },
 			'judge-model': { type: 'string' },
 			'judge-effort': { type: 'string' },
 			'judge-mode': { type: 'string' },
@@ -112,6 +114,7 @@ export default async function run(args: string[]): Promise<number> {
 		tests,
 		repetitions: v.reps ? Number(v.reps) : undefined,
 		judge: {
+			profile: v['judge-profile'] as string | undefined,
 			kind: (v.judge as 'claude' | 'dry-run' | 'none' | undefined) ?? 'claude',
 			model: v['judge-model'] as string | undefined,
 			effort: v['judge-effort'] as never,
@@ -156,7 +159,7 @@ export default async function run(args: string[]): Promise<number> {
 		if (!pre.ok && !v.force) return fail('preflight failed (use --force to start anyway)');
 		const run = await exclusive.createRun(spec);
 		console.log(
-			`\n${c.bold('run')} ${run.id}  ${c.gray(`${run.counts?.total} attempt(s), judge: ${run.judge.kind}${run.judge.model ? ' ' + run.judge.model : ''}`)}`
+			`\n${c.bold('run')} ${run.id}  ${c.gray(`${run.counts?.total} attempt(s), judge: ${run.judge.label ?? run.judge.kind}`)}`
 		);
 		const seen = new Map<string, string>();
 		exclusive.on('event', onEvent(run.id, seen));

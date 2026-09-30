@@ -5,13 +5,17 @@ import { streamSSE } from 'hono/streaming';
 import type { Engine } from '../engine/run/engine.ts';
 import type { EngineEvent } from '../engine/run/events.ts';
 import {
+	BUILTIN_JUDGES,
 	deleteBlueprint,
+	deleteJudgeProfile,
 	deleteSuite,
 	deleteTest,
 	saveBlueprint,
+	saveJudgeProfile,
 	saveSuite,
 	saveTest
 } from '../engine/core/library.ts';
+import { deleteSecret, listSecrets, setSecret } from '../engine/secrets.ts';
 import { leaderboard } from '../engine/core/rows.ts';
 import { attemptDetail, libraryPayload, statusPayload } from '../engine/views.ts';
 import { importPreset } from '../engine/legacy/preset-import.ts';
@@ -114,6 +118,43 @@ export function createApp(engine: Engine, opts: { uiDir: string | null }) {
 		});
 		engine.emitEvent({ type: 'library' });
 		return c.json({ ...result, library: await libraryPayload(engine) });
+	});
+
+	app.put('/api/judges/:id', async (c) => {
+		const body = (await c.req.json()) as { id?: string };
+		const old = c.req.param('id');
+		if (body.id !== old && !BUILTIN_JUDGES.some((j) => j.id === old))
+			await deleteJudgeProfile(engine.ws, old);
+		await saveJudgeProfile(engine.ws, body);
+		return libChanged(c);
+	});
+	app.delete('/api/judges/:id', async (c) => {
+		const id = c.req.param('id');
+		if (id === engine.settings.judge.default_profile)
+			throw Object.assign(new Error('the default judge profile cannot be deleted'), {
+				status: 409
+			});
+		await deleteJudgeProfile(engine.ws, id);
+		return libChanged(c);
+	});
+
+	// ---------------------------------------------------------- API keys (names only, never values)
+
+	app.get('/api/secrets', async (c) =>
+		c.json(await listSecrets(engine.ws, await engine.library()))
+	);
+	app.put('/api/secrets/:name', async (c) => {
+		guardWritable();
+		const body = (await c.req.json()) as { value?: unknown };
+		if (typeof body.value !== 'string')
+			throw Object.assign(new Error('value must be a string'), { status: 400 });
+		await setSecret(engine.ws, c.req.param('name'), body.value);
+		return c.json(await listSecrets(engine.ws, await engine.library()));
+	});
+	app.delete('/api/secrets/:name', async (c) => {
+		guardWritable();
+		await deleteSecret(engine.ws, c.req.param('name'));
+		return c.json(await listSecrets(engine.ws, await engine.library()));
 	});
 
 	app.put('/api/tests/:id', async (c) => {
@@ -238,12 +279,22 @@ export function createApp(engine: Engine, opts: { uiDir: string | null }) {
 		guardWritable();
 		const body = (await c.req.json()) as {
 			ids: string[];
-			override?: object;
+			profile?: string;
+			mode_override?: 'static' | 'interactive';
+			override?: { profile?: string; mode_override?: 'static' | 'interactive' };
 			rubric?: 'current' | 'snapshot';
 		};
+		const override = {
+			profile: body.profile ?? body.override?.profile,
+			mode_override: body.mode_override ?? body.override?.mode_override
+		};
+		if (override.profile && !(await engine.library()).judges.has(override.profile))
+			throw Object.assign(new Error(`unknown judge profile: ${override.profile}`), {
+				status: 400
+			});
 		// Fire and forget: progress arrives over /api/events.
 		engine
-			.rejudge(body.ids, body.override ?? {}, body.rubric ?? 'current')
+			.rejudge(body.ids, override, body.rubric ?? 'current')
 			.catch((e) => engine.log(null, 'error', `rejudge: ${(e as Error).message}`));
 		return c.json({ queued: body.ids.length });
 	});
@@ -254,8 +305,7 @@ export function createApp(engine: Engine, opts: { uiDir: string | null }) {
 			leaderboard(engine.index.attemptRows(), {
 				tests: q.tests ? q.tests.split(',') : undefined,
 				runs: q.runs ? q.runs.split(',') : undefined,
-				splitVersions: q.split === '1',
-				source: (q.source as 'judge' | 'human' | 'blend') ?? 'judge'
+				splitVersions: q.split === '1'
 			})
 		);
 	});

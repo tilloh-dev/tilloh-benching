@@ -6,9 +6,9 @@ import { parseAttemptId } from '../../engine/core/workspace.ts';
 
 const HELP = `benchy judge <run-id | attempt-id>… — (re-)judge without regenerating
 
-      --judge <kind>        claude | dry-run (default: claude)
-      --judge-model <m>     default: settings (claude-opus-5-5)
-      --judge-effort <e>    low | medium | high | xhigh | max
+      --profile <id>        judge profile from library/judges (default: the run's judge,
+                            else settings judge.default_profile, opus-xhigh)
+      --judge dry-run       shorthand for --profile dry-run
       --judge-mode <m>      static | interactive (default: each test's mode)
       --rubric <r>          current (library, default) | snapshot (as of the run)
       --only-unjudged       skip attempts that already have a score`;
@@ -17,9 +17,8 @@ export default async function judge(args: string[]): Promise<number> {
 	const p = parse(
 		args,
 		{
+			profile: { type: 'string' },
 			judge: { type: 'string' },
-			'judge-model': { type: 'string' },
-			'judge-effort': { type: 'string' },
 			'judge-mode': { type: 'string' },
 			rubric: { type: 'string' },
 			'only-unjudged': { type: 'boolean' }
@@ -33,9 +32,7 @@ export default async function judge(args: string[]): Promise<number> {
 	}
 	const v = p.values;
 	const override = {
-		kind: (v.judge as 'claude' | 'dry-run' | undefined) ?? 'claude',
-		model: v['judge-model'] as string | undefined,
-		effort: v['judge-effort'] as never,
+		profile: (v.profile as string | undefined) ?? (v.judge === 'dry-run' ? 'dry-run' : undefined),
 		mode_override: v['judge-mode'] as never
 	};
 	const rubric = (v.rubric as 'current' | 'snapshot' | undefined) ?? 'current';
@@ -47,7 +44,11 @@ export default async function judge(args: string[]): Promise<number> {
 			ids.push(
 				...reader.index
 					.attemptsOfRun(target)
-					.filter((a) => !v['only-unjudged'] || !a.judgement)
+					.filter(
+						(a) =>
+							!v['only-unjudged'] ||
+							(override.profile ? !a.judgements?.[override.profile] : !a.judgement)
+					)
 					.map((a) => a.id)
 			);
 	}
@@ -57,7 +58,7 @@ export default async function judge(args: string[]): Promise<number> {
 		return 0;
 	}
 	console.log(
-		`judging ${ids.length} attempt(s) with ${override.kind}${override.model ? ' ' + override.model : ''}`
+		`judging ${ids.length} attempt(s) with ${override.profile ?? "the run's judge profile"}`
 	);
 	const server = await ServerClient.detect(v.root);
 	if (server) {

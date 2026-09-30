@@ -1,5 +1,6 @@
 import type { Blueprint, Metrics } from '../core/schema.ts';
 import type { ChatMessage } from '../artifacts/prompt.ts';
+import { computeTps } from './tps.ts';
 import { SubjectError, type GenerateRequest, type GenerateResult, type Subject } from './types.ts';
 
 type StreamChunk = {
@@ -153,11 +154,13 @@ export async function streamChat(opts: ChatCallOptions): Promise<GenerateResult>
 		reasoning_tokens: usage?.completion_tokens_details?.reasoning_tokens,
 		total_tokens: usage?.total_tokens,
 		prompt_tps: timings?.prompt_per_second ? round1(timings.prompt_per_second) : undefined,
-		gen_tps: timings?.predicted_per_second
-			? round1(timings.predicted_per_second)
-			: usage?.completion_tokens && ttft !== undefined && latency > ttft
-				? round1(usage.completion_tokens / ((latency - ttft) / 1000))
-				: undefined,
+		...(timings?.predicted_per_second
+			? { gen_tps: round1(timings.predicted_per_second), tps_source: 'server' as const }
+			: computeTps({
+					tokens: usage?.completion_tokens,
+					chars: content.length + reasoning.length,
+					genMs: ttft !== undefined ? latency - ttft : undefined
+				})),
 		draft_n: timings?.draft_n,
 		draft_accepted: timings?.draft_n_accepted,
 		cost_usd: usage?.cost ?? priced(opts.pricing, usage),

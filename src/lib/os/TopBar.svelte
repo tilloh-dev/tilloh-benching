@@ -35,22 +35,6 @@
 		benchy.status?.host.gpus[0]?.replace(/^(NVIDIA|Vulkan)\s+/, '').replace(/,.*$/, '') ?? null
 	);
 
-	const appItems = $derived<MenuItem[]>(
-		[...wm.apps.values()]
-			.filter((a) => a.desktop !== false && (benchy.live || !a.liveOnly))
-			.map((a) => ({ label: a.title, icon: a.icon, action: () => wm.open(a.id) }))
-	);
-	const windowItems = $derived<MenuItem[]>(
-		wm.windows.length
-			? [
-					...wm.windows.map(
-						(w) => ({ label: w.title, icon: w.icon, action: () => wm.restore(w.id) }) as MenuItem
-					),
-					'sep',
-					{ label: 'Close all windows', icon: 'close', action: () => wm.closeAll() }
-				]
-			: [{ label: 'No open windows', disabled: true, action: () => {} }]
-	);
 	const benchyItems = $derived<MenuItem[]>([
 		{ label: 'About BenchyOS', icon: 'info', action: () => wm.open('welcome') },
 		{ label: 'Host & llama.cpp', icon: 'chip', action: () => wm.open('host') },
@@ -77,12 +61,6 @@
 			<Logo size={12} />
 			<span class="brand">BenchyOS</span>
 		{/snippet}
-	</Menu>
-	<Menu items={appItems}>
-		{#snippet trigger()}Apps{/snippet}
-	</Menu>
-	<Menu items={windowItems}>
-		{#snippet trigger()}Window{/snippet}
 	</Menu>
 
 	<span class="spacer"></span>
@@ -153,7 +131,7 @@
 		align-items: center;
 		gap: var(--sp-2);
 		padding: 0 var(--sp-3);
-		background: var(--surface);
+		background: var(--surface-2);
 		border-bottom: var(--bw) solid var(--line);
 	}
 	.brand {

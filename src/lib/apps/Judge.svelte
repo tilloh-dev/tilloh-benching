@@ -8,18 +8,25 @@
 	import Score from '../ui/Score.svelte';
 	import Empty from '../ui/Empty.svelte';
 	import Status from '../ui/Status.svelte';
+	import JudgeProfiles from './JudgeProfiles.svelte';
 
 	let { win: _win }: { win: Win } = $props();
 
 	let tab = $state('queue');
-	let model = $state('');
-	let effort = $state('');
+	/** '' = default profile. The queue lists attempts this profile has not scored yet. */
+	let profile = $state('');
 	let mode = $state('');
 	let busy = $state(false);
 
+	const judges = $derived(benchy.library?.judges ?? []);
+	const defaultJudge = $derived(judges.find((j) => j.default)?.profile);
+	const profileId = $derived(profile || defaultJudge?.id || '');
 	const unjudged = $derived(
 		benchy.attempts.filter(
-			(a) => a.score === null && !a.error && (a.stage === 'checked' || a.stage === 'judged')
+			(a) =>
+				!a.error &&
+				(a.stage === 'checked' || a.stage === 'judged') &&
+				!a.judge_scores.some((j) => j.profile === profileId)
 		)
 	);
 	const judging = $derived(benchy.attempts.filter((a) => a.stage === 'judging'));
@@ -31,8 +38,8 @@
 	});
 	const pairs = $derived(
 		benchy.attempts
-			.filter((a) => a.score !== null && a.human_score !== null)
-			.map((a) => ({ a, delta: (a.score ?? 0) - (a.human_score ?? 0) }))
+			.filter((a) => a.judge_score !== null && a.human_score !== null)
+			.map((a) => ({ a, delta: (a.judge_score ?? 0) - (a.human_score ?? 0) }))
 			.sort((x, y) => Math.abs(y.delta) - Math.abs(x.delta))
 	);
 	const mae = $derived(
@@ -51,11 +58,10 @@
 	async function judge(ids: string[]) {
 		busy = true;
 		try {
-			const override: Record<string, unknown> = {};
-			if (model) override.model = model;
-			if (effort) override.effort = effort;
-			if (mode) override.mode_override = mode;
-			const r = await benchy.api.judge(ids, override);
+			const r = await benchy.api.judge(ids, {
+				profile: profile || undefined,
+				mode_override: (mode || undefined) as 'static' | 'interactive' | undefined
+			});
 			toasts.push('info', `Queued ${r.queued} judgement(s)`);
 		} catch (e) {
 			toasts.error(e);
@@ -67,7 +73,7 @@
 
 <div class="head">
 	<div class="stat">
-		<b>{benchy.attempts.filter((a) => a.score !== null).length}</b><span>judged</span>
+		<b>{benchy.attempts.filter((a) => a.judge_score !== null).length}</b><span>judged</span>
 	</div>
 	<div class="stat"><b>{unjudged.length}</b><span>waiting</span></div>
 	<div class="stat">
@@ -76,14 +82,14 @@
 	<div class="stat"><b>{mae !== null ? mae.toFixed(1) : '—'}</b><span>judge ↔ human MAE</span></div>
 	<span class="spacer"></span>
 	<div class="cfg muted small">
-		default judge: <b>{benchy.status?.settings?.judge.model ?? '—'}</b> @ {benchy.status?.settings
-			?.judge.effort ?? '—'}
+		default judge: <b>{defaultJudge?.label ?? defaultJudge?.id ?? '—'}</b>
 	</div>
 </div>
 <Tabs
 	bind:active={tab}
 	tabs={[
 		{ id: 'queue', label: 'Unjudged', count: unjudged.length },
+		{ id: 'profiles', label: 'Profiles', count: judges.length },
 		{ id: 'calibration', label: 'Judge vs. human', count: pairs.length },
 		{ id: 'log', label: 'Activity' }
 	]}
@@ -93,22 +99,21 @@
 		{#if benchy.live}
 			<div class="card opts">
 				<div class="row wrap">
-					<input
-						class="input"
-						style="max-width:220px"
-						list="jm"
-						placeholder="model (default)"
-						bind:value={model}
-					/>
-					<datalist id="jm"
-						><option value="claude-opus-5-5"></option><option value="claude-sonnet-5-5"
-						></option><option value="haiku"></option></datalist
+					<select
+						class="select"
+						style="max-width:260px"
+						bind:value={profile}
+						aria-label="Judge profile"
 					>
-					<select class="select" style="max-width:160px" bind:value={effort}
-						><option value="">effort (default)</option
-						>{#each ['low', 'medium', 'high', 'xhigh', 'max'] as e (e)}<option value={e}>{e}</option
-							>{/each}</select
-					>
+						{#each judges as j (j.profile.id)}
+							<option value={j.default ? '' : j.profile.id}
+								>{j.profile.label ?? j.profile.id}{j.default ? ' — default' : ''}{j.key_set ===
+								false
+									? ' (key missing)'
+									: ''}</option
+							>
+						{/each}
+					</select>
 					<select class="select" style="max-width:200px" bind:value={mode}
 						><option value="">depth: per test</option><option value="static">force static</option
 						><option value="interactive">force interactive</option></select
@@ -123,9 +128,10 @@
 					>
 				</div>
 				<p class="hint">
-					Judging runs in the background with limited parallelism (settings → concurrency.judge).
-					Opus at xhigh takes a few minutes per attempt; watch your subscription limits on large
-					batches.
+					Lists attempts the chosen profile has not scored. Each profile adds one vote to the
+					combined score. Judging runs in the background with limited parallelism (settings →
+					concurrency.judge). Opus at xhigh takes a few minutes per attempt; watch your subscription
+					limits on large batches.
 				</p>
 			</div>
 		{/if}
@@ -150,8 +156,12 @@
 				</div>
 			</div>
 		{:else}
-			<Empty icon="gavel" title="Nothing waiting">Every generated attempt has a verdict.</Empty>
+			<Empty icon="gavel" title="Nothing waiting"
+				>Every generated attempt has a verdict from this profile.</Empty
+			>
 		{/each}
+	{:else if tab === 'profiles'}
+		<div class="profiles"><JudgeProfiles /></div>
 	{:else if tab === 'calibration'}
 		{#if !pairs.length}
 			<Empty icon="user" title="No human ratings yet"
@@ -166,7 +176,9 @@
 			</p>
 			<table class="table">
 				<thead
-					><tr><th>Attempt</th><th>Judge</th><th>Human</th><th class="num">Δ</th><th>Checks</th></tr
+					><tr
+						><th>Attempt</th><th>Judges (mean)</th><th>You</th><th class="num">Δ</th><th>Checks</th
+						></tr
 					></thead
 				>
 				<tbody>
@@ -174,7 +186,7 @@
 						<tr class="clickable" onclick={() => wm.open('attempt', { key: p.a.id, id: p.a.id })}>
 							<td class="ellipsis" style="max-width:320px">{p.a.blueprint_label} × {p.a.test_id}</td
 							>
-							<td><Score value={p.a.score} width={70} /></td>
+							<td><Score value={p.a.judge_score} width={70} /></td>
 							<td><Score value={p.a.human_score} width={70} /></td>
 							<td class="num" class:pos={p.delta > 0} class:neg={p.delta < 0}
 								>{p.delta > 0 ? '+' : ''}{p.delta.toFixed(1)}</td
@@ -229,6 +241,12 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--sp-5);
+	}
+	.profiles {
+		flex: 1;
+		min-height: 420px;
+		display: flex;
+		margin: calc(-1 * var(--sp-5));
 	}
 	.opts {
 		display: flex;

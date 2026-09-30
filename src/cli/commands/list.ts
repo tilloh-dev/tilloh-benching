@@ -4,7 +4,7 @@ import { Engine } from '../../engine/run/engine.ts';
 import { blueprintHash } from '../../engine/core/library.ts';
 import { listChecks } from '../../engine/checks/index.ts';
 
-const HELP = `benchy list [blueprints|tests|suites|runs|checks]   (default: everything)`;
+const HELP = `benchy list [blueprints|tests|suites|judges|runs|checks]   (default: everything)`;
 
 export default async function list(args: string[]): Promise<number> {
 	const p = parse(args, {}, HELP);
@@ -43,6 +43,24 @@ export default async function list(args: string[]): Promise<number> {
 			table(
 				[...lib.suites.values()].map((s) => [s.id, s.title, s.tests.length, s.repetitions ?? 1]),
 				['id', 'title', 'tests', 'reps']
+			)
+		);
+	}
+	if (show('judges')) {
+		const def = engine.settings.judge.default_profile;
+		console.log(c.bold(`\nJudge profiles (${lib.judges.size})`));
+		console.log(
+			table(
+				[...lib.judges.values()].map((j) => [
+					j.id + (j.id === def ? ' *' : ''),
+					j.kind,
+					j.model ?? '',
+					j.effort ?? '',
+					j.endpoint?.api_key_env
+						? `${j.endpoint.api_key_env} ${process.env[j.endpoint.api_key_env] ? 'set' : 'missing'}`
+						: ''
+				]),
+				['id (* default)', 'kind', 'model', 'effort', 'api key']
 			)
 		);
 	}

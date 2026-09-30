@@ -1,0 +1,80 @@
+{
+	"id": "2026-09-30T1109Z-lieselotte-8ea6/claude-sonnet-agentic/01-svg-clock/1",
+	"run_id": "2026-09-30T1109Z-lieselotte-8ea6",
+	"blueprint_id": "claude-sonnet-agentic",
+	"blueprint_hash": "63655e8c1274",
+	"test_id": "01-svg-clock",
+	"task_hash": "f85f680ae16c",
+	"rep": 1,
+	"stage": "judged",
+	"status": "ok",
+	"created_at": "2026-09-30T11:09:07.339Z",
+	"metrics": {
+		"latency_ms": 14662,
+		"ttft_ms": 11535,
+		"prompt_tokens": 19073,
+		"completion_tokens": 2387,
+		"reasoning_tokens": 0,
+		"cost_usd": 0.0490858,
+		"num_turns": 2,
+		"finish_reason": "completed",
+		"gen_tps": 165.9,
+		"tps_source": "computed"
+	},
+	"artifacts": [
+		{
+			"path": "artifacts/index.html",
+			"kind": "html",
+			"bytes": 4068,
+			"sha256": "5d85fcff3b6d09c1",
+			"declared": true,
+			"source": "workspace"
+		}
+	],
+	"evidence": [
+		{
+			"path": "evidence/html-render-1.png",
+			"kind": "image",
+			"label": "Screenshot t=3000ms",
+			"check": "html.render"
+		},
+		{
+			"path": "evidence/html-render-0.png",
+			"kind": "image",
+			"label": "Screenshot t=500ms",
+			"check": "html.render"
+		}
+	],
+	"started_at": "2026-09-30T11:09:07.343Z",
+	"generated_at": "2026-09-30T11:09:22.879Z",
+	"extraction": {
+		"method": "workspace",
+		"notes": []
+	},
+	"checks": {
+		"status": "ok",
+		"failed": [],
+		"warned": []
+	},
+	"judgement": {
+		"fingerprint": "51fc3e3b62",
+		"score": 96.9,
+		"gate_failed": false,
+		"judged_at": "2026-09-30T11:09:26.356Z",
+		"judge": "claude-opus-5-5@xhigh·static",
+		"profile_id": "opus-xhigh",
+		"profile_label": "Opus 5.5 · xhigh"
+	},
+	"finished_at": "2026-09-30T11:10:13.722Z",
+	"judgements": {
+		"opus-xhigh": {
+			"fingerprint": "51fc3e3b62",
+			"score": 96.9,
+			"gate_failed": false,
+			"judged_at": "2026-09-30T11:09:26.356Z",
+			"judge": "claude-opus-5-5@xhigh·static",
+			"profile_id": "opus-xhigh",
+			"profile_label": "Opus 5.5 · xhigh"
+		}
+	}
+}

@@ -1,0 +1,82 @@
+{
+	"status": "ok",
+	"checks_hash": "b14134801dd9",
+	"finished_at": "2026-09-30T13:15:49.115Z",
+	"results": [
+		{
+			"id": "output.files",
+			"duration_ms": 0,
+			"status": "pass",
+			"issues": [],
+			"evidence": [],
+			"data": {
+				"files": [
+					"index.html"
+				]
+			}
+		},
+		{
+			"id": "html.parse",
+			"duration_ms": 10,
+			"status": "pass",
+			"issues": [],
+			"evidence": [],
+			"data": {
+				"index.html": {
+					"bytes": 39962,
+					"lines": 958,
+					"scripts": 1,
+					"doctype": true
+				}
+			}
+		},
+		{
+			"id": "html.render",
+			"duration_ms": 11414,
+			"status": "pass",
+			"issues": [],
+			"evidence": [
+				{
+					"path": "evidence/html-render-4.png",
+					"kind": "image",
+					"label": "Screenshot regenerate-done",
+					"check": "html.render"
+				},
+				{
+					"path": "evidence/html-render-3.png",
+					"kind": "image",
+					"label": "Screenshot regenerate-growing",
+					"check": "html.render"
+				},
+				{
+					"path": "evidence/html-render-2.png",
+					"kind": "image",
+					"label": "Screenshot t=5000ms",
+					"check": "html.render"
+				},
+				{
+					"path": "evidence/html-render-1.png",
+					"kind": "image",
+					"label": "Screenshot t=1500ms",
+					"check": "html.render"
+				},
+				{
+					"path": "evidence/html-render-0.png",
+					"kind": "image",
+					"label": "Screenshot t=300ms",
+					"check": "html.render"
+				}
+			],
+			"data": {
+				"load_ms": 28,
+				"title": "Lantern Grove — L-system Fractal Tree",
+				"dom_nodes": 88,
+				"text_chars": 710,
+				"visual_elements": 1,
+				"canvases": 1,
+				"blank": false,
+				"console_warnings": []
+			}
+		}
+	]
+}

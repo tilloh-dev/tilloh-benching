@@ -5,10 +5,12 @@ import type { z } from 'zod';
 import {
 	Blueprint,
 	BlueprintFile,
+	JudgeProfileFile,
 	SuiteFile,
 	TestFile,
 	BLUEPRINT_COSMETIC_KEYS,
 	type BenchTest,
+	type JudgeProfile,
 	type CheckEntry,
 	type CheckSpec,
 	type ResolvedCriterion,
@@ -28,8 +30,26 @@ export type Library = {
 	tests: Map<string, BenchTest>;
 	testFiles: Map<string, TestFile>;
 	suites: Map<string, Suite>;
+	judges: Map<string, JudgeProfile>;
 	issues: LibraryIssue[];
 };
+
+/** Used when library/judges does not define them, so every workspace can judge. */
+export const BUILTIN_JUDGES: JudgeProfile[] = [
+	{
+		id: 'opus-xhigh',
+		label: 'Opus 5.5 · xhigh',
+		kind: 'claude',
+		model: 'claude-opus-5-5',
+		effort: 'xhigh'
+	},
+	{
+		id: 'dry-run',
+		label: 'Dry-run judge',
+		kind: 'dry-run',
+		description: 'Deterministic scores from the checks. No model, no cost.'
+	}
+];
 
 export const DEFAULT_CRITERIA: ResolvedCriterion[] = [
 	{
@@ -302,7 +322,28 @@ export async function loadLibrary(ws: Workspace): Promise<Library> {
 		}
 	}
 
-	return { blueprintFiles, blueprints, tests, testFiles, suites, issues };
+	const judges = new Map<string, JudgeProfile>();
+	for (const name of await listFiles(ws.judges)) {
+		if (!/\.ya?ml$/.test(name)) continue;
+		const rel = `judges/${name}`;
+		try {
+			const parsed = JudgeProfileFile.safeParse(await readYaml(join(ws.judges, name)));
+			if (!parsed.success) {
+				issues.push({ file: rel, message: formatZodError(parsed.error) });
+				continue;
+			}
+			if (parsed.data.id !== name.replace(/\.ya?ml$/, '')) {
+				issues.push({ file: rel, message: `id "${parsed.data.id}" must match file name` });
+				continue;
+			}
+			judges.set(parsed.data.id, parsed.data);
+		} catch (e) {
+			issues.push({ file: rel, message: `invalid YAML: ${(e as Error).message}` });
+		}
+	}
+	for (const j of BUILTIN_JUDGES) if (!judges.has(j.id)) judges.set(j.id, j);
+
+	return { blueprintFiles, blueprints, tests, testFiles, suites, judges, issues };
 }
 
 // ---------------------------------------------------------------- saving
@@ -360,4 +401,15 @@ export async function saveSuite(ws: Workspace, input: unknown): Promise<Suite> {
 
 export async function deleteSuite(ws: Workspace, id: string): Promise<void> {
 	await rm(join(ws.suites, `${id}.yaml`), { force: true });
+}
+
+export async function saveJudgeProfile(ws: Workspace, input: unknown): Promise<JudgeProfile> {
+	const j = JudgeProfileFile.parse(input);
+	await ensureDir(ws.judges);
+	await writeFile(join(ws.judges, `${j.id}.yaml`), toYaml(prune(j)));
+	return j;
+}
+
+export async function deleteJudgeProfile(ws: Workspace, id: string): Promise<void> {
+	await rm(join(ws.judges, `${id}.yaml`), { force: true });
 }

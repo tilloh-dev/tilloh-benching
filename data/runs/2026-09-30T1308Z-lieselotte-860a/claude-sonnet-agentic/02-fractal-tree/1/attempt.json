@@ -1,0 +1,98 @@
+{
+	"id": "2026-09-30T1308Z-lieselotte-860a/claude-sonnet-agentic/02-fractal-tree/1",
+	"run_id": "2026-09-30T1308Z-lieselotte-860a",
+	"blueprint_id": "claude-sonnet-agentic",
+	"blueprint_hash": "63655e8c1274",
+	"test_id": "02-fractal-tree",
+	"task_hash": "ea178129da5a",
+	"rep": 1,
+	"stage": "judged",
+	"status": "ok",
+	"created_at": "2026-09-30T13:08:29.191Z",
+	"metrics": {
+		"latency_ms": 427756,
+		"ttft_ms": 296178,
+		"prompt_tokens": 336676,
+		"completion_tokens": 58927,
+		"reasoning_tokens": 35869,
+		"cost_usd": 0.896365,
+		"num_turns": 7,
+		"finish_reason": "completed",
+		"gen_tps": 138.3,
+		"tps_source": "computed"
+	},
+	"artifacts": [
+		{
+			"path": "artifacts/index.html",
+			"kind": "html",
+			"bytes": 39980,
+			"sha256": "103ad2fd580e2af0",
+			"declared": true,
+			"source": "workspace"
+		}
+	],
+	"evidence": [
+		{
+			"path": "evidence/html-render-4.png",
+			"kind": "image",
+			"label": "Screenshot regenerate-done",
+			"check": "html.render"
+		},
+		{
+			"path": "evidence/html-render-3.png",
+			"kind": "image",
+			"label": "Screenshot regenerate-growing",
+			"check": "html.render"
+		},
+		{
+			"path": "evidence/html-render-2.png",
+			"kind": "image",
+			"label": "Screenshot t=5000ms",
+			"check": "html.render"
+		},
+		{
+			"path": "evidence/html-render-1.png",
+			"kind": "image",
+			"label": "Screenshot t=1500ms",
+			"check": "html.render"
+		},
+		{
+			"path": "evidence/html-render-0.png",
+			"kind": "image",
+			"label": "Screenshot t=300ms",
+			"check": "html.render"
+		}
+	],
+	"started_at": "2026-09-30T13:08:29.192Z",
+	"generated_at": "2026-09-30T13:15:37.686Z",
+	"extraction": {
+		"method": "workspace",
+		"notes": []
+	},
+	"checks": {
+		"status": "ok",
+		"failed": [],
+		"warned": []
+	},
+	"judgement": {
+		"fingerprint": "0ba5cf085d",
+		"score": 86.7,
+		"gate_failed": false,
+		"judged_at": "2026-09-30T13:15:49.116Z",
+		"judge": "claude-opus-5-5@xhigh·static",
+		"profile_id": "opus-xhigh",
+		"profile_label": "Opus 5.5 · xhigh"
+	},
+	"finished_at": "2026-09-30T13:17:51.004Z",
+	"judgements": {
+		"opus-xhigh": {
+			"fingerprint": "0ba5cf085d",
+			"score": 86.7,
+			"gate_failed": false,
+			"judged_at": "2026-09-30T13:15:49.116Z",
+			"judge": "claude-opus-5-5@xhigh·static",
+			"profile_id": "opus-xhigh",
+			"profile_label": "Opus 5.5 · xhigh"
+		}
+	}
+}

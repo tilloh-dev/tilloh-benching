@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import Icon from '../os/Icon.svelte';
+	import Busy from './Busy.svelte';
 
 	let {
 		variant = 'default',
@@ -36,9 +37,9 @@
 	{onclick}
 >
 	{#if loading}
-		<span class="busy" aria-hidden="true">◐</span>
+		<Busy />
 	{:else if icon}
-		<Icon name={icon} size={12} />
+		<Icon name={icon} size={12} mono={variant === 'primary'} />
 	{/if}
 	{#if children}<span>{@render children()}</span>{/if}
 </button>
@@ -113,9 +114,5 @@
 	}
 	.danger:hover:not(:disabled) {
 		border-color: var(--bad);
-	}
-	.busy {
-		display: inline-block;
-		animation: blink var(--dur-3) steps(2) infinite;
 	}
 </style>

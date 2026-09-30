@@ -12,6 +12,8 @@ concurrency:
   judge: 2 # claude -p judgements in parallel
 
 judge:
+  default_profile: opus-xhigh # library/judges/<id>.yaml
+  # model and effort are only used by `benchy run --judge-model` without a profile
   model: claude-opus-5-5
   effort: xhigh
   timeout_s: 1800

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Analog Clock</title>
+<style>
+  :root {
+    --bg: #0f1218;
+    --face: #171b24;
+    --ring: #2b3240;
+    --fg: #e8ecf3;
+    --muted: #8a93a6;
+    --accent: #ff5d5d;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: radial-gradient(circle at 50% 35%, #1a2030 0%, var(--bg) 70%);
+    color: var(--fg);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+  }
+  svg#clock {
+    width: min(80vmin, 480px);
+    height: min(80vmin, 480px);
+    min-width: 320px;
+    min-height: 320px;
+    filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.55));
+  }
+  .face { fill: var(--face); stroke: var(--ring); stroke-width: 4; }
+  .tick-hour { stroke: var(--fg); stroke-width: 3; stroke-linecap: round; }
+  .tick-min { stroke: var(--muted); stroke-width: 1.2; stroke-linecap: round; }
+  .num { fill: var(--fg); font-size: 18px; font-weight: 600; text-anchor: middle; dominant-baseline: central; }
+  .hand-hour { stroke: var(--fg); stroke-width: 6; stroke-linecap: round; }
+  .hand-min { stroke: var(--fg); stroke-width: 4; stroke-linecap: round; }
+  .hand-sec { stroke: var(--accent); stroke-width: 2; stroke-linecap: round; }
+  .hub { fill: var(--accent); }
+  .hub-inner { fill: var(--face); }
+  #digital {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 2.2rem;
+    letter-spacing: 0.08em;
+    font-variant-numeric: tabular-nums;
+    color: var(--fg);
+  }
+</style>
+</head>
+<body>
+  <svg id="clock" viewBox="-110 -110 220 220" role="img" aria-label="Analog clock">
+    <circle class="face" cx="0" cy="0" r="104"></circle>
+    <g id="ticks"></g>
+    <g id="numbers"></g>
+    <line id="hour" class="hand-hour" x1="0" y1="6" x2="0" y2="-50"></line>
+    <line id="minute" class="hand-min" x1="0" y1="8" x2="0" y2="-78"></line>
+    <g id="second">
+      <line class="hand-sec" x1="0" y1="16" x2="0" y2="-88"></line>
+    </g>
+    <circle class="hub" cx="0" cy="0" r="5"></circle>
+    <circle class="hub-inner" cx="0" cy="0" r="2"></circle>
+  </svg>
+  <div id="digital" aria-live="off">00:00:00</div>
+
+<script>
+(function () {
+  var NS = "http://www.w3.org/2000/svg";
+  var ticks = document.getElementById("ticks");
+  var numbers = document.getElementById("numbers");
+
+  function el(name, attrs) {
+    var e = document.createElementNS(NS, name);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  for (var i = 0; i < 60; i++) {
+    var isHour = i % 5 === 0;
+    var len = isHour ? 10 : 4;
+    var outer = 98;
+    ticks.appendChild(el("line", {
+      "class": isHour ? "tick-hour" : "tick-min",
+      x1: 0, y1: -outer, x2: 0, y2: -(outer - len),
+      transform: "rotate(" + (i * 6) + ")"
+    }));
+  }
+
+  for (var h = 1; h <= 12; h++) {
+    var a = h * Math.PI / 6;
+    var t = el("text", {
+      "class": "num",
+      x: (Math.sin(a) * 74).toFixed(2),
+      y: (-Math.cos(a) * 74).toFixed(2)
+    });
+    t.textContent = String(h);
+    numbers.appendChild(t);
+  }
+
+  var hourHand = document.getElementById("hour");
+  var minHand = document.getElementById("minute");
+  var secHand = document.getElementById("second");
+  var digital = document.getElementById("digital");
+
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+
+  function update() {
+    var now = new Date();
+    var s = now.getSeconds();
+    var m = now.getMinutes();
+    var h = now.getHours();
+    hourHand.setAttribute("transform", "rotate(" + (((h % 12) + m / 60 + s / 3600) * 30) + ")");
+    minHand.setAttribute("transform", "rotate(" + ((m + s / 60) * 6) + ")");
+    secHand.setAttribute("transform", "rotate(" + (s * 6) + ")");
+    digital.textContent = pad(h) + ":" + pad(m) + ":" + pad(s);
+  }
+
+  function tick() {
+    update();
+    setTimeout(tick, 1000 - (Date.now() % 1000) + 5);
+  }
+  tick();
+})();
+</script>
+</body>
+</html>

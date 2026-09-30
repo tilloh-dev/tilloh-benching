@@ -26,11 +26,16 @@
 	let replay = $state(0);
 
 	const COLORS: [string, string[]][] = [
-		['Surfaces', ['--bg', '--surface', '--surface-2', '--sunken', '--hover']],
+		['Surfaces', ['--bg', '--surface', '--surface-2', '--surface-3', '--sunken', '--hover']],
 		['Lines', ['--line', '--line-soft', '--line-strong']],
 		['Text', ['--fg', '--fg-2', '--fg-3', '--fg-4']],
 		['Accent', ['--accent', '--accent-text', '--accent-fg', '--accent-soft', '--focus']],
 		['Status', ['--ok', '--warn', '--bad', '--info', '--muted']],
+		['Status fills', ['--ok-soft', '--warn-soft', '--bad-soft', '--info-soft']],
+		[
+			'Identity hues',
+			['--hue-1', '--hue-2', '--hue-3', '--hue-4', '--hue-5', '--hue-6', '--hue-7', '--hue-8']
+		],
 		[
 			'Data',
 			['--data', '--track', '--score-1', '--score-2', '--score-3', '--score-4', '--score-5']
@@ -206,7 +211,10 @@
 						/><AppTile icon="gavel" size={24} />
 					</div>
 				{:else if section === 'icons'}
-					<p class="hint">12×12 pixel grid, one color. Only 12, 24 or 36 px.</p>
+					<p class="hint">
+						12×12 pixel grid, one identity hue per icon (derived from its name). Only 12, 24 or 36
+						px.
+					</p>
 					<div class="icons">
 						{#each ICONS as name (name)}
 							<div class="icon-cell">

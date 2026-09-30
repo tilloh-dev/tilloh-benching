@@ -1,0 +1,4 @@
+id: e2e-second
+label: Second opinion
+kind: dry-run
+description: A second deterministic judge, so the leaderboard has two profiles.

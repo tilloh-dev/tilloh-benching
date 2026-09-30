@@ -57,10 +57,15 @@ function saveLayout(s: Saved) {
 	}
 }
 
+export const TOPBAR_H = 30; // --topbar-h
+const TASKBAR_H = 36; // --taskbar-h
+
+/**
+ * The desktop area in window coordinates. Windows are positioned inside the
+ * desktop layer, which already starts below the top bar, so y starts at 0.
+ */
 export function desktopBounds() {
-	const top = 30; // --topbar-h
-	const bottom = 36; // --taskbar-h
-	return { x: 0, y: top, w: window.innerWidth, h: window.innerHeight - top - bottom };
+	return { x: 0, y: 0, w: window.innerWidth, h: window.innerHeight - TOPBAR_H - TASKBAR_H };
 }
 
 class WindowManager {
@@ -202,7 +207,8 @@ class WindowManager {
 			w.restore = undefined;
 		} else {
 			w.restore = { x: w.x, y: w.y, w: w.w, h: w.h };
-			Object.assign(w, { x: b.x + 6, y: b.y + 6, w: b.w - 12, h: b.h - 12 });
+			// Maximized fills the whole desktop area between top bar and taskbar.
+			Object.assign(w, { x: b.x, y: b.y, w: b.w, h: b.h });
 			w.state = 'maximized';
 		}
 		this.focus(id);
@@ -235,7 +241,12 @@ class WindowManager {
 		w.restore = { x: w.x, y: w.y, w: w.w, h: w.h };
 		if (edge === 'top') return this.toggleMax(id);
 		const half = Math.floor(b.w / 2);
-		Object.assign(w, { x: edge === 'left' ? 6 : half + 3, y: b.y + 6, w: half - 9, h: b.h - 12 });
+		Object.assign(w, {
+			x: edge === 'left' ? 0 : half,
+			y: b.y,
+			w: edge === 'left' ? half : b.w - half,
+			h: b.h
+		});
 		w.state = 'normal';
 	}
 
