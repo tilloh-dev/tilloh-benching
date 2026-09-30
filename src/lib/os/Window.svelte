@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import Icon from './Icon.svelte';
-	import { desktopBounds, wm, type Win } from './wm.svelte.ts';
+	import { desktopBounds, TOPBAR_H, wm, type Win } from './wm.svelte.ts';
 
 	let { win, children }: { win: Win; children: Snippet } = $props();
 
@@ -38,7 +38,7 @@
 			wm.move(win.id, ox + dx, oy + dy);
 			const b = desktopBounds();
 			snapHint =
-				ev.clientY <= b.y + 2
+				ev.clientY <= TOPBAR_H + 2
 					? 'top'
 					: ev.clientX <= 2
 						? 'left'
@@ -123,17 +123,17 @@
 		<span class="spacer"></span>
 		<div class="controls">
 			<button class="ctl" title="Minimize" onclick={() => wm.minimize(win.id)}
-				><Icon name="minimize" size={12} /></button
+				><Icon name="minimize" size={12} mono /></button
 			>
 			<button
 				class="ctl"
 				title={win.state === 'maximized' ? 'Restore' : 'Maximize'}
 				onclick={() => wm.toggleMax(win.id)}
 			>
-				<Icon name={win.state === 'maximized' ? 'restore' : 'maximize'} size={12} />
+				<Icon name={win.state === 'maximized' ? 'restore' : 'maximize'} size={12} mono />
 			</button>
 			<button class="ctl close" title="Close" onclick={() => wm.close(win.id)}
-				><Icon name="close" size={12} /></button
+				><Icon name="close" size={12} mono /></button
 			>
 		</div>
 	</div>
@@ -197,12 +197,18 @@
 		background: var(--surface-2);
 		border-bottom: var(--bw) solid var(--line);
 		color: var(--fg-3);
+		transition: background var(--dur-2);
 		cursor: default;
 		user-select: none;
 		touch-action: none;
 	}
 	.focused .titlebar {
+		background: var(--surface-3);
+		border-bottom-color: var(--line-strong);
 		color: var(--fg);
+	}
+	.window:not(.focused) .app-icon {
+		opacity: 0.55;
 	}
 	.app-icon {
 		display: grid;
@@ -225,7 +231,9 @@
 		display: grid;
 		place-items: center;
 		width: 20px;
-		height: 18px;
+		height: 20px;
+		padding: 0;
+		line-height: 0;
 		border: var(--bw) solid var(--line);
 		background: var(--surface);
 		color: var(--fg-3);
@@ -233,6 +241,9 @@
 		transition:
 			color var(--dur-1),
 			border-color var(--dur-1);
+	}
+	.ctl :global(svg) {
+		display: block;
 	}
 	.ctl:hover {
 		color: var(--fg);
@@ -315,18 +326,18 @@
 		pointer-events: none;
 	}
 	.snap-hint.top {
-		inset: calc(var(--topbar-h) + 4px) 4px calc(var(--taskbar-h) + 4px) 4px;
+		inset: var(--topbar-h) 0 var(--taskbar-h) 0;
 	}
 	.snap-hint.left {
-		top: calc(var(--topbar-h) + 4px);
-		bottom: calc(var(--taskbar-h) + 4px);
-		left: 4px;
-		width: calc(50% - 6px);
+		top: var(--topbar-h);
+		bottom: var(--taskbar-h);
+		left: 0;
+		width: 50%;
 	}
 	.snap-hint.right {
-		top: calc(var(--topbar-h) + 4px);
-		bottom: calc(var(--taskbar-h) + 4px);
-		right: 4px;
-		width: calc(50% - 6px);
+		top: var(--topbar-h);
+		bottom: var(--taskbar-h);
+		right: 0;
+		width: 50%;
 	}
 </style>

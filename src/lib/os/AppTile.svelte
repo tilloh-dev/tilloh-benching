@@ -28,7 +28,6 @@
 			border-color var(--dur-1);
 	}
 	.selected {
-		color: var(--accent);
 		border-color: var(--accent);
 		background: var(--accent-soft);
 	}

@@ -10,16 +10,17 @@
 :root,
 [data-theme='dark'] {
 	/* ---- surfaces (back to front) ---- */
-	--bg: #0a0c10; /* desktop */
-	--surface: #0e1116; /* windows, bars, panels */
-	--surface-2: #12161d; /* title bars, table headers, secondary buttons */
-	--sunken: #07090c; /* inputs, code, tracks */
-	--hover: #171c25; /* hover fill for rows and ghost controls */
+	--bg: #06080b; /* desktop */
+	--surface: #0f131a; /* windows, panels */
+	--surface-2: #151a23; /* bars, inactive title bars, secondary buttons */
+	--surface-3: #1d2431; /* focused title bar, table headers — the most raised level */
+	--sunken: #0a0d12; /* inputs, code, tracks */
+	--hover: #1a202b; /* hover fill for rows and ghost controls */
 
 	/* ---- lines ---- */
 	--line: #232a35; /* default border */
 	--line-soft: #181d25; /* dividers inside a surface */
-	--line-strong: #303846; /* control borders, focused window */
+	--line-strong: #384457; /* control borders, focused window */
 
 	/* ---- text ---- */
 	--fg: #d8dde6; /* primary */
@@ -39,6 +40,22 @@
 	--bad: #ef6f73;
 	--info: #7fa7d9;
 	--muted: #6b7383;
+
+	/* ---- soft status fills (badges, issue rows, notices) ---- */
+	--ok-soft: color-mix(in srgb, var(--ok) 14%, transparent);
+	--warn-soft: color-mix(in srgb, var(--warn) 14%, transparent);
+	--bad-soft: color-mix(in srgb, var(--bad) 14%, transparent);
+	--info-soft: color-mix(in srgb, var(--info) 14%, transparent);
+
+	/* ---- identity hues: icons, blueprint kinds, chart series. Never status, never accent. ---- */
+	--hue-1: #e2806f;
+	--hue-2: #e8a45c;
+	--hue-3: #d6c565;
+	--hue-4: #7fcf8f;
+	--hue-5: #5ec3c4;
+	--hue-6: #72a6e6;
+	--hue-7: #a08fe6;
+	--hue-8: #dc8cc3;
 
 	/* ---- data ---- */
 	--data: #7fa7d9; /* bars, lines, points */
@@ -110,14 +127,15 @@
 
 /* Light theme: warm paper. Applied when forced, or when the OS prefers light and nothing is forced. */
 [data-theme='light'] {
-	--bg: #f5f4ef;
+	--bg: #e9e6dc;
 	--surface: #fbfaf6;
-	--surface-2: #efede5;
+	--surface-2: #f1eee5;
+	--surface-3: #e4e0d3;
 	--sunken: #ffffff;
-	--hover: #efede5;
-	--line: #d8d6cc;
-	--line-soft: #e8e6de;
-	--line-strong: #bfbcb0;
+	--hover: #ece9df;
+	--line: #d3d0c4;
+	--line-soft: #e6e3da;
+	--line-strong: #b3afa2;
 	--fg: #1c1f25;
 	--fg-2: #4b505b;
 	--fg-3: #7c818c;
@@ -139,6 +157,14 @@
 	--score-4: #4f8a5e;
 	--score-5: #1f7a4f;
 	--focus: #a87c00;
+	--hue-1: #b8493a;
+	--hue-2: #b0661a;
+	--hue-3: #8a7610;
+	--hue-4: #3a8a4b;
+	--hue-5: #1c8084;
+	--hue-6: #2f63a8;
+	--hue-7: #5f4fb3;
+	--hue-8: #a4468b;
 	--syn-keyword: #6a4c9c;
 	--syn-string: #2f7a47;
 	--syn-number: #a0522d;
@@ -152,14 +178,15 @@
 
 @media (prefers-color-scheme: light) {
 	:root:not([data-theme]) {
-		--bg: #f5f4ef;
+		--bg: #e9e6dc;
 		--surface: #fbfaf6;
-		--surface-2: #efede5;
+		--surface-2: #f1eee5;
+		--surface-3: #e4e0d3;
 		--sunken: #ffffff;
-		--hover: #efede5;
-		--line: #d8d6cc;
-		--line-soft: #e8e6de;
-		--line-strong: #bfbcb0;
+		--hover: #ece9df;
+		--line: #d3d0c4;
+		--line-soft: #e6e3da;
+		--line-strong: #b3afa2;
 		--fg: #1c1f25;
 		--fg-2: #4b505b;
 		--fg-3: #7c818c;
@@ -181,6 +208,14 @@
 		--score-4: #4f8a5e;
 		--score-5: #1f7a4f;
 		--focus: #a87c00;
+		--hue-1: #b8493a;
+		--hue-2: #b0661a;
+		--hue-3: #8a7610;
+		--hue-4: #3a8a4b;
+		--hue-5: #1c8084;
+		--hue-6: #2f63a8;
+		--hue-7: #5f4fb3;
+		--hue-8: #a4468b;
 		--syn-keyword: #6a4c9c;
 		--syn-string: #2f7a47;
 		--syn-number: #a0522d;

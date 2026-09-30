@@ -53,6 +53,20 @@ test('leaderboard ranks the good blueprint first', async ({ page }) => {
 	await expect(board.getByText('overall')).toBeVisible();
 });
 
+test('clicking a ranking row switches to the matrix and marks that blueprint', async ({ page }) => {
+	// arrange
+	await page.goto('/#/?open=leaderboard');
+	const board = page.getByRole('dialog', { name: 'Leaderboard' });
+
+	// act
+	await board.locator('tbody tr').first().click();
+
+	// assume
+	await expect(board.getByRole('radio', { name: 'Matrix' })).toBeChecked();
+	await expect(board.locator('.row-head.focus')).toContainText('E2E good');
+	await expect(page.getByRole('dialog', { name: 'Blueprints' })).toHaveCount(0);
+});
+
 test('run matrix opens an attempt with preview, checks and verdict', async ({ page }) => {
 	// arrange
 	await page.goto('/');

@@ -1,6 +1,13 @@
 <script lang="ts" module>
 	import { PIXEL_ICONS } from './pixel-icons.ts';
 
+	/** Stable pseudo-random identity hue (--hue-1 … --hue-8) per icon name. */
+	export function iconHue(name: string): number {
+		let h = 2166136261;
+		for (let i = 0; i < name.length; i++) h = Math.imul(h ^ name.charCodeAt(i), 16777619);
+		return ((h >>> 0) % 8) + 1;
+	}
+
 	/** Pixel icons render only at integer multiples of their 12 px grid. */
 	export function snapIconSize(size: number): 12 | 24 | 36 {
 		return size <= 18 ? 12 : size <= 30 ? 24 : 36;
@@ -36,9 +43,17 @@
 	let {
 		name,
 		size = 12,
+		mono = false,
 		class: klass = ''
-	}: { name: string; size?: number; class?: string } = $props();
+	}: {
+		name: string;
+		size?: number;
+		/** Inherit the text color instead of the icon's own hue (window controls, filled buttons). */
+		mono?: boolean;
+		class?: string;
+	} = $props();
 	const px = $derived(snapIconSize(size));
+	const color = $derived(mono ? 'currentColor' : `var(--hue-${iconHue(name)})`);
 </script>
 
 <svg
@@ -46,6 +61,7 @@
 	width={px}
 	height={px}
 	viewBox="0 0 12 12"
+	style="color: {color}"
 	fill="currentColor"
 	shape-rendering="crispEdges"
 	aria-hidden="true"
@@ -58,6 +74,6 @@
 	.icon {
 		flex: none;
 		display: inline-block;
-		vertical-align: middle;
+		vertical-align: -1px;
 	}
 </style>

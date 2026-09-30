@@ -21,6 +21,18 @@
 	let run = $state('');
 	let hover = $state<{ row: LeaderRow; test: string; x: number; y: number } | null>(null);
 	let hoverPoint = $state<LeaderRow | null>(null);
+	/** Row highlighted in the matrix after picking an entry in ranking or scatter. */
+	let focusKey = $state<string | null>(null);
+
+	function showInMatrix(row: LeaderRow) {
+		focusKey = row.key;
+		view = 'matrix';
+		requestAnimationFrame(() =>
+			document
+				.querySelector(`[data-row-key="${CSS.escape(row.key)}"]`)
+				?.scrollIntoView({ block: 'nearest' })
+		);
+	}
 
 	const suites = $derived(benchy.library?.suites ?? []);
 	const board = $derived(
@@ -111,7 +123,7 @@
 			</thead>
 			<tbody>
 				{#each board.rows as r, i (r.key)}
-					<tr class="clickable" onclick={() => wm.open('blueprints', { select: r.blueprint_id })}>
+					<tr class="clickable" onclick={() => showInMatrix(r)}>
 						<td class="num rank"
 							>{#if r.overall.mean !== null}<span class:top={i === 0}>{i + 1}</span>{/if}</td
 						>
@@ -150,7 +162,7 @@
 			{/each}
 			<div class="col-head overall"><span>overall</span></div>
 			{#each board.rows as r (r.key)}
-				<div class="row-head">
+				<div class="row-head" class:focus={focusKey === r.key} data-row-key={r.key}>
 					<span class="ellipsis">{r.label}</span>{#if r.blueprint_hash}<small class="mono"
 							>{r.blueprint_hash.slice(0, 7)}</small
 						>{/if}
@@ -230,7 +242,7 @@
 							role="presentation"
 							onmouseenter={() => (hoverPoint = p)}
 							onmouseleave={() => (hoverPoint = null)}
-							onclick={() => wm.open('blueprints', { select: p.blueprint_id })}
+							onclick={() => showInMatrix(p)}
 						>
 							<rect
 								x={sx(p.mean_gen_tps ?? 0) - 4}
@@ -328,6 +340,10 @@
 		min-width: 0;
 		padding: 0 var(--sp-4);
 		color: var(--fg);
+	}
+	.row-head.focus {
+		box-shadow: inset 2px 0 0 var(--accent);
+		background: var(--accent-soft);
 	}
 	.row-head small {
 		font-size: var(--fs-xs);

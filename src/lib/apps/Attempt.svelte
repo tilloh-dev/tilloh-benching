@@ -11,6 +11,7 @@
 	import Kind from '../ui/Kind.svelte';
 	import Button from '../ui/Button.svelte';
 	import Spinner from '../ui/Spinner.svelte';
+	import Busy from '../ui/Busy.svelte';
 	import Empty from '../ui/Empty.svelte';
 	import Markdown from '../ui/Markdown.svelte';
 	import Code from '../ui/Code.svelte';
@@ -193,9 +194,8 @@
 			{#if benchy.live && !a.error}
 				<Menu items={judgeItems} align="right">
 					{#snippet trigger()}
-						<Icon name="gavel" size={12} /> Judge {#if busy === 'judge' || a.stage === 'judging'}<span
-								class="dotspin"
-							></span>{/if}
+						<Icon name="gavel" size={12} /> Judge {#if busy === 'judge' || a.stage === 'judging'}<Busy
+							/>{/if}
 					{/snippet}
 				</Menu>
 			{/if}
@@ -686,18 +686,6 @@
 		align-items: center;
 		gap: var(--sp-2);
 	}
-	.dotspin {
-		width: 10px;
-		height: 10px;
-		border-right-color: transparent;
-		animation: spin var(--dur-3) linear infinite;
-		border: 2px solid var(--fg);
-	}
-	@keyframes spin {
-		to {
-			transform: rotate(360deg);
-		}
-	}
 	.body {
 		flex: 1;
 		min-height: 0;
@@ -791,6 +779,12 @@
 		font-weight: var(--fw-strong);
 		text-transform: uppercase;
 		min-width: 52px;
+	}
+	.issues .error {
+		background: var(--bad-soft);
+	}
+	.issues .warning {
+		background: var(--warn-soft);
 	}
 	.issues .error .sev {
 		color: var(--bad);

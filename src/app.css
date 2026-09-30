@@ -147,9 +147,9 @@ code {
 	text-align: left;
 	font-size: var(--fs-s);
 	font-weight: var(--fw-strong);
-	color: var(--fg-3);
-	background: var(--surface-2);
-	border-bottom: var(--bw) solid var(--line);
+	color: var(--fg-2);
+	background: var(--surface-3);
+	border-bottom: var(--bw) solid var(--line-strong);
 	white-space: nowrap;
 }
 .table td {
@@ -203,7 +203,7 @@ code {
 	padding: var(--sp-4) var(--sp-5);
 }
 .card {
-	background: var(--surface);
+	background: var(--surface-2);
 	border: var(--bw) solid var(--line);
 	padding: var(--sp-4) var(--sp-5);
 }
@@ -212,8 +212,10 @@ code {
 	font-weight: var(--fw-strong);
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
-	color: var(--fg-3);
+	color: var(--fg-2);
 	margin: 0 0 var(--sp-3);
+	padding-left: var(--sp-3);
+	border-left: 2px solid var(--line-strong);
 }
 .ellipsis {
 	overflow: hidden;
