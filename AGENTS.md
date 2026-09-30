@@ -26,7 +26,7 @@ src/engine/                framework-free engine shared by CLI and server
   legacy/                  llm-check and router-preset importers
   export/                  static export
 src/lib/                   BenchyOS: os/ (window manager, shell), apps/, viewers/, ui/, data/
-library/                   authored blueprints, tests, suites (tracked)
+library/                   authored blueprints, tests, suites, judge profiles (tracked)
 data/runs/                 results (tracked); data/.cache is not
 tests/                     Vitest, including a real dry-run pipeline
 ```
@@ -65,6 +65,7 @@ Every test uses the phase markers `// arrange`, `// act`, `// assume` (lowercase
 | New check | `src/engine/checks/<name>.ts` implementing `CheckImpl`, register in `checks/index.ts`, optionally add it to a kind's `defaultChecks` in `core/kinds.ts` |
 | New artifact kind | `core/kinds.ts` (extensions, fence languages, viewer, default checks); viewer in `src/lib/viewers/ArtifactPreview.svelte` |
 | New blueprint kind | schema in `core/schema.ts`, subject in `src/engine/subjects/`, wire it in `Engine.#subjectFor`, preflight item, Blueprints app form |
+| New judge kind | `JUDGE_PROFILE_KINDS` and `JudgeProfileFile` in `core/schema.ts`, a branch in `judge/index.ts` `judgeAttempt`, preflight item, the Judge app's profile form |
 | New BenchyOS app | component in `src/lib/apps/`, entry in `src/lib/apps/registry.ts`; mark it `liveOnly` if it edits or runs anything |
 | New test for the library | `library/tests/NN-slug/` with `test.yaml` and `prompt.md`; run `./bin/benchy list tests` — there must be no library issues. The `create-prompt` skill does this. |
 

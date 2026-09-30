@@ -124,7 +124,7 @@
 	);
 	const unjudged = $derived(
 		attempts.filter(
-			(a) => a.score === null && !a.error && (a.stage === 'checked' || a.stage === 'judged')
+			(a) => a.judge_score === null && !a.error && (a.stage === 'checked' || a.stage === 'judged')
 		)
 	);
 	const failed = $derived(attempts.filter((a) => a.error));
@@ -351,7 +351,11 @@
 									<td><Status status={a.status} /></td>
 									<td><Score value={a.score} gate={a.gate_failed} width={60} /></td>
 									<td class="num">{fmtDuration(a.latency_ms)}</td>
-									<td class="num">{fmtNum(a.gen_tps)}</td>
+									<td
+										class="num"
+										title={a.tps_source && a.tps_source !== 'server' ? `t/s ${a.tps_source}` : ''}
+										>{a.tps_source && a.tps_source !== 'server' ? '~' : ''}{fmtNum(a.gen_tps)}</td
+									>
 									<td class="num">{fmtNum(a.completion_tokens, 0)}</td>
 								</tr>
 								{#if a.error}<tr><td colspan="9" class="err small">{a.error}</td></tr>{/if}

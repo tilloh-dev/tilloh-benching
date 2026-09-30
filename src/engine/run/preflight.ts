@@ -1,7 +1,7 @@
 import { homedir } from 'node:os';
 import { isAbsolute, join } from 'node:path';
 import { chromium } from 'playwright';
-import type { BenchTest, Blueprint, JudgeKind } from '../core/schema.ts';
+import type { BenchTest, Blueprint, JudgeProfile } from '../core/schema.ts';
 import type { ResolvedSettings } from '../core/settings.ts';
 import { exists } from '../util/fs.ts';
 import { execCapture, which } from '../util/exec.ts';
@@ -33,7 +33,7 @@ export async function preflight(o: {
 	settings: ResolvedSettings;
 	blueprints: Blueprint[];
 	tests: BenchTest[];
-	judge: JudgeKind;
+	judge: JudgeProfile | null;
 	llama: LlamaManager;
 	llamaBusy: boolean;
 }): Promise<PreflightReport> {
@@ -72,7 +72,17 @@ export async function preflight(o: {
 		else add(bp.id, 'ok', `${bp.endpoint?.base_url} · ${bp.endpoint?.model}`);
 	}
 
-	const needsClaude = o.blueprints.some((b) => b.kind === 'claude-code') || o.judge === 'claude';
+	const j = o.judge;
+	if (!j) add('judge', 'ok', 'no judging in this run');
+	else if (j.kind === 'openai-compatible') {
+		const env = j.endpoint?.api_key_env;
+		if (env && !process.env[env])
+			add('judge', 'error', `${j.id}: API key ${env} is not set (Settings → API keys)`);
+		else add('judge', 'ok', `${j.label ?? j.id} · ${j.endpoint?.base_url} · ${j.model}`);
+	} else add('judge', 'ok', j.label ?? j.id);
+
+	const needsClaude =
+		o.blueprints.some((b) => b.kind === 'claude-code') || o.judge?.kind === 'claude';
 	if (needsClaude) {
 		const v = await claudeVersion(o.settings.judge.claude_bin);
 		if (!v) add('claude', 'error', `${o.settings.judge.claude_bin} not found or not working`);

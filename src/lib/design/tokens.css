@@ -40,6 +40,8 @@
 	--bad: #ef6f73;
 	--info: #7fa7d9;
 	--muted: #6b7383;
+	/* data caution (not a status): a value rests on less data than its neighbours */
+	--caution: #e6cf45;
 
 	/* ---- soft status fills (badges, issue rows, notices) ---- */
 	--ok-soft: color-mix(in srgb, var(--ok) 14%, transparent);
@@ -149,6 +151,7 @@
 	--bad: #b3353a;
 	--info: #3d5f95;
 	--muted: #7c818c;
+	--caution: #8f7400;
 	--data: #3d5f95;
 	--track: #e8e6de;
 	--score-1: #b3353a;
@@ -200,6 +203,8 @@
 		--bad: #b3353a;
 		--info: #3d5f95;
 		--muted: #7c818c;
+		--caution: #8f7400;
+		--caution: #8f7400;
 		--data: #3d5f95;
 		--track: #e8e6de;
 		--score-1: #b3353a;

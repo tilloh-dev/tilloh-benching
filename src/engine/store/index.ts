@@ -1,6 +1,6 @@
 import { join } from 'node:path';
 import type { Attempt, RunRecord } from '../core/schema.ts';
-import type { AttemptRow, RunRow } from '../core/rows.ts';
+import { combinedScore, judgeScoresOf, type AttemptRow, type RunRow } from '../core/rows.ts';
 import { runDir, type Workspace } from '../core/workspace.ts';
 import { exists, listDirs, readJsonOr } from '../util/fs.ts';
 import { listRunIds, readRun } from './runs.ts';
@@ -90,6 +90,9 @@ async function scanRunAttempts(ws: Workspace, runId: string): Promise<Attempt[]>
 export function toAttemptRow(a: Attempt, run?: RunRecord): AttemptRow {
 	const bp = run?.blueprints[a.blueprint_id]?.blueprint;
 	const thumb = a.evidence.find((e) => e.kind === 'image');
+	const judges = judgeScoresOf(a);
+	const human = a.human?.score ?? null;
+	const judgeMean = combinedScore(judges, null);
 	return {
 		id: a.id,
 		run_id: a.run_id,
@@ -101,13 +104,16 @@ export function toAttemptRow(a: Attempt, run?: RunRecord): AttemptRow {
 		rep: a.rep,
 		stage: a.stage,
 		status: a.status,
-		score: a.judgement?.score ?? null,
-		gate_failed: a.judgement?.gate_failed ?? false,
-		human_score: a.human?.score ?? null,
+		score: combinedScore(judges, human),
+		judge_score: judgeMean,
+		judge_scores: judges,
+		gate_failed: judges.some((j) => j.gate_failed),
+		human_score: human,
 		judge: a.judgement?.judge ?? null,
 		latency_ms: a.metrics.latency_ms ?? null,
 		ttft_ms: a.metrics.ttft_ms ?? null,
 		gen_tps: a.metrics.gen_tps ?? null,
+		tps_source: a.metrics.gen_tps === undefined ? null : (a.metrics.tps_source ?? 'server'),
 		completion_tokens: a.metrics.completion_tokens ?? null,
 		cost_usd: a.metrics.cost_usd ?? null,
 		thumbnail: thumb ? `${a.id}/${thumb.path}` : null,
@@ -120,7 +126,7 @@ const GENERATED_STAGES = new Set(['generated', 'checking', 'checked', 'judging',
 
 export function toRunRow(r: RunRecord, attempts: Attempt[]): RunRow {
 	const scores = attempts
-		.map((a) => a.judgement?.score)
+		.map((a) => combinedScore(judgeScoresOf(a), a.human?.score ?? null))
 		.filter((s): s is number => typeof s === 'number');
 	return {
 		id: r.id,
@@ -132,7 +138,8 @@ export function toRunRow(r: RunRecord, attempts: Attempt[]): RunRow {
 		blueprints: r.spec.blueprints,
 		tests: r.spec.tests,
 		repetitions: r.spec.repetitions,
-		judge: r.judge.kind === 'claude' ? `claude:${r.judge.model ?? ''}` : r.judge.kind,
+		judge:
+			r.judge.label ?? (r.judge.kind === 'claude' ? `claude:${r.judge.model ?? ''}` : r.judge.kind),
 		legacy: !!r.legacy,
 		counts: {
 			total: attempts.length,

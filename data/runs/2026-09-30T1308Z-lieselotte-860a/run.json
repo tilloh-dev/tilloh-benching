@@ -32,7 +32,9 @@
 	"judge": {
 		"kind": "claude",
 		"model": "claude-opus-5-5",
-		"effort": "xhigh"
+		"effort": "xhigh",
+		"profile": "opus-xhigh",
+		"label": "Opus 5.5 · xhigh"
 	},
 	"blueprints": {
 		"claude-sonnet-agentic": {

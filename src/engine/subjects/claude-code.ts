@@ -1,7 +1,8 @@
 import { cp, mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { runClaude } from '../util/claude.ts';
+import { runClaude, type ClaudeJson } from '../util/claude.ts';
+import { computeTps } from './tps.ts';
 import { SubjectError, type GenerateRequest, type GenerateResult, type Subject } from './types.ts';
 
 const AGENTIC_TOOLS = ['Read', 'Write', 'Edit', 'Glob', 'Grep', 'Bash'];
@@ -75,6 +76,7 @@ export class ClaudeCodeSubject implements Subject {
 					reasoning_tokens: j.usage?.output_tokens_details?.thinking_tokens,
 					cost_usd: j.total_cost_usd,
 					num_turns: j.num_turns,
+					...claudeTps(j),
 					finish_reason: j.terminal_reason ?? j.subtype
 				}
 			};
@@ -82,4 +84,15 @@ export class ClaudeCodeSubject implements Subject {
 			await rm(cwd, { recursive: true, force: true });
 		}
 	}
+}
+
+/**
+ * claude -p reports no speed. API time excludes tool runs; with a single turn
+ * the time to first token is taken off as well. Multi-turn values stay rough.
+ */
+function claudeTps(j: ClaudeJson) {
+	const api = j.duration_api_ms ?? j.duration_ms;
+	if (!api) return {};
+	const genMs = (j.num_turns ?? 1) <= 1 && j.ttft_ms && api > j.ttft_ms ? api - j.ttft_ms : api;
+	return computeTps({ tokens: j.usage?.output_tokens, chars: j.result?.length, genMs });
 }

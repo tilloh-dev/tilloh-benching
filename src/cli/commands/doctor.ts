@@ -134,7 +134,10 @@ export default async function doctor(args: string[]): Promise<number> {
 
 	const lib = await engine.library();
 	const envs = new Set(
-		[...lib.blueprints.values()].map((b) => b.endpoint?.api_key_env).filter((x): x is string => !!x)
+		[
+			...[...lib.blueprints.values()].map((b) => b.endpoint?.api_key_env),
+			...[...lib.judges.values()].map((j) => j.endpoint?.api_key_env)
+		].filter((x): x is string => !!x)
 	);
 	for (const env of envs)
 		add(

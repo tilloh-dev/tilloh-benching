@@ -37,6 +37,8 @@ export type ClaudeJson = {
 	result?: string;
 	structured_output?: unknown;
 	duration_ms?: number;
+	/** Time spent waiting on the model API, without tool execution. */
+	duration_api_ms?: number;
 	ttft_ms?: number;
 	num_turns?: number;
 	total_cost_usd?: number;

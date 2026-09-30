@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { leaderboard, type LeaderRow, type ScoreSource } from '$engine/core/rows.ts';
+	import { SvelteSet } from 'svelte/reactivity';
+	import { leaderboard, type LeaderRow } from '$engine/core/rows.ts';
 	import type { Win } from '../os/wm.svelte.ts';
 	import { wm } from '../os/wm.svelte.ts';
 	import { benchy } from '../data/store.svelte.ts';
@@ -15,7 +16,9 @@
 	let { win: _win }: { win: Win } = $props();
 
 	let view = $state('ranking');
-	let source = $state<ScoreSource>('judge');
+	/** Entries whose per-judge subrows are open. */
+	const expanded = new SvelteSet<string>();
+	let warnTip = $state<{ row: LeaderRow; x: number; y: number } | null>(null);
 	let split = $state(false);
 	let suite = $state('');
 	let run = $state('');
@@ -39,10 +42,25 @@
 		leaderboard(benchy.attempts, {
 			tests: suite ? suites.find((s) => s.id === suite)?.tests : undefined,
 			runs: run ? [run] : undefined,
-			splitVersions: split,
-			source
+			splitVersions: split
 		})
 	);
+	const baseline = $derived(
+		board.rows.reduce<LeaderRow | null>(
+			(best, r) => (!best || r.judge_count > best.judge_count ? r : best),
+			null
+		)
+	);
+
+	function toggle(e: Event, row: LeaderRow) {
+		e.stopPropagation();
+		if (expanded.has(row.key)) expanded.delete(row.key);
+		else expanded.add(row.key);
+	}
+
+	function judgeLabel(id: string): string {
+		return benchy.library?.judges.find((j) => j.profile.id === id)?.profile.label ?? id;
+	}
 	const scored = $derived(board.rows.filter((r) => r.overall.mean !== null));
 
 	function openCell(row: LeaderRow, test: string) {
@@ -90,14 +108,6 @@
 		<option value="">All runs</option>
 		{#each benchy.runs as r (r.id)}<option value={r.id}>{r.label ?? r.id}</option>{/each}
 	</select>
-	<Segmented
-		options={[
-			{ id: 'judge', label: 'Judge' },
-			{ id: 'human', label: 'Human' },
-			{ id: 'blend', label: 'Blend' }
-		]}
-		bind:value={source}
-	/>
 	<Toggle bind:checked={split} label="Split versions" />
 </Toolbar>
 
@@ -112,7 +122,8 @@
 				<tr>
 					<th class="num">#</th>
 					<th>Blueprint</th>
-					<th>Score</th>
+					<th title="Mean of every judge profile's score and yours">Score</th>
+					<th class="num" title="Distinct judge profiles that scored this entry">Judges</th>
 					<th class="num">Coverage</th>
 					<th class="num">Attempts</th>
 					<th class="num">Gates</th>
@@ -123,16 +134,34 @@
 			</thead>
 			<tbody>
 				{#each board.rows as r, i (r.key)}
+					{@const open = expanded.has(r.key)}
 					<tr class="clickable" onclick={() => showInMatrix(r)}>
 						<td class="num rank"
 							>{#if r.overall.mean !== null}<span class:top={i === 0}>{i + 1}</span>{/if}</td
 						>
 						<td>
 							<div class="row">
+								{#if r.sources.length}
+									<button
+										class="expander"
+										aria-expanded={open}
+										aria-label={open ? 'Hide single ratings' : 'Show single ratings'}
+										onclick={(e) => toggle(e, r)}>{open ? '▾' : '▸'}</button
+									>
+								{:else}<span class="expander"></span>{/if}
 								<b class="ellipsis bp">{r.label}</b>
 								<Kind kind={r.kind} />
 								{#if r.blueprint_hash}<span class="mono hash">{r.blueprint_hash.slice(0, 7)}</span
 									>{/if}
+								{#if r.missing_judges.length}
+									<span
+										class="caution"
+										role="img"
+										aria-label="fewer judge runs than the baseline"
+										onmouseenter={(e) => (warnTip = { row: r, x: e.clientX, y: e.clientY })}
+										onmouseleave={() => (warnTip = null)}>▲</span
+									>
+								{/if}
 							</div>
 						</td>
 						<td
@@ -142,18 +171,64 @@
 								width={120}
 							/></td
 						>
+						<td class="num" class:caution-text={r.missing_judges.length > 0}>{r.judge_count}</td>
 						<td class="num">{Math.round(r.coverage * 100)}%</td>
 						<td class="num">{r.attempts}</td>
 						<td class="num" class:bad={r.gates_failed > 0}>{r.gates_failed || ''}</td>
-						<td class="num">{fmtNum(r.mean_gen_tps)}</td>
+						<td
+							class="num"
+							title={r.tps_approx
+								? 'computed from tokens and timing, not reported by the server'
+								: ''}
+							>{r.tps_approx && r.mean_gen_tps !== null ? '~' : ''}{fmtNum(r.mean_gen_tps)}</td
+						>
 						<td class="num"
 							>{fmtDuration(r.mean_latency_ms ? Math.round(r.mean_latency_ms) : null)}</td
 						>
 						<td class="num">{fmtCost(r.total_cost_usd)}</td>
 					</tr>
+					{#if open}
+						{#each r.sources as src (src.id)}
+							<tr class="sub">
+								<td></td>
+								<td>
+									<div class="row">
+										<span class="expander">└</span>
+										<span class="ellipsis" class:you={src.human}
+											>{src.human ? 'you' : src.label}</span
+										>
+										{#if !src.human}<span class="mono hash">{src.id}</span>{/if}
+									</div>
+								</td>
+								<td><Score value={src.overall.mean} width={120} /></td>
+								<td></td>
+								<td class="num"
+									>{board.tests.length
+										? Math.round((Object.keys(src.per_test).length / board.tests.length) * 100)
+										: 0}%</td
+								>
+								<td class="num">{src.attempts}</td>
+								<td colspan="4"></td>
+							</tr>
+						{/each}
+					{/if}
 				{/each}
 			</tbody>
 		</table>
+		{#if warnTip && baseline}
+			<div class="tip" style="left:{warnTip.x + 14}px; top:{warnTip.y + 14}px">
+				<b class="caution-text">▲ Fewer judge runs</b><br />
+				<b>{warnTip.row.label}</b> was scored by {warnTip.row.judge_count} judge profile{warnTip.row
+					.judge_count === 1
+					? ''
+					: 's'}; <b>{baseline.label}</b>, the best-covered entry, by {baseline.judge_count}. Its
+				score averages fewer opinions, so it is not fully comparable.<br />
+				<span class="muted"
+					>Missing: {warnTip.row.missing_judges.map(judgeLabel).join(', ')}. Judge its attempts with
+					those profiles to close the gap.</span
+				>
+			</div>
+		{/if}
 	{:else if view === 'matrix'}
 		<div class="matrix" style="--cols:{board.tests.length}">
 			<div class="corner"></div>
@@ -203,6 +278,10 @@
 				<b>{hover.row.label}</b> × {benchy.testTitle(hover.test)}<br />
 				mean <b>{c.mean}</b>{#if c.n > 1}
 					± {c.stddev} (n={c.n}, {c.min}–{c.max}){/if}<br />
+				{#each hover.row.sources.filter((x) => x.per_test[hover!.test]) as src (src.id)}
+					<span class="muted">{src.human ? 'you' : src.label}</span>
+					<b>{src.per_test[hover.test].mean}</b><br />
+				{/each}
 				<span class="muted"
 					>{Object.entries(c.statuses)
 						.map(([k, v]) => `${v} ${k}`)
@@ -301,6 +380,34 @@
 	.bad {
 		color: var(--bad);
 		font-weight: var(--fw-strong);
+	}
+	.expander {
+		display: inline-grid;
+		place-items: center;
+		width: 2ch;
+		padding: 0;
+		border: 0;
+		background: none;
+		color: var(--fg-3);
+		font: inherit;
+		cursor: pointer;
+	}
+	.expander:hover {
+		color: var(--fg);
+	}
+	.caution {
+		color: var(--caution);
+		cursor: help;
+	}
+	.caution-text {
+		color: var(--caution);
+	}
+	tr.sub td {
+		color: var(--fg-2);
+		background: var(--sunken);
+	}
+	tr.sub .you {
+		color: var(--fg);
 	}
 
 	.matrix {

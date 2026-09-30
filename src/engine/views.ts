@@ -2,6 +2,7 @@ import { join } from 'node:path';
 import type {
 	AttemptDetail,
 	BlueprintEntry,
+	JudgeEntry,
 	LibraryPayload,
 	LlamaView,
 	StatusPayload,
@@ -41,10 +42,23 @@ export async function libraryPayload(engine: Engine): Promise<LibraryPayload> {
 			));
 		tests.push({ id, file, prompt, resolved, hashes: resolved ? testHashes(resolved) : null });
 	}
+	const judges: JudgeEntry[] = [];
+	for (const profile of lib.judges.values()) {
+		const env = profile.endpoint?.api_key_env;
+		judges.push({
+			profile,
+			builtin: !(await exists(join(engine.ws.judges, `${profile.id}.yaml`))),
+			default: profile.id === engine.settings.judge.default_profile,
+			key_set: env ? !!process.env[env] : null
+		});
+	}
 	return {
 		blueprints: blueprints.sort((a, b) => a.id.localeCompare(b.id)),
 		tests: tests.sort((a, b) => a.id.localeCompare(b.id)),
 		suites: [...lib.suites.values()].sort((a, b) => a.id.localeCompare(b.id)),
+		judges: judges.sort(
+			(a, b) => Number(b.default) - Number(a.default) || a.profile.id.localeCompare(b.profile.id)
+		),
 		issues: lib.issues,
 		checks: listChecks()
 	};
@@ -66,7 +80,11 @@ export async function statusPayload(
 		settings:
 			mode === 'live'
 				? {
-						judge: { model: engine.settings.judge.model, effort: engine.settings.judge.effort },
+						judge: {
+							model: engine.settings.judge.model,
+							effort: engine.settings.judge.effort,
+							default_profile: engine.settings.judge.default_profile
+						},
 						llama_port: engine.settings.llama.port
 					}
 				: null

@@ -19,6 +19,7 @@ BenchyOS looks like a terminal that grew a desktop: square, monospaced, compact,
 | Text | `--fg`, `--fg-2`, `--fg-3`, `--fg-4` | primary · secondary · labels and meta · disabled and placeholders |
 | Accent | `--accent`, `--accent-text`, `--accent-fg`, `--accent-soft` | see *Accent* below |
 | Status | `--ok`, `--warn`, `--bad`, `--info`, `--muted` | check and run states only |
+| Caution | `--caution` | yellow `▲` for a value that rests on less data than its neighbours (e.g. fewer judge profiles); always with a hover explanation |
 | Status fills | `--ok-soft`, `--warn-soft`, `--bad-soft`, `--info-soft` | background of status badges, issue rows, notices |
 | Identity hues | `--hue-1` … `--hue-8` | icons, blueprint kinds, chart series — what a thing *is*, never how it *went* |
 | Data | `--data`, `--track`, `--score-1` … `--score-5` | bars and charts · empty meter · score scale |

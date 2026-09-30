@@ -11,6 +11,7 @@ import type {
 	ChecksFile,
 	HostInfo,
 	HumanRating,
+	JudgeProfile,
 	Judgement,
 	RunRecord,
 	Suite,
@@ -38,10 +39,20 @@ export type TestEntry = {
 
 export type CheckInfo = { id: string; description: string; kinds: string[] };
 
+export type JudgeEntry = {
+	profile: JudgeProfile;
+	/** Built in (no YAML yet); saving it writes library/judges/<id>.yaml. */
+	builtin: boolean;
+	default: boolean;
+	/** Whether the API key the profile needs is set; null when it needs none. */
+	key_set: boolean | null;
+};
+
 export type LibraryPayload = {
 	blueprints: BlueprintEntry[];
 	tests: TestEntry[];
 	suites: Suite[];
+	judges: JudgeEntry[];
 	issues: LibraryIssue[];
 	checks: CheckInfo[];
 };
@@ -87,7 +98,10 @@ export type StatusPayload = {
 	app: { name: 'benchy'; version: string; mode: 'live' | 'static'; exported_at?: string };
 	host: HostInfo;
 	engine: EngineStatus | null;
-	settings: { judge: { model: string; effort: string }; llama_port: number } | null;
+	settings: {
+		judge: { model: string; effort: string; default_profile: string };
+		llama_port: number;
+	} | null;
 };
 
 export type IndexPayload = {
@@ -97,3 +111,12 @@ export type IndexPayload = {
 };
 
 export type RunDetail = { run: RunRecord; attempts: AttemptRow[] };
+
+export type SecretInfo = {
+	name: string;
+	set: boolean;
+	/** Where the current value comes from: the .env file, or the environment BenchyOS started in. */
+	source: 'env-file' | 'environment' | null;
+	/** Blueprints and judge profiles that read this key. */
+	used_by: string[];
+};

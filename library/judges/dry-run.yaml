@@ -1,0 +1,4 @@
+id: dry-run
+label: Dry-run judge
+description: Deterministic scores derived from the automated checks. No model, no cost.
+kind: dry-run

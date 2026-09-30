@@ -10,6 +10,7 @@ export type Workspace = {
 	blueprints: string;
 	tests: string;
 	suites: string;
+	judges: string;
 	data: string;
 	runs: string;
 	cache: string;
@@ -28,6 +29,7 @@ export function workspaceAt(root: string): Workspace {
 		blueprints: join(library, 'blueprints'),
 		tests: join(library, 'tests'),
 		suites: join(library, 'suites'),
+		judges: join(library, 'judges'),
 		data,
 		runs: join(data, 'runs'),
 		cache: join(data, '.cache'),

@@ -7,9 +7,9 @@ import type {
 	Attempt,
 	BenchTest,
 	ChecksFile,
-	Effort,
 	JudgeIdentity,
 	JudgeMode,
+	JudgeProfile,
 	Judgement,
 	Verdict as VerdictType
 } from '../core/schema.ts';
@@ -23,21 +23,26 @@ import { nowIso, sleep } from '../util/time.ts';
 import { mimeFor } from '../checks/browser.ts';
 import { CHARTER, CHARTER_VERSION, judgePrompt, verdictSchema } from './charter.ts';
 import { buildJudgeWorkspace } from './workspace.ts';
+import { judgeViaChat } from './openai.ts';
 import { createHash } from 'node:crypto';
 
-export type JudgeConfig = {
-	kind: 'claude' | 'dry-run';
-	model: string;
-	effort?: Effort;
-	mode_override?: JudgeMode;
-};
+/** A judge profile plus an optional per-call depth override. */
+export type JudgeConfig = { profile: JudgeProfile; mode_override?: JudgeMode };
+
+export function judgeMode(cfg: JudgeConfig, test: BenchTest): JudgeMode {
+	// Only claude -p can drive a browser; every other judge reads files and screenshots.
+	if (cfg.profile.kind !== 'claude') return 'static';
+	return cfg.mode_override ?? cfg.profile.mode ?? test.judge.mode;
+}
 
 export function judgeIdentity(cfg: JudgeConfig, test: BenchTest): JudgeIdentity {
+	const p = cfg.profile;
 	return {
-		kind: cfg.kind,
-		model: cfg.kind === 'dry-run' ? 'dry-run' : cfg.model,
-		effort: cfg.kind === 'dry-run' ? undefined : cfg.effort,
-		mode: cfg.mode_override ?? test.judge.mode,
+		kind: p.kind,
+		profile_id: p.id,
+		model: p.kind === 'dry-run' ? 'dry-run' : (p.model ?? ''),
+		effort: p.kind === 'claude' ? p.effort : undefined,
+		mode: judgeMode(cfg, test),
 		charter_version: CHARTER_VERSION
 	};
 }
@@ -46,9 +51,17 @@ export function judgeFingerprint(identity: JudgeIdentity, rubricHash: string): s
 	return hashOf({ ...identity, rubric_hash: rubricHash }, 10);
 }
 
-export function judgeLabel(identity: JudgeIdentity): string {
+export function judgeLabel(identity: JudgeIdentity, profile?: JudgeProfile): string {
+	if (profile?.label) return `${profile.label}·${identity.mode}`;
 	if (identity.kind === 'dry-run') return 'dry-run';
 	return `${identity.model}${identity.effort ? `@${identity.effort}` : ''}·${identity.mode}`;
+}
+
+/** Profile id of a stored judgement; older judgements predate profiles. */
+export function profileIdOf(identity: JudgeIdentity): string {
+	if (identity.profile_id) return identity.profile_id;
+	if (identity.kind === 'dry-run') return 'dry-run';
+	return `${identity.model}${identity.effort ? `@${identity.effort}` : ''}`;
 }
 
 /** Serves the submission read-only on 127.0.0.1 for the interactive judge's browser. */
@@ -142,7 +155,7 @@ export async function judgeAttempt(input: JudgeInput): Promise<Judgement> {
 		created_at: nowIso()
 	};
 	if (identity.kind === 'dry-run') {
-		const verdict = dryRunVerdict(input.test, input.attempt, input.checks);
+		const verdict = dryRunVerdict(input.test, input.attempt, input.checks, input.config.profile.id);
 		return {
 			...base,
 			duration_ms: Math.round(performance.now() - started),
@@ -158,6 +171,32 @@ export async function judgeAttempt(input: JudgeInput): Promise<Judgement> {
 		test: input.test,
 		checks: input.checks
 	});
+	if (identity.kind === 'openai-compatible') {
+		try {
+			const r = await judgeViaChat({
+				dir: jw.dir,
+				profile: input.config.profile,
+				test: input.test,
+				hasReasoning: jw.hasReasoning,
+				signal: input.signal,
+				timeoutMs: input.settings.judge.timeout_s * 1000
+			});
+			const common = {
+				...base,
+				duration_ms: Math.round(performance.now() - started),
+				cost_usd: r.cost_usd,
+				usage: r.usage
+			};
+			if (r.error || !r.verdict) return { ...common, error: r.error ?? 'no verdict' };
+			return {
+				...common,
+				verdict: r.verdict,
+				...scoreVerdict(input.test.judge.criteria, r.verdict)
+			};
+		} finally {
+			await jw.cleanup();
+		}
+	}
 	let served: { server: Server; url: string } | null = null;
 	try {
 		const interactive = identity.mode === 'interactive';
@@ -244,7 +283,8 @@ export async function judgeAttempt(input: JudgeInput): Promise<Judgement> {
 export function dryRunVerdict(
 	test: BenchTest,
 	attempt: Attempt,
-	checks: ChecksFile | null
+	checks: ChecksFile | null,
+	profileId = 'dry-run'
 ): VerdictType {
 	const base =
 		{ ok: 8, warnings: 6.5, broken: 3.5, failed: 0 }[
@@ -253,7 +293,7 @@ export function dryRunVerdict(
 	const criteria = test.judge.criteria.map((c) => {
 		const h = parseInt(
 			createHash('sha256')
-				.update(`${attempt.blueprint_id}:${attempt.test_id}:${attempt.rep}:${c.id}`)
+				.update(`${profileId}:${attempt.blueprint_id}:${attempt.test_id}:${attempt.rep}:${c.id}`)
 				.digest('hex')
 				.slice(0, 6),
 			16

@@ -7,7 +7,8 @@ import type {
 	BenchTest,
 	Blueprint,
 	HumanRating,
-	JudgeKind,
+	JudgeMode,
+	JudgeProfile,
 	RunRecord,
 	RunSpec
 } from '../core/schema.ts';
@@ -19,6 +20,7 @@ import { kindForPath } from '../core/kinds.ts';
 import { sha256 } from '../core/hash.ts';
 import { scoreHuman } from '../core/scoring.ts';
 import { ResultIndex, toAttemptRow, toRunRow } from '../store/index.ts';
+import { judgeScoresOf } from '../core/rows.ts';
 import {
 	dirOfAttempt,
 	readAttempt,
@@ -218,15 +220,60 @@ export class Engine extends EventEmitter<{ event: [EngineEvent] }> {
 
 	// ------------------------------------------------------------ run lifecycle
 
-	#judgeConfig(spec: RunSpec): RunRecord['judge'] {
-		const kind: JudgeKind = spec.judge?.kind ?? 'claude';
-		if (kind !== 'claude') return { kind };
+	/**
+	 * Resolves who judges a run: an explicit profile, "none"/"dry-run" by kind, an
+	 * ad-hoc claude model from the CLI, or the default profile.
+	 */
+	#resolveJudge(lib: Library, spec: RunSpec): JudgeProfile | null {
+		const j = spec.judge ?? {};
+		if (j.kind === 'none') return null;
+		if (j.profile) {
+			const p = lib.judges.get(j.profile);
+			if (!p) throw new Error(`unknown judge profile: ${j.profile}`);
+			return p;
+		}
+		if (j.kind === 'dry-run')
+			return lib.judges.get('dry-run') ?? { id: 'dry-run', kind: 'dry-run' };
+		if (j.model || j.effort) {
+			const model = j.model ?? this.settings.judge.model;
+			const effort = j.effort ?? this.settings.judge.effort;
+			const known = [...lib.judges.values()].find(
+				(p) => p.kind === 'claude' && p.model === model && p.effort === effort && !p.mode
+			);
+			return known ?? { id: `${model}@${effort}`, kind: 'claude', model, effort };
+		}
+		const id = this.settings.judge.default_profile;
+		const p = lib.judges.get(id);
+		if (!p) throw new Error(`default judge profile not found: ${id}`);
+		return p;
+	}
+
+	#judgeRecord(profile: JudgeProfile | null, spec: RunSpec): RunRecord['judge'] {
+		if (!profile) return { kind: 'none' };
 		return {
-			kind,
-			model: spec.judge?.model ?? this.settings.judge.model,
-			effort: spec.judge?.effort ?? this.settings.judge.effort,
-			mode_override: spec.judge?.mode_override ?? this.settings.judge.mode_override
+			kind: profile.kind,
+			profile: profile.id,
+			label: profile.label ?? profile.id,
+			model: profile.model,
+			effort: profile.effort,
+			mode_override: spec.judge?.mode_override ?? this.settings.judge.mode_override,
+			snapshot: profile
 		};
+	}
+
+	/** The profile a stored run judges with; runs from before profiles are reconstructed. */
+	#profileOf(lib: Library, run: RunRecord): JudgeProfile | null {
+		const j = run.judge;
+		if (j.kind === 'none') return null;
+		if (j.profile) return lib.judges.get(j.profile) ?? j.snapshot ?? null;
+		if (j.kind === 'dry-run')
+			return lib.judges.get('dry-run') ?? { id: 'dry-run', kind: 'dry-run' };
+		const model = j.model ?? this.settings.judge.model;
+		const effort = j.effort ?? this.settings.judge.effort;
+		const known = [...lib.judges.values()].find(
+			(p) => p.kind === 'claude' && p.model === model && p.effort === effort && !p.mode
+		);
+		return known ?? { id: `${model}@${effort}`, kind: 'claude', model, effort };
 	}
 
 	async preflight(spec: RunSpec): Promise<PreflightReport> {
@@ -236,7 +283,7 @@ export class Engine extends EventEmitter<{ event: [EngineEvent] }> {
 			settings: this.settings,
 			blueprints,
 			tests,
-			judge: this.#judgeConfig(spec).kind,
+			judge: this.#resolveJudge(lib, spec),
 			llama: this.llama,
 			llamaBusy: this.#llamaBusy
 		});
@@ -272,7 +319,7 @@ export class Engine extends EventEmitter<{ event: [EngineEvent] }> {
 				repetitions
 			},
 			host: await hostInfo(this.settings.host.name),
-			judge: this.#judgeConfig(spec),
+			judge: this.#judgeRecord(this.#resolveJudge(lib, spec), spec),
 			blueprints: Object.fromEntries(
 				blueprints.map((b) => [b.id, { hash: blueprintHash(b), blueprint: b }])
 			),
@@ -599,6 +646,7 @@ export class Engine extends EventEmitter<{ event: [EngineEvent] }> {
 			delete x.error;
 			delete x.checks;
 			delete x.judgement;
+			delete x.judgements;
 			delete x.judge_error;
 			delete x.human;
 		});
@@ -707,12 +755,15 @@ export class Engine extends EventEmitter<{ event: [EngineEvent] }> {
 		}
 		if (signal.aborted || !a) return;
 		if ((a.stage === 'checked' || a.stage === 'judging') && run.judge.kind !== 'none') {
-			const cfg: JudgeConfig = {
-				kind: run.judge.kind,
-				model: run.judge.model ?? this.settings.judge.model,
-				effort: run.judge.effort,
-				mode_override: run.judge.mode_override
-			};
+			const profile = this.#profileOf(await this.library(), run);
+			if (!profile) {
+				await this.#patch(a.id, (x) => {
+					x.stage = 'checked';
+					x.judge_error = `judge profile not found: ${run.judge.profile}`;
+				});
+				return;
+			}
+			const cfg: JudgeConfig = { profile, mode_override: run.judge.mode_override };
 			await this.#judgeOne(run, a, cfg, run.tests[a.test_id], signal);
 		}
 	}
@@ -767,7 +818,7 @@ export class Engine extends EventEmitter<{ event: [EngineEvent] }> {
 				await this.#patch(a.id, (x) => {
 					x.stage = 'judging';
 				});
-				const label = judgeLabel(judgeIdentity(cfg, snap.test));
+				const label = judgeLabel(judgeIdentity(cfg, snap.test), cfg.profile);
 				this.log(run.id, 'info', `judge ${a.blueprint_id} × ${a.test_id} #${a.rep} (${label})`);
 				const dir = attemptDir(this.ws, run.id, a.blueprint_id, a.test_id, a.rep);
 				const j = await judgeAttempt({
@@ -790,13 +841,23 @@ export class Engine extends EventEmitter<{ event: [EngineEvent] }> {
 					} else {
 						x.stage = 'judged';
 						delete x.judge_error;
-						x.judgement = {
+						const summary = {
 							fingerprint: j.fingerprint,
+							profile_id: cfg.profile.id,
+							profile_label: cfg.profile.label ?? cfg.profile.id,
 							score: j.score,
 							gate_failed: !!j.gate_failed,
 							judged_at: j.created_at,
 							judge: label
 						};
+						// Attempts judged before profiles existed keep their one verdict as a vote.
+						const legacy = !x.judgements && judgeScoresOf(x)[0];
+						x.judgements = {
+							...(legacy && x.judgement ? { [legacy.profile]: x.judgement } : {}),
+							...x.judgements,
+							[cfg.profile.id]: summary
+						};
+						x.judgement = summary;
 					}
 					x.finished_at = nowIso();
 				});
@@ -814,7 +875,7 @@ export class Engine extends EventEmitter<{ event: [EngineEvent] }> {
 	 */
 	async rejudge(
 		ids: string[],
-		override: Partial<JudgeConfig> = {},
+		override: { profile?: string; mode_override?: JudgeMode } = {},
 		rubric: 'current' | 'snapshot' = 'current'
 	): Promise<void> {
 		if (!this.exclusive) throw new Error('this engine is read-only');
@@ -830,16 +891,12 @@ export class Engine extends EventEmitter<{ event: [EngineEvent] }> {
 			if (rubric === 'current' && lib.tests.has(a.test_id))
 				test = { ...snap.test, judge: lib.tests.get(a.test_id)!.judge };
 			const hashes = testHashes(test);
+			const profile = override.profile
+				? lib.judges.get(override.profile)
+				: (this.#profileOf(lib, run) ?? lib.judges.get(this.settings.judge.default_profile));
+			if (!profile) throw new Error(`unknown judge profile: ${override.profile}`);
 			const cfg: JudgeConfig = {
-				kind:
-					override.kind ??
-					(run.judge.kind === 'none'
-						? 'claude'
-						: run.judge.kind === 'dry-run'
-							? 'dry-run'
-							: 'claude'),
-				model: override.model ?? run.judge.model ?? this.settings.judge.model,
-				effort: override.effort ?? run.judge.effort ?? this.settings.judge.effort,
+				profile,
 				mode_override: override.mode_override ?? run.judge.mode_override
 			};
 			await this.#judgeOne(

@@ -250,6 +250,8 @@ export const Settings = z.strictObject({
 		.optional(),
 	judge: z
 		.strictObject({
+			/** Judge profile used when a run names none. */
+			default_profile: Id.optional(),
 			model: z.string().optional(),
 			effort: Effort.optional(),
 			claude_bin: z.string().optional(),
@@ -284,6 +286,46 @@ export const Settings = z.strictObject({
 });
 export type SettingsFile = z.infer<typeof Settings>;
 
+// ---------------------------------------------------------------- judge profiles
+
+export const JUDGE_PROFILE_KINDS = ['claude', 'openai-compatible', 'dry-run'] as const;
+
+/** library/judges/<id>.yaml — who judges, with which model and settings. */
+export const JudgeProfileFile = z
+	.strictObject({
+		id: Id,
+		label: z.string().optional(),
+		description: z.string().optional(),
+		kind: z.enum(JUDGE_PROFILE_KINDS),
+		/** claude: model alias or id; openai-compatible: the provider's model name. */
+		model: z.string().min(1).optional(),
+		effort: Effort.optional(),
+		/** Force static or interactive for every test (interactive needs kind claude). */
+		mode: JudgeMode.optional(),
+		endpoint: z
+			.strictObject({
+				base_url: z.string().url(),
+				api_key_env: z.string().optional(),
+				headers: z.record(z.string(), z.string()).optional()
+			})
+			.optional(),
+		/** Merged into the chat request (openai-compatible), e.g. temperature or reasoning. */
+		request: JsonObject.optional(),
+		/** openai-compatible: attach screenshots as images (needs a vision model). Default true. */
+		images: z.boolean().optional(),
+		/** openai-compatible: max characters of submission text sent. Default 120000. */
+		max_chars: z.number().int().positive().optional()
+	})
+	.superRefine((p, ctx) => {
+		if (p.kind !== 'dry-run' && !p.model)
+			ctx.addIssue({ code: 'custom', message: 'model is required' });
+		if (p.kind === 'openai-compatible' && !p.endpoint)
+			ctx.addIssue({ code: 'custom', message: 'openai-compatible judges need endpoint' });
+		if (p.kind === 'openai-compatible' && p.mode === 'interactive')
+			ctx.addIssue({ code: 'custom', message: 'interactive judging needs kind claude' });
+	});
+export type JudgeProfile = z.infer<typeof JudgeProfileFile>;
+
 // ---------------------------------------------------------------- runs & attempts
 
 export const CHECK_STATUSES = ['ok', 'warnings', 'broken', 'failed'] as const;
@@ -310,7 +352,7 @@ export const ATTEMPT_STAGES = [
 ] as const;
 export type AttemptStage = (typeof ATTEMPT_STAGES)[number];
 
-export const JUDGE_KINDS = ['claude', 'dry-run', 'none'] as const;
+export const JUDGE_KINDS = ['claude', 'openai-compatible', 'dry-run', 'none'] as const;
 export type JudgeKind = (typeof JUDGE_KINDS)[number];
 
 export const RunSpec = z.strictObject({
@@ -322,6 +364,9 @@ export const RunSpec = z.strictObject({
 	repetitions: z.number().int().positive().max(50).optional(),
 	judge: z
 		.strictObject({
+			/** Judge profile id (library/judges). Default: settings judge.default_profile. */
+			profile: Id.optional(),
+			/** "none" skips judging for this run. */
 			kind: z.enum(JUDGE_KINDS).optional(),
 			model: z.string().optional(),
 			effort: Effort.optional(),
@@ -346,6 +391,8 @@ export type Metrics = {
 	cost_usd?: number;
 	num_turns?: number;
 	finish_reason?: string;
+	/** Where gen_tps comes from: the server's timings, computed from usage and timing, or estimated from text length. */
+	tps_source?: 'server' | 'computed' | 'estimated';
 };
 
 export type ArtifactRef = {
@@ -393,6 +440,9 @@ export type ChecksFile = {
 
 export type JudgeSummary = {
 	fingerprint: string;
+	/** Judge profile that produced it; older data falls back to a derived id. */
+	profile_id?: string;
+	profile_label?: string;
 	score: number;
 	gate_failed: boolean;
 	judged_at: string;
@@ -427,7 +477,10 @@ export type Attempt = {
 	extraction?: { method: string; notes: string[] };
 	evidence: EvidenceRef[];
 	checks?: { status: CheckStatus; failed: string[]; warned: string[] };
+	/** Latest judgement overall (kept for older readers). */
 	judgement?: JudgeSummary;
+	/** Latest successful judgement per judge profile — the basis of the combined score. */
+	judgements?: Record<string, JudgeSummary>;
 	judge_error?: string;
 	human?: { score: number | null; rated_at: string };
 };
@@ -477,7 +530,16 @@ export type RunRecord = {
 	status: RunStatus;
 	spec: RunSpec & { repetitions: number };
 	host: HostInfo;
-	judge: { kind: JudgeKind; model?: string; effort?: Effort; mode_override?: JudgeMode };
+	judge: {
+		kind: JudgeKind;
+		profile?: string;
+		label?: string;
+		model?: string;
+		effort?: Effort;
+		mode_override?: JudgeMode;
+		/** The profile as it was when the run was created, used if it is later deleted. */
+		snapshot?: JudgeProfile;
+	};
 	blueprints: Record<string, BlueprintSnapshot>;
 	tests: Record<string, TestSnapshot>;
 	llama?: LlamaRunInfo;
@@ -510,7 +572,8 @@ export const Verdict = z.object({
 export type Verdict = z.infer<typeof Verdict>;
 
 export type JudgeIdentity = {
-	kind: 'claude' | 'dry-run';
+	kind: 'claude' | 'openai-compatible' | 'dry-run';
+	profile_id?: string;
 	model: string;
 	effort?: Effort;
 	mode: JudgeMode;

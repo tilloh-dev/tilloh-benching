@@ -1,0 +1,7 @@
+id: haiku-quick
+label: Haiku · quick check
+description: Cheap sanity pass before spending Opus limits. Always static.
+kind: claude
+model: haiku
+effort: low
+mode: static

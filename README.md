@@ -101,22 +101,35 @@ Relative model paths resolve against `llama.models_dir`, so one blueprint works 
 
 ## Judging
 
-The judge is `claude -p` with `claude-opus-5-5` at effort `xhigh` by default. Change the default in `benchy.config.yaml`, or per run with `--judge-model` and `--judge-effort`.
+A **judge profile** says who judges and how: `library/judges/<id>.yaml`, edited in the Judge app under **Profiles**. The default is `opus-xhigh`: `claude -p` with `claude-opus-5-5` at effort `xhigh`. Set another default with `judge.default_profile` in `benchy.config.yaml`.
+
+| Kind | Judges with | Depth |
+|---|---|---|
+| `claude` | `claude -p` on your subscription | per test: static or interactive |
+| `openai-compatible` | any `/chat/completions` API (OpenRouter, OpenAI, Ollama Cloud, vLLM …), key from `.env` | always static: code, check results and screenshots in one message |
+| `dry-run` | deterministic scores from the checks | no model, no cost |
 
 - **Isolated from your setup.** `--safe-mode` (static) or `--restricted` (interactive) with `--strict-mcp-config`: your CLAUDE.md, hooks, skills and MCP servers do not reach the judge.
 - **Blind.** It works in a neutral temp directory: task, criteria, submission, screenshots and check logs. Nothing names the model.
-- **Structured.** `--json-schema` forces a score, rationale and evidence per criterion. BenchyOS computes the 0–100 score from the weights. A `required` criterion below 5/10 fails the attempt's gate.
+- **Structured.** A JSON schema forces a score, rationale and evidence per criterion. BenchyOS computes the 0–100 score from the weights. A `required` criterion below 5/10 fails the attempt's gate.
 - **Two depths per test.** `static` reads code, screenshots and logs. `interactive` also drives the page with Playwright MCP and may run programs with sandboxed Bash. Interactive is more thorough and much slower.
+
+**One vote each.** An attempt's score is the mean of the latest score from every judge profile that scored it, plus your own rating from the attempt viewer's **Human** tab. The leaderboard ranks by that combined value. Expand an entry (▸) to see every judge's and your score as subrows. The entry with the most judge profiles sets the baseline. Entries judged by fewer profiles get a yellow ▲; hover it to see which profiles are missing.
 
 Re-judge anything without regenerating:
 
 ```bash
-./bin/benchy judge <run-id>                       # current rubric, default judge
-./bin/benchy judge <run-id> --judge-model haiku   # cheap sanity pass
-./bin/benchy criteria 09-violin-3d --write        # let Claude draft a rubric
+./bin/benchy judge <run-id>                         # the run's judge, current rubric
+./bin/benchy judge <run-id> --profile haiku-quick   # add a second opinion
+./bin/benchy run -s smoke -b my-model --judge-profile openrouter-example
+./bin/benchy criteria 09-violin-3d --write          # let Claude draft a rubric
 ```
 
-Rate attempts yourself in the attempt viewer's **Human** tab. The leaderboard can rank by judge, human or a blend. The Judge app shows where you and the judge disagree.
+The Judge app lists what the selected profile has not scored yet, and shows where you and the judges disagree.
+
+### API keys
+
+Set keys in BenchyOS under **Start → Settings**. They are written to `.env` in the BenchyOS root with file mode 600. BenchyOS refuses to write them if git does not ignore `.env` or tracks it. The UI and API only ever report a key's name, whether it is set and which blueprints and judges use it, never its value.
 
 ## Commands
 
@@ -124,10 +137,10 @@ Rate attempts yourself in the attempt viewer's **Human** tab. The leaderboard ca
 |---|---|
 | `benchy serve` | BenchyOS and API on localhost |
 | `benchy run -s <suite> -b <blueprint>…` | Run, with preflight; hands off to a running server |
-| `benchy judge <run\|attempt>…` | (Re-)judge stored attempts |
+| `benchy judge <run\|attempt>… [--profile <id>]` | (Re-)judge stored attempts, optionally with another judge profile |
 | `benchy resume <run> [--retry-failed]` | Continue an interrupted run; optionally regenerate failed attempts |
 | `benchy recheck <run\|attempt>…` | Re-run the automated checks (fresh screenshots and logs) |
-| `benchy list [blueprints\|tests\|suites\|runs\|checks]` | Show the library and library errors |
+| `benchy list [blueprints\|tests\|suites\|judges\|runs\|checks]` | Show the library and library errors |
 | `benchy criteria <test> [--write]` | Draft judge criteria with Claude |
 | `benchy import-preset <models.ini> [--strip-models-dir]` | Blueprints from a llama-server router preset; relative model paths make them portable |
 | `benchy import-legacy runs/ --preset <ini>` | Import llm-check results |
@@ -167,3 +180,27 @@ pnpm lint       # Prettier + ESLint
 ```
 
 Contributor and agent conventions are in [AGENTS.md](AGENTS.md); the UI rules are in [docs/DESIGN.md](docs/DESIGN.md) and live in BenchyOS under **Start → Design system**. The top-bar theme switch cycles system → dark → light.
+
+## How BenchyOS works
+
+**1. Describe what you test.** A blueprint is a model with its settings, a bench test is a prompt with the files you expect, automated checks and judge criteria. Both are YAML files in `library/`, editable in BenchyOS.
+
+**2. Start a run.** Pick blueprints, tests and a judge profile. The preflight checks llama-server, the GPU, API keys and the sandbox before anything is generated.
+
+![New run: blueprints, tests and the judge profile](docs/assets/readme/launcher.png)
+
+**3. BenchyOS generates, checks and judges.** It starts llama-server on this host if needed, stores the response and extracted files, renders and tests them, and hands the result to the judge without saying which model made it. Everything lands in `data/runs/` as plain files.
+
+![Attempt viewer: combined score at the top, one judge's verdict per criterion below](docs/assets/readme/attempt-verdict.png)
+
+**4. Add opinions.** Judge the same attempts with more profiles, and rate them yourself. Each profile and you count as one vote.
+
+![Judge profiles: Opus 5.5 at xhigh is the default](docs/assets/readme/judge-profiles.png)
+
+**5. Compare.** The leaderboard ranks by the combined score. Expand an entry for every judge's score. A yellow ▲ marks entries with fewer judge runs than the best-covered one.
+
+![Leaderboard with judge subrows and the under-judged warning](docs/assets/readme/leaderboard.png)
+
+**6. Keep it.** Commit `data/runs/` — the repository is the knowledge base. `benchy export` turns it into a read-only site to share.
+
+![The BenchyOS desktop](docs/assets/readme/desktop.png)

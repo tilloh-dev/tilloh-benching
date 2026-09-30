@@ -17,7 +17,9 @@
 		"reasoning_tokens": 35869,
 		"cost_usd": 0.896365,
 		"num_turns": 7,
-		"finish_reason": "completed"
+		"finish_reason": "completed",
+		"gen_tps": 138.3,
+		"tps_source": "computed"
 	},
 	"artifacts": [
 		{
@@ -77,7 +79,20 @@
 		"score": 86.7,
 		"gate_failed": false,
 		"judged_at": "2026-09-30T13:15:49.116Z",
-		"judge": "claude-opus-5-5@xhigh·static"
+		"judge": "claude-opus-5-5@xhigh·static",
+		"profile_id": "opus-xhigh",
+		"profile_label": "Opus 5.5 · xhigh"
 	},
-	"finished_at": "2026-09-30T13:17:51.004Z"
+	"finished_at": "2026-09-30T13:17:51.004Z",
+	"judgements": {
+		"opus-xhigh": {
+			"fingerprint": "0ba5cf085d",
+			"score": 86.7,
+			"gate_failed": false,
+			"judged_at": "2026-09-30T13:15:49.116Z",
+			"judge": "claude-opus-5-5@xhigh·static",
+			"profile_id": "opus-xhigh",
+			"profile_label": "Opus 5.5 · xhigh"
+		}
+	}
 }
